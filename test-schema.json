@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TriageExamPackage",
+  "description": "Standardized schema specification for Triage medical computer-based testing (CBT) question datasets and packages.",
+  "type": "object",
+  "required": ["examType", "sections"],
+  "properties": {
+    "examType": {
+      "type": "string",
+      "enum": ["neetpg", "inicet"],
+      "description": "Target examination type."
+    },
+    "examTitle": {
+      "type": "string",
+      "description": "Human-readable title of the exam package."
+    },
+    "totalBlocks": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total number of exam sections or blocks."
+    },
+    "defaultBlockDurationMinutes": {
+      "type": "number",
+      "minimum": 1,
+      "description": "Default timer allocation in minutes per block."
+    },
+    "markingScheme": {
+      "type": "object",
+      "required": ["correct", "incorrect", "unattempted"],
+      "properties": {
+        "correct": {
+          "type": "number",
+          "description": "Marks awarded for each correct response (e.g. +4 or +1)."
+        },
+        "incorrect": {
+          "type": "number",
+          "description": "Marks deducted for each incorrect response (e.g. -1 or -0.333)."
+        },
+        "unattempted": {
+          "type": "number",
+          "description": "Marks for unattempted questions (typically 0)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/Section"
+      },
+      "description": "Array of examination sections/blocks."
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "Section": {
+      "type": "object",
+      "required": ["id", "name", "questions"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this section (e.g. 'sec_a', 'block_1')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the section (e.g. 'Section A', 'Block 1')."
+        },
+        "durationMinutes": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Section time limit in minutes."
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/QuestionItem"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "QuestionItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "options",
+        "correctAnswerIndex",
+        "subject",
+        "system",
+        "format",
+        "difficulty",
+        "explanation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the question (e.g. 'neet_q_1', 'ini_q_42')."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 5,
+          "description": "Question stem, prompt, or clinical vignette."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Exactly 4 multiple-choice options corresponding to A, B, C, D."
+        },
+        "correctAnswerIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Zero-based index of the correct answer (0=A, 1=B, 2=C, 3=D)."
+        },
+        "subject": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Anatomy",
+              "Anesthesiology",
+              "Biochemistry",
+              "Community Medicine",
+              "Dermatology",
+              "ENT",
+              "Forensic Medicine",
+              "Medicine",
+              "Microbiology",
+              "Obstetrics & Gynecology",
+              "Ophthalmology",
+              "Orthopedics",
+              "Pathology",
+              "Pediatrics",
+              "Pharmacology",
+              "Physiology",
+              "Psychiatry",
+              "Radiology",
+              "Surgery"
+            ]
+          },
+          "description": "One or more standard MBBS subjects relevant to the question."
+        },
+        "system": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "Cardiovascular System",
+              "Central Nervous System",
+              "Endocrine System",
+              "Gastrointestinal System",
+              "General",
+              "Head & Neck",
+              "Hematology & Oncology",
+              "Hepatobiliary System",
+              "Immune System",
+              "Integumentary System",
+              "Lower Limb",
+              "Musculoskeletal System",
+              "Renal & Urinary System",
+              "Reproductive System",
+              "Respiratory System",
+              "Upper Limb"
+            ]
+          },
+          "description": "One or more clinical organ systems."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["Clinical Vignette", "One-Liner", "Conceptual"],
+          "description": "Clinical item format / style."
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["Easy", "Medium", "Hard"],
+          "description": "Question difficulty level."
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Comprehensive pedagogical rationale explaining key and distractors."
+        },
+        "reference": {
+          "type": "string",
+          "description": "Optional textbook, journal, or guideline reference citation."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Optional specific clinical topic or keyword tag."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional image or clinical diagram URL / data URI."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

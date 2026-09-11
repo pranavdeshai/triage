@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>triage — CBT Mock Test Practice</title>
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="triage" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Global Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <svg class="brand-logo-icon" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <rect x="6" y="1" width="4" height="14" />
+          <rect x="1" y="6" width="14" height="4" />
+        </svg>
+        <span class="brand-title">triage</span>
+        <span class="brand-badge" id="header-exam-badge">cbt</span>
+      </div>
+      <div class="header-right">
+        <button
+          type="button"
+          class="btn btn-outline btn-theme"
+          id="theme-toggle-btn"
+          aria-label="Toggle dark and light theme"
+        >
+          <span id="theme-label">LIGHT</span>
+        </button>
+        <div id="dynamic-nav-actions"></div>
+      </div>
+    </header>
+
+    <!-- Main Views -->
+    <main id="app-root">
+      <!-- 1. HOME / SETUP VIEW -->
+      <section id="view-home" class="view-panel active">
+        <div class="home-container">
+          <!-- Session Mode Switcher (Full Simulation vs Targeted Practice) -->
+          <div class="session-mode-bar-wrapper">
+            <div class="session-mode-toggle-bar">
+              <button
+                type="button"
+                class="btn btn-session-mode active"
+                id="btn-mode-practice"
+                data-session-mode="practice"
+              >
+                Targeted Practice Mode
+              </button>
+              <button
+                type="button"
+                class="btn btn-session-mode"
+                id="btn-mode-simulation"
+                data-session-mode="simulation"
+              >
+                Full Simulation Mode
+              </button>
+            </div>
+          </div>
+
+          <!-- Compact Header Row (Title + Target Exam Toggle) -->
+          <div class="home-header-row">
+            <div class="home-header-text">
+              <h1 class="panel-title">Test Setup</h1>
+              <div class="exam-format-details" id="exam-format-details">
+                NEET-PG Practice Drill • Custom Question Count • Standard Pace (63s/Q) • Single Timer
+              </div>
+            </div>
+            <!-- Target Test (Level 1: Action + Status) -->
+            <div class="exam-toggle-bar">
+              <button
+                type="button"
+                class="btn btn-exam-mode active"
+                id="mode-btn-neet"
+                data-mode="neetpg"
+              >
+                NEET-PG
+              </button>
+              <button
+                type="button"
+                class="btn btn-exam-mode"
+                id="mode-btn-ini"
+                data-mode="inicet"
+              >
+                INI-CET
+              </button>
+            </div>
+          </div>
+
+          <!-- Test Name / Rename Row -->
+          <div class="test-name-field-row">
+            <div class="test-name-input-wrap">
+              <label for="input-test-name" class="test-name-label">Test Name:</label>
+              <input
+                type="text"
+                id="input-test-name"
+                class="form-input test-name-input"
+                placeholder="NEET-PG Mock Test"
+                maxlength="100"
+                autocomplete="off"
+              />
+              <button
+                type="button"
+                class="btn btn-outline btn-xs"
+                id="btn-reset-test-name"
+                title="Reset to default test name"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Setup Mode Switcher (Level 1: Action + Status) -->
+          <div class="setup-mode-toggle-group">
+            <div class="setup-toggle-bar">
+              <button
+                type="button"
+                class="btn btn-setup-mode active"
+                id="tab-setup-ai"
+                data-target="setup-ai-panel"
+              >
+                AI Test Generator
+              </button>
+              <button
+                type="button"
+                class="btn btn-setup-mode"
+                id="tab-setup-sample"
+                data-target="setup-sample-panel"
+              >
+                Instant Sample Test
+              </button>
+              <button
+                type="button"
+                class="btn btn-setup-mode"
+                id="tab-setup-manual"
+                data-target="setup-manual-panel"
+              >
+                Upload / Paste JSON
+              </button>
+            </div>
+          </div>
+
+          <!-- AI Generator Panel (Streamlined Single-Card Layout) -->
+          <div id="setup-ai-panel" class="setup-subpanel active">
+            <div class="setup-compact-card">
+              <!-- Row 1: Syllabus & Topic Scope -->
+              <div class="setup-row">
+                <span class="setup-row-label">Syllabus & Topic Scope</span>
+                <div class="scope-select-wrap">
+                  <select id="select-ai-scope" class="form-select">
+                    <option value="grand" selected>Grand Test (Full Syllabus)</option>
+                    <option value="custom">Custom Scope (Multiple Subjects, Systems & Topics)...</option>
+                  </select>
+
+                  <!-- Custom Scope Drawer (Expanded when Custom Scope is selected) -->
+                  <div id="ai-custom-scope-drawer" class="custom-scope-drawer hidden">
+                    <!-- Subjects Section -->
+                    <div class="scope-subset-group">
+                      <div class="scope-subset-header">
+                        <span class="selector-label">MBBS Subjects (<span id="count-selected-subjects">0</span>/19 selected)</span>
+                        <div class="scope-subset-actions">
+                          <button type="button" class="btn-link btn-xs" id="btn-select-all-subjects">Select All</button>
+                          <span class="sep">•</span>
+                          <button type="button" class="btn-link btn-xs" id="btn-clear-all-subjects">Clear</button>
+                        </div>
+                      </div>
+                      <div class="ai-chips-grid" id="ai-subjects-chips-grid"></div>
+                    </div>
+
+                    <!-- Systems Section -->
+                    <div class="scope-subset-group" style="margin-top: 0.75rem;">
+                      <div class="scope-subset-header">
+                        <span class="selector-label">Organ Systems (<span id="count-selected-systems">0</span>/16 selected)</span>
+                        <div class="scope-subset-actions">
+                          <button type="button" class="btn-link btn-xs" id="btn-select-all-systems">Select All</button>
+                          <span class="sep">•</span>
+                          <button type="button" class="btn-link btn-xs" id="btn-clear-all-systems">Clear</button>
+                        </div>
+                      </div>
+                      <div class="ai-chips-grid" id="ai-systems-chips-grid"></div>
+                    </div>
+
+                    <!-- Topics / Keywords Input -->
+                    <div class="scope-subset-group" style="margin-top: 0.75rem;">
+                      <label for="input-ai-custom-topic" class="selector-label">Specific Clinical Topics / Keywords (Optional)</label>
+                      <input
+                        type="text"
+                        id="input-ai-custom-topic"
+                        class="form-input"
+                        placeholder="e.g., Acute Coronary Syndrome, Glomerulonephritis, Anti-arrhythmics"
+                        style="margin-top: 0.35rem;"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 2: Question Sizing & Partitioning -->
+              <div class="setup-row" id="setup-row-sizing">
+                <span class="setup-row-label">Question Sizing & Partitioning</span>
+                
+                <!-- Practice Mode Sizing Row -->
+                <div class="ai-sizing-row" id="ai-sizing-row-practice">
+                  <div class="ai-preset-chips" id="ai-count-presets">
+                    <button type="button" class="btn btn-count-preset active" data-count="10">10 Qs</button>
+                    <button type="button" class="btn btn-count-preset" data-count="25">25 Qs</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-unit" data-count="36">36 Qs (Section)</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-mock" data-count="180">180 Qs (Full Test)</button>
+                  </div>
+
+                  <!-- Distinct Custom Question Sizing Element -->
+                  <div class="ai-custom-sizing-element" id="ai-custom-sizing-element">
+                    <label for="input-ai-custom-count" class="ai-custom-label">Custom:</label>
+                    <input
+                      type="number"
+                      id="input-ai-custom-count"
+                      class="ai-custom-number-input"
+                      min="5"
+                      max="200"
+                      value="10"
+                      aria-label="Custom Question Count"
+                    />
+                    <span class="ai-custom-suffix">Qs</span>
+                  </div>
+                </div>
+
+                <!-- Simulation Mode Sizing Notice (Shown only in Full Simulation) -->
+                <div class="simulation-sizing-notice hidden" id="simulation-sizing-notice">
+                  <span class="simulation-lock-badge" id="simulation-lock-badge">LOCKED: 180 Questions (Official NEET-PG Specification • 5 Sections × 36 Qs)</span>
+                </div>
+
+                <!-- Dynamic Time Budget & Pace Feedback -->
+                <div class="ai-sizing-breakdown" id="ai-sizing-breakdown">
+                  NEET-PG Pace: 63s/Q • Time Budget: 10 min 30s • Single Timer Drill
+                </div>
+              </div>
+
+              <!-- Row 3: Clinical Configuration -->
+              <div class="setup-row">
+                <span class="setup-row-label">Clinical Configuration</span>
+                <div class="ai-grid-2col">
+                  <div class="ai-col">
+                    <label for="select-ai-difficulty" class="selector-label">Difficulty Level</label>
+                    <select id="select-ai-difficulty" class="form-select">
+                      <option value="balanced" selected>Balanced</option>
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                  <div class="ai-col">
+                    <label for="select-ai-style" class="selector-label">Question Formats</label>
+                    <select id="select-ai-style" class="form-select">
+                      <option value="mixed" selected>Mixed</option>
+                      <option value="oneliner">One-liners</option>
+                      <option value="conceptual">Conceptual</option>
+                      <option value="vignette">Clinical Case Scenarios</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 4: Gemini AI Engine & API Key -->
+              <div class="setup-row">
+                <span class="setup-row-label">Gemini AI Engine & API Key</span>
+                <!-- Compact Key Strip -->
+                <div class="key-compact-strip" id="key-compact-strip">
+                  <div class="key-status-display" id="key-status-display">
+                    <span class="ai-key-status-pill configured" id="ai-key-status-pill">CONFIGURED</span>
+                    <span class="key-mask-text" id="key-mask-text">API Key: AIzaSy••••••••</span>
+                    <span class="key-engine-badge">Engine: Gemini 3.5 Flash (0.15 Temp)</span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-change-api-key">Change</button>
+                  </div>
+                  <!-- Hidden/Expandable Key Editor -->
+                  <div class="key-editor-row hidden" id="key-editor-row">
+                    <input
+                      type="password"
+                      id="input-gemini-api-key"
+                      class="form-input ai-api-input"
+                      placeholder="Paste Gemini API key (AIzaSy...)"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-key-mask">Show</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-save-api-key">Save Key</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="btn-clear-api-key">Clear</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-key-edit">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generation Progress Box -->
+              <div id="ai-generation-progress" class="ai-progress-card hidden">
+                <div class="ai-progress-header">
+                  <span class="ai-progress-status" id="ai-progress-status">Initializing test generation...</span>
+                  <span class="ai-progress-percentage" id="ai-progress-percentage">0%</span>
+                </div>
+                <div class="ai-progress-track">
+                  <div class="ai-progress-fill" id="ai-progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="ai-progress-footer">
+                  <span class="ai-progress-batch" id="ai-progress-batch">Batch 1 of 1</span>
+                  <button type="button" class="btn btn-danger" id="btn-cancel-ai-generation">Cancel Generation</button>
+                </div>
+              </div>
+
+              <!-- Primary Action Buttons (Level 2: Pure Action) -->
+              <div class="home-actions ai-actions-bar" style="margin-top: 1.25rem;">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="btn-ai-copy-prompt"
+                >
+                  Copy AI Prompt
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-start"
+                  id="btn-ai-generate"
+                >
+                  Generate Test with Gemini
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Sample Test Panel -->
+          <div id="setup-sample-panel" class="setup-subpanel hidden">
+            <div class="setup-compact-card">
+              <div class="sample-direct-content">
+                <h3 class="sample-title" id="sample-panel-title">NEET-PG Practice Mock Test</h3>
+                <p class="sample-desc" id="sample-panel-desc">
+                  Load a verified, curriculum-mapped sample dataset covering high-yield MBBS clinical vignettes and start a full CBT testing session immediately.
+                </p>
+                <div class="sample-stats-row">
+                  <span class="sample-stat-tag" id="sample-tag-sections">1 Section</span>
+                  <span class="summary-sep">•</span>
+                  <span class="sample-stat-tag" id="sample-tag-questions">10 Questions</span>
+                  <span class="summary-sep">•</span>
+                  <span class="sample-stat-tag" id="sample-tag-marking">+4 / -1 Marking</span>
+                </div>
+              </div>
+              <div class="home-actions" style="margin-top: 1.25rem;">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-start"
+                  id="btn-start-sample-direct"
+                >
+                  Start Practice Test
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Manual Upload / Paste Panel -->
+          <div id="setup-manual-panel" class="setup-subpanel hidden">
+            <!-- Upload Drop Zone -->
+            <div class="upload-dropzone" id="drop-zone">
+              <input
+                type="file"
+                id="json-file-input"
+                accept=".json"
+                class="file-input-hidden"
+              />
+              <div class="dropzone-text">
+                Drop AI-generated JSON here or
+                <button type="button" class="btn-link" id="browse-btn">
+                  browse file
+                </button>
+              </div>
+              <div id="file-name-display" class="file-name-tag"></div>
+            </div>
+
+            <div class="divider-line"><span>OR PASTE JSON CONFIGURATION</span></div>
+
+            <!-- Paste Area -->
+            <div class="paste-container">
+              <textarea
+                id="json-text-input"
+                placeholder="Paste questions JSON here..."
+                rows="6"
+                spellcheck="false"
+              ></textarea>
+            </div>
+
+            <!-- Validation Alert Box -->
+            <div id="validation-alert" class="alert-box alert-warning hidden">
+              <span class="alert-symbol">!</span>
+              <span id="validation-msg">Invalid format: Check JSON structure.</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="home-actions">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="load-sample-btn"
+              >
+                Load NEET-PG Sample
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-start"
+                id="start-exam-btn"
+                disabled
+              >
+                Start CBT Session
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. EXAM / CBT VIEW -->
+      <section id="view-exam" class="view-panel hidden">
+        <!-- Section Navigation Bar -->
+        <nav class="sections-navbar">
+          <div class="sections-tabs-track" id="sections-bar"></div>
+          <button
+            type="button"
+            class="btn btn-secondary palette-toggle-btn"
+            id="btn-palette-nav-toggle"
+            aria-label="Toggle Question Palette"
+            title="Question Palette &amp; Timer"
+          >
+            <span class="timer-digits">00:00:00</span>
+          </button>
+        </nav>
+
+        <!-- Exam Workspace -->
+        <div class="exam-workspace">
+          <!-- Question Column -->
+          <div class="question-column">
+            <div class="question-header">
+              <span class="question-counter" id="exam-q-number">Question No. 1</span>
+              <button
+                type="button"
+                class="btn-bookmark"
+                id="btn-bookmark-toggle"
+                title="Toggle Bookmark (B)"
+                aria-label="Bookmark Question"
+              >
+                <span id="bookmark-status-text">Bookmark</span>
+              </button>
+            </div>
+
+            <div class="question-body">
+              <div class="question-text" id="exam-q-text">Loading question text...</div>
+              <div class="options-container" id="exam-options-list"></div>
+            </div>
+
+            <!-- Question Footer Actions -->
+            <footer class="question-footer">
+              <div class="footer-left">
+                <button type="button" class="btn btn-secondary" id="btn-clear-response">
+                  Clear Response
+                </button>
+              </div>
+              <div class="footer-right">
+                <button type="button" class="btn btn-secondary" id="btn-prev-q">
+                  Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-save-next">
+                  Save &amp; Next
+                </button>
+              </div>
+            </footer>
+          </div>
+
+          <!-- Progress Sidebar / Palette -->
+          <aside class="progress-column" id="exam-progress-sidebar">
+            <div class="sidebar-header">
+              <span class="sidebar-title">Question Palette</span>
+              <button
+                type="button"
+                class="btn btn-outline sidebar-close-btn"
+                id="btn-sidebar-close"
+                aria-label="Close Palette"
+              >
+                ✕
+              </button>
+            </div>
+
+            <!-- Section Timer -->
+            <div class="section-timer-box">
+              <span class="timer-label" id="timer-sec-label">Section A</span>
+              <span class="timer-clock" id="section-clock-display">00:42:00</span>
+            </div>
+
+            <!-- Status Legend -->
+            <div class="palette-legend">
+              <div class="legend-row">
+                <span class="legend-box status-answered" id="count-answered">0</span>
+                <span class="legend-text">Answered</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-box status-low-confidence" id="count-low-confidence">0</span>
+                <span class="legend-text">Low Confidence</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-box status-not-answered" id="count-not-answered">0</span>
+                <span class="legend-text">Not Answered</span>
+              </div>
+              <div class="legend-row">
+                <span class="legend-box status-not-visited" id="count-not-visited">0</span>
+                <span class="legend-text">Not Visited</span>
+              </div>
+            </div>
+
+            <!-- Question Grid Palette -->
+            <div class="palette-grid-wrapper">
+              <div class="palette-grid" id="exam-palette-grid"></div>
+            </div>
+
+            <!-- Submit Action -->
+            <div class="palette-footer">
+              <button type="button" class="btn btn-primary btn-submit-action" id="btn-submit-section">
+                Submit Section
+              </button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- 3. REVIEW / ANALYTICS VIEW -->
+      <section id="view-review" class="view-panel hidden">
+        <!-- Past Attempt Viewing Notification Banner -->
+        <div id="past-attempt-banner" class="past-attempt-banner hidden">
+          <div class="banner-left">
+            <span class="banner-indicator">ARCHIVE</span>
+            <span id="past-attempt-label" class="banner-title">Viewing Past Attempt: NEET-PG</span>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-return-latest">
+            Return to Latest Test
+          </button>
+        </div>
+
+        <!-- Top KPI Dashboard -->
+        <div class="kpi-dashboard-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Total Score</span>
+            <span class="kpi-value" id="kpi-total-score">0</span>
+            <span class="kpi-sub" id="kpi-max-score">Max: 80</span>
+          </div>
+          <div class="kpi-card kpi-status-correct">
+            <span class="kpi-label">Correct</span>
+            <span class="kpi-value" id="kpi-correct-count">0</span>
+            <span class="kpi-sub" id="kpi-correct-score">+0 Marks</span>
+          </div>
+          <div class="kpi-card kpi-status-incorrect">
+            <span class="kpi-label">Incorrect</span>
+            <span class="kpi-value" id="kpi-incorrect-count">0</span>
+            <span class="kpi-sub" id="kpi-incorrect-score">-0 Marks</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Unattempted</span>
+            <span class="kpi-value" id="kpi-unattempted-count">0</span>
+            <span class="kpi-sub" id="kpi-unattempted-rate">0% of Test</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Accuracy</span>
+            <span class="kpi-value" id="kpi-accuracy-pct">0%</span>
+            <span class="kpi-sub" id="kpi-attempt-rate">Attempt Rate: 0%</span>
+          </div>
+        </div>
+
+        <!-- 3-Column Analytics Workspace -->
+        <div class="analytics-workspace">
+          <!-- Col 1: Tab Navigation -->
+          <aside class="analytics-nav-col">
+            <nav class="analytics-tabs-list" id="analytics-master-tabs-nav">
+              <button
+                type="button"
+                class="tab-btn active"
+                data-master-tab="tab-question-review"
+              >
+                Question Review
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-master-tab="tab-analytics-master"
+              >
+                Analytics
+              </button>
+              <button
+                type="button"
+                class="tab-btn"
+                data-master-tab="tab-history"
+              >
+                History
+              </button>
+            </nav>
+          </aside>
+
+          <!-- Col 2: Active Tab Content Area -->
+          <main class="analytics-content-col">
+            <!-- TAB 1: QUESTION REVIEW (FIRST) -->
+            <div id="tab-question-review" class="analytics-subtab active">
+              <div class="review-question-card">
+                <div class="review-card-header">
+                  <div class="review-q-title">
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm"
+                      id="btn-review-prev-q"
+                      title="Previous Question"
+                    >
+                      Prev
+                    </button>
+                    <span id="review-q-num" class="bold-text">Question No. 1</span>
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm"
+                      id="btn-review-next-q"
+                      title="Next Question"
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div class="review-status-indicators">
+                    <span id="review-q-status-badge" class="badge">Unattempted</span>
+                    <span id="review-bookmark-indicator" class="badge badge-marked hidden">Bookmarked</span>
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm"
+                      id="btn-copy-question"
+                      title="Copy Question Details"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div class="review-q-text" id="review-q-text"></div>
+                <div class="review-options-list" id="review-options-list"></div>
+
+                <div class="explanation-box">
+                  <div class="explanation-title">Explanation</div>
+                  <div id="review-explanation-text" class="explanation-content"></div>
+                </div>
+
+                <div class="tag-pills-container" id="review-tag-pills"></div>
+              </div>
+            </div>
+
+            <!-- MASTER TAB 2: ANALYTICS -->
+            <div id="tab-analytics-master" class="analytics-master-view hidden">
+              <!-- Analytics Sub-Navbar Items -->
+              <div class="analytics-subnav-container">
+                <nav class="analytics-subnav-track" id="analytics-subnav-bar">
+                  <button type="button" class="subnav-item active" data-subtab="tab-triage-matrix">Triage Matrix</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-section-analysis">Section Analysis</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-subject-analysis">Subject Analysis</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-system-analysis">System Analysis</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-difficulty-analysis">Difficulty Breakdown</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-format-analysis">Question Formats</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-time-analysis">Time &amp; Pacing</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-behavior-analysis">Option Switches</button>
+                </nav>
+              </div>
+
+              <!-- TAB: TRIAGE MATRIX -->
+              <div id="tab-triage-matrix" class="analytics-subtab">
+                <div class="tab-header-banner">
+                  <h2>Triage Matrix</h2>
+                  <p class="text-muted">
+                    Cross-referencing outcome accuracy with reported confidence into 4 actionable quadrants.
+                  </p>
+                </div>
+
+                <!-- 2x2 Triage Matrix Grid -->
+                <div class="triage-matrix-grid">
+                  <!-- Quadrant 1: Mastered -->
+                  <div class="matrix-card matrix-mastered" data-quadrant="mastered">
+                    <div class="matrix-card-header">
+                      <span class="matrix-title">Mastered</span>
+                      <span class="matrix-tag">Correct &amp; Sure</span>
+                    </div>
+                    <div class="matrix-stats">
+                      <span class="matrix-count" id="count-mastered">0</span>
+                      <span class="matrix-pct" id="pct-mastered">(0%)</span>
+                    </div>
+                    <p class="matrix-desc">
+                      Firm conceptual mastery. Knowledge requiring minimal review; maintain retention via spaced flashcards.
+                    </p>
+                    <button type="button" class="btn btn-outline btn-sm matrix-filter-btn">
+                      Review Questions
+                    </button>
+                  </div>
+
+                  <!-- Quadrant 2: Silly Mistake -->
+                  <div class="matrix-card matrix-silly" data-quadrant="silly_mistake">
+                    <div class="matrix-card-header">
+                      <span class="matrix-title">Silly Mistake</span>
+                      <span class="matrix-tag">Wrong &amp; Sure</span>
+                    </div>
+                    <div class="matrix-stats">
+                      <span class="matrix-count" id="count-silly">0</span>
+                      <span class="matrix-pct" id="pct-silly">(0%)</span>
+                    </div>
+                    <p class="matrix-desc">
+                      High-confidence errors: stem misreads, distractor traps, or faulty assumptions. Priority for pacing calibration.
+                    </p>
+                    <button type="button" class="btn btn-outline btn-sm matrix-filter-btn">
+                      Review Questions
+                    </button>
+                  </div>
+
+                  <!-- Quadrant 3: Lucky Guesses -->
+                  <div class="matrix-card matrix-lucky" data-quadrant="lucky_guesses">
+                    <div class="matrix-card-header">
+                      <span class="matrix-title">Lucky Guesses</span>
+                      <span class="matrix-tag">Correct &amp; Not Sure</span>
+                    </div>
+                    <div class="matrix-stats">
+                      <span class="matrix-count" id="count-lucky">0</span>
+                      <span class="matrix-pct" id="pct-lucky">(0%)</span>
+                    </div>
+                    <p class="matrix-desc">
+                      Correct answers driven by elimination or intuition without firm grasp. Review rationales to convert to true mastery.
+                    </p>
+                    <button type="button" class="btn btn-outline btn-sm matrix-filter-btn">
+                      Review Questions
+                    </button>
+                  </div>
+
+                  <!-- Quadrant 4: Knowledge Gaps -->
+                  <div class="matrix-card matrix-gaps" data-quadrant="knowledge_gaps">
+                    <div class="matrix-card-header">
+                      <span class="matrix-title">Knowledge Gaps</span>
+                      <span class="matrix-tag">Wrong &amp; Not Sure</span>
+                    </div>
+                    <div class="matrix-stats">
+                      <span class="matrix-count" id="count-gaps">0</span>
+                      <span class="matrix-pct" id="pct-gaps">(0%)</span>
+                    </div>
+                    <p class="matrix-desc">
+                      Syllabus blindspots and unmastered concepts. Fundamental subject areas requiring structured re-reading.
+                    </p>
+                    <button type="button" class="btn btn-outline btn-sm matrix-filter-btn">
+                      Review Questions
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Matrix Subject Breakdown Table -->
+                <div class="matrix-table-section">
+                  <h3>Subject Distribution</h3>
+                  <div class="table-responsive">
+                    <table class="analytics-data-table" id="matrix-subject-table">
+                      <thead>
+                        <tr>
+                          <th>Subject</th>
+                          <th>Mastered</th>
+                          <th>Silly Mistakes</th>
+                          <th>Lucky Guesses</th>
+                          <th>Knowledge Gaps</th>
+                          <th>Total</th>
+                          <th style="text-align: center; width: 60px;">Ratio</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: GENERIC ANALYTICS BREAKDOWN -->
+              <div id="tab-analytics-generic" class="analytics-subtab hidden">
+                <div class="tab-header-banner">
+                  <h2 id="generic-tab-title">Category Breakdown</h2>
+                  <p id="generic-tab-desc" class="text-muted">
+                    Click any row to filter questions.
+                  </p>
+                </div>
+                <div class="table-responsive">
+                  <table class="analytics-data-table" id="analytics-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- MASTER TAB 3: TEST HISTORY -->
+            <div id="tab-history" class="analytics-master-view hidden">
+              <div class="tab-header-banner">
+                <div class="history-banner-left">
+                  <h2>Test History</h2>
+                  <p class="text-muted">
+                    Session mock test comparison, score trends, and portable archive.
+                  </p>
+                </div>
+                <div class="history-banner-actions">
+                  <input
+                    type="file"
+                    id="history-file-input"
+                    accept=".json"
+                    class="file-input-hidden"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    id="btn-import-history"
+                  >
+                    Import History JSON
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    id="btn-export-history"
+                  >
+                    Export History JSON
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    id="btn-clear-history"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+
+              <!-- History Aggregate Summary Strip (4 Cards) -->
+              <div class="history-aggregate-grid" id="history-aggregate-grid">
+                <div class="history-aggregate-card">
+                  <span class="aggregate-label">Total Tests Taken</span>
+                  <span class="aggregate-value" id="hist-agg-tests">0</span>
+                  <span class="aggregate-sub" id="hist-agg-breakdown">0 NEET-PG • 0 INI-CET</span>
+                </div>
+                <div class="history-aggregate-card">
+                  <span class="aggregate-label">Average Score &amp; Accuracy</span>
+                  <span class="aggregate-value" id="hist-agg-score-acc">--</span>
+                  <span class="aggregate-sub" id="hist-agg-avg-sub">NEET-PG: -- • INI-CET: --</span>
+                </div>
+                <div class="history-aggregate-card">
+                  <span class="aggregate-label">Average Correct Answers</span>
+                  <span class="aggregate-value text-pastel-green" id="hist-agg-correct">0</span>
+                  <span class="aggregate-sub" id="hist-agg-correct-sub">0 Total Correct</span>
+                </div>
+                <div class="history-aggregate-card">
+                  <span class="aggregate-label">Average Incorrect Answers</span>
+                  <span class="aggregate-value text-pastel-red" id="hist-agg-incorrect">0</span>
+                  <span class="aggregate-sub" id="hist-agg-incorrect-sub">0 Total Incorrect</span>
+                </div>
+              </div>
+
+              <div class="table-responsive mt-3">
+                <table class="analytics-data-table" id="history-comparison-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 45px;">#</th>
+                      <th style="width: 155px;">
+                        <button type="button" class="history-sort-header-btn" id="btn-sort-history-date" title="Sort by Date &amp; Time (Latest / Oldest)">
+                          <span>Date &amp; Time</span>
+                          <span class="history-sort-arrow" id="history-sort-arrow" aria-hidden="true">&#9660;</span>
+                        </button>
+                      </th>
+                      <th style="width: 135px;">
+                        <select id="history-filter-exam" class="history-header-filter-select" aria-label="Filter by Test Type">
+                          <option value="all">Type: All</option>
+                          <option value="neetpg">NEET-PG</option>
+                          <option value="inicet">INI-CET</option>
+                        </select>
+                      </th>
+                      <th>Test Title</th>
+                      <th style="width: 95px;">Score</th>
+                      <th style="width: 80px;">Accuracy</th>
+                      <th style="text-align: center; width: 140px;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </main>
+
+          <!-- Col 3: Review Filter & Mini-Palette -->
+          <aside class="analytics-filter-col">
+            <div class="filter-panel-header">
+              <h3>Filter Questions</h3>
+              <button
+                type="button"
+                class="btn btn-outline btn-sm"
+                id="btn-reset-filters"
+                disabled
+              >
+                Reset
+              </button>
+            </div>
+
+            <div class="filter-controls-group">
+              <div class="form-group">
+                <label for="filter-matrix">Triage Matrix</label>
+                <select id="filter-matrix" class="form-select">
+                  <option value="all">All Quadrants</option>
+                  <option value="mastered">Mastered (Correct &amp; Sure)</option>
+                  <option value="silly_mistake">Silly Mistake (Wrong &amp; Sure)</option>
+                  <option value="lucky_guesses">Lucky Guesses (Correct &amp; Not Sure)</option>
+                  <option value="knowledge_gaps">Knowledge Gaps (Wrong &amp; Not Sure)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-result">Result Status</label>
+                <select id="filter-result" class="form-select">
+                  <option value="all">All Results</option>
+                  <option value="correct">Correct</option>
+                  <option value="incorrect">Incorrect</option>
+                  <option value="unattempted">Unattempted</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-confidence">Confidence</label>
+                <select id="filter-confidence" class="form-select">
+                  <option value="all">All</option>
+                  <option value="sure">Confident</option>
+                  <option value="not_sure">Low Confidence</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-bookmark">Bookmark</label>
+                <select id="filter-bookmark" class="form-select">
+                  <option value="all">All</option>
+                  <option value="bookmarked">Bookmarked Only</option>
+                  <option value="unbookmarked">Unbookmarked Only</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-section">Section / Block</label>
+                <select id="filter-section" class="form-select">
+                  <option value="all">All Sections</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-subject">Subject</label>
+                <select id="filter-subject" class="form-select">
+                  <option value="all">All Subjects</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-system">System</label>
+                <select id="filter-system" class="form-select">
+                  <option value="all">All Systems</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-difficulty">Difficulty</label>
+                <select id="filter-difficulty" class="form-select">
+                  <option value="all">All Difficulties</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="filter-format">Format</label>
+                <select id="filter-format" class="form-select">
+                  <option value="all">All Formats</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Filtered Mini-Palette -->
+            <div class="mini-palette-container">
+              <div class="mini-palette-header">
+                Filtered Questions (<span id="filtered-count-display">0</span>)
+              </div>
+              <div class="mini-palette-grid" id="review-mini-palette"></div>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline btn-block mt-3"
+              id="btn-copy-all-filtered"
+            >
+              Copy Filtered Questions
+            </button>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <!-- Confirmation Modal Dialog -->
+    <div id="modal-container" class="modal-backdrop hidden">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3 id="modal-title">Confirmation</h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+          Are you sure you want to proceed?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="modal-btn-cancel">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="modal-btn-confirm">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Ready Modal -->
+    <div id="modal-test-ready" class="modal-backdrop hidden">
+      <div class="modal-dialog modal-dialog-wide">
+        <div class="modal-header">
+          <h3 id="modal-test-ready-header-title">Test Generated Successfully</h3>
+        </div>
+        <div class="modal-body">
+          <p id="test-ready-title" class="test-ready-title">NEET-PG CBT Mock Test</p>
+          <div class="test-ready-stats-grid">
+            <div class="ready-stat-box">
+              <span class="ready-stat-val" id="ready-stat-questions">50</span>
+              <span class="ready-stat-lbl">Questions</span>
+            </div>
+            <div class="ready-stat-box">
+              <span class="ready-stat-val" id="ready-stat-sections">2</span>
+              <span class="ready-stat-lbl">Sections</span>
+            </div>
+            <div class="ready-stat-box">
+              <span class="ready-stat-val" id="ready-stat-duration">52 min</span>
+              <span class="ready-stat-lbl">Total Time</span>
+            </div>
+            <div class="ready-stat-box">
+              <span class="ready-stat-val" id="ready-stat-scheme">+4 / -1</span>
+              <span class="ready-stat-lbl">Marking Scheme</span>
+            </div>
+          </div>
+          <div class="test-ready-subjects-wrap">
+            <span class="selector-label">Subjects Included:</span>
+            <div class="test-ready-subjects" id="test-ready-subjects"></div>
+          </div>
+        </div>
+        <div class="modal-footer test-ready-footer">
+          <button type="button" class="btn btn-secondary" id="btn-test-ready-inspect">Inspect in JSON Editor</button>
+          <button type="button" class="btn btn-secondary" id="btn-test-ready-download">Download Test JSON</button>
+          <button type="button" class="btn btn-primary btn-start" id="btn-test-ready-start">Start CBT Session Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copy AI Prompt Modal -->
+    <div id="modal-copy-prompt" class="modal-backdrop hidden">
+      <div class="modal-dialog modal-dialog-wide">
+        <div class="modal-header">
+          <h3>Engineered AI Test Prompt</h3>
+        </div>
+        <div class="modal-body">
+          <div class="copy-prompt-meta">
+            <span class="copy-prompt-stat" id="copy-prompt-chars">0 characters</span>
+            <span class="copy-prompt-stat" id="copy-prompt-tokens">~0 tokens</span>
+          </div>
+          <textarea id="copy-prompt-textarea" class="copy-prompt-textarea" readonly rows="12" spellcheck="false"></textarea>
+          <div class="copy-prompt-instructions">
+            <strong>How to use with external LLMs (ChatGPT / Claude / Gemini Web):</strong>
+            <ol class="copy-prompt-steps">
+              <li>Click <strong>Copy Prompt to Clipboard</strong> below.</li>
+              <li>Paste into your LLM of choice. The prompt instructs the model to return strict valid JSON only.</li>
+              <li>Copy the JSON response and paste it into the <strong>Upload / Paste JSON</strong> tab in triage.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-copy-prompt-close">Close</button>
+          <button type="button" class="btn btn-primary" id="btn-copy-prompt-action">Copy Prompt to Clipboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toast-notification" class="toast-notification hidden" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
