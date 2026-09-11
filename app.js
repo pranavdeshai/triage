@@ -200,10 +200,13 @@ function normalizeToArray(val) {
 // ==========================================================================
 const AppState = {
   theme: localStorage.getItem('triage_theme') || 'dark',
-  view: 'home', // 'home' | 'exam' | 'review'
+  view: 'home', // 'home' | 'setup' | 'exam' | 'review'
   sessionMode: 'practice', // 'practice' | 'simulation'
   examMode: 'neetpg', // 'neetpg' | 'inicet'
   examData: null,
+  isSampleTest: false,
+  pendingExamPackage: null,
+  practiceElapsedTime: 0,
   activeSectionIndex: 0,
   activeQuestionIndex: 0,
   timerInterval: null,
@@ -260,17 +263,46 @@ const DOM = {
 
   // Views
   viewHome: document.getElementById('view-home'),
+  viewSetup: document.getElementById('view-setup'),
   viewExam: document.getElementById('view-exam'),
   viewReview: document.getElementById('view-review'),
 
-  // Home Controls & Mode Switcher
+  // Landing / Home Elements
+  btnLandingSample: document.getElementById('btn-landing-sample'),
+  btnLandingSetup: document.getElementById('btn-landing-setup'),
+  btnSetupBackHome: document.getElementById('btn-setup-back-home'),
+
+  // Mode explanation & scope pill
+  modeExplanationPractice: document.getElementById('mode-explanation-practice'),
+  modeExplanationExam: document.getElementById('mode-explanation-exam'),
+  aiScopeSummaryPill: document.getElementById('ai-scope-summary-pill'),
+
+  // Sample Confirmation Modal
+  modalSampleConfirm: document.getElementById('modal-sample-confirm'),
+  btnSampleCancel: document.getElementById('btn-sample-cancel'),
+  btnSampleConfirm: document.getElementById('btn-sample-confirm'),
+
+  // Start Test Dialog Modal
+  modalStartTest: document.getElementById('modal-start-test'),
+  dialogStatMode: document.getElementById('dialog-stat-mode'),
+  dialogStatExam: document.getElementById('dialog-stat-exam'),
+  dialogStatQuestions: document.getElementById('dialog-stat-questions'),
+  dialogStatTime: document.getElementById('dialog-stat-time'),
+  dialogStatSyllabus: document.getElementById('dialog-stat-syllabus'),
+  dialogStatDiffFormat: document.getElementById('dialog-stat-diff-format'),
+  inputDialogTestName: document.getElementById('input-dialog-test-name'),
+  btnDialogResetName: document.getElementById('btn-dialog-reset-name'),
+  btnDialogGotoSetup: document.getElementById('btn-dialog-goto-setup'),
+  btnDialogStartTest: document.getElementById('btn-dialog-start-test'),
+
+  // Home / Setup Controls & Mode Switcher
   btnModePractice: document.getElementById('btn-mode-practice'),
   btnModeSimulation: document.getElementById('btn-mode-simulation'),
   modeBtnNeet: document.getElementById('mode-btn-neet'),
   modeBtnIni: document.getElementById('mode-btn-ini'),
   examFormatDetails: document.getElementById('exam-format-details'),
-  inputTestName: document.getElementById('input-test-name'),
-  btnResetTestName: document.getElementById('btn-reset-test-name'),
+  inputTestName: document.getElementById('input-dialog-test-name') || document.getElementById('input-test-name'),
+  btnResetTestName: document.getElementById('btn-dialog-reset-name') || document.getElementById('btn-reset-test-name'),
   tabSetupAi: document.getElementById('tab-setup-ai'),
   tabSetupSample: document.getElementById('tab-setup-sample'),
   tabSetupManual: document.getElementById('tab-setup-manual'),
@@ -278,7 +310,7 @@ const DOM = {
   setupSamplePanel: document.getElementById('setup-sample-panel'),
   setupManualPanel: document.getElementById('setup-manual-panel'),
 
-  // Quick Sample Mock Test
+  // Quick Sample Mock Test (Backward Compatibility)
   btnStartSampleDirect: document.getElementById('btn-start-sample-direct'),
   samplePanelTitle: document.getElementById('sample-panel-title'),
   samplePanelDesc: document.getElementById('sample-panel-desc'),
@@ -538,11 +570,9 @@ async function initApp() {
 
     if (rawExamEarly) {
       switchView('exam');
-    } else if (hash === '#setup' || hash === '#home') {
-      switchView('home');
-    } else if (hash === '#review') {
-      switchView('review');
-    } else if (savedStateEarly && savedStateEarly.view === 'review') {
+    } else if (hash === '#setup' || (savedStateEarly && savedStateEarly.view === 'setup')) {
+      switchView('setup');
+    } else if (hash === '#review' || (savedStateEarly && savedStateEarly.view === 'review')) {
       switchView('review');
     } else {
       switchView('home');
@@ -610,23 +640,25 @@ function setSessionMode(mode) {
   }
 
   const isSim = mode === 'simulation';
+  if (DOM.modeExplanationPractice) {
+    DOM.modeExplanationPractice.classList.toggle('hidden', isSim);
+  }
+  if (DOM.modeExplanationExam) {
+    DOM.modeExplanationExam.classList.toggle('hidden', !isSim);
+  }
   if (DOM.simulationSizingNotice) {
     DOM.simulationSizingNotice.classList.toggle('hidden', !isSim);
   }
   if (DOM.aiSizingRowPractice) {
-    DOM.aiSizingRowPractice.classList.toggle('hidden', isSim);
+    DOM.aiSizingRowPractice.classList.remove('hidden');
   }
 
-  if (isSim) {
-    AppState.aiQuestionCount = AppState.examMode === 'neetpg' ? 180 : 200;
-  } else {
-    if (DOM.aiCountPresets) {
-      const activePreset = DOM.aiCountPresets.querySelector('.btn-count-preset.active');
-      if (activePreset) {
-        AppState.aiQuestionCount = parseInt(activePreset.dataset.count, 10) || 10;
-      } else if (DOM.inputAiCustomCount) {
-        AppState.aiQuestionCount = parseInt(DOM.inputAiCustomCount.value, 10) || 10;
-      }
+  if (DOM.aiCountPresets) {
+    const activePreset = DOM.aiCountPresets.querySelector('.btn-count-preset.active');
+    if (activePreset) {
+      AppState.aiQuestionCount = parseInt(activePreset.dataset.count, 10) || 10;
+    } else if (DOM.inputAiCustomCount) {
+      AppState.aiQuestionCount = parseInt(DOM.inputAiCustomCount.value, 10) || 10;
     }
   }
 
@@ -642,20 +674,17 @@ function setSessionMode(mode) {
 
 function setExamMode(mode) {
   AppState.examMode = mode;
-  if (AppState.sessionMode === 'simulation') {
-    AppState.aiQuestionCount = mode === 'neetpg' ? 180 : 200;
-  } else {
-    // If the active preset was the unit (36/50) or mock (180/200), update to match the new exam mode
-    if (AppState.aiQuestionCount === 36 && mode === 'inicet') {
-      AppState.aiQuestionCount = 50;
-    } else if (AppState.aiQuestionCount === 50 && mode === 'neetpg') {
-      AppState.aiQuestionCount = 36;
-    } else if (AppState.aiQuestionCount === 180 && mode === 'inicet') {
-      AppState.aiQuestionCount = 200;
-    } else if (AppState.aiQuestionCount === 200 && mode === 'neetpg') {
-      AppState.aiQuestionCount = 180;
-    }
+  // If the active preset was the unit (36/50) or mock (180/200), update to match the new exam mode
+  if (AppState.aiQuestionCount === 36 && mode === 'inicet') {
+    AppState.aiQuestionCount = 50;
+  } else if (AppState.aiQuestionCount === 50 && mode === 'neetpg') {
+    AppState.aiQuestionCount = 36;
+  } else if (AppState.aiQuestionCount === 180 && mode === 'inicet') {
+    AppState.aiQuestionCount = 200;
+  } else if (AppState.aiQuestionCount === 200 && mode === 'neetpg') {
+    AppState.aiQuestionCount = 180;
   }
+
   updateExamModeUI();
   persistAppState();
 }
@@ -664,7 +693,9 @@ function updateExamModeUI() {
   DOM.modeBtnNeet.classList.toggle('active', isNeet);
   DOM.modeBtnIni.classList.toggle('active', !isNeet);
   DOM.headerExamBadge.textContent = isNeet ? 'NEET-PG' : 'INI-CET';
-  DOM.loadSampleBtn.textContent = isNeet ? 'Load NEET-PG Sample' : 'Load INI-CET Sample';
+  if (DOM.loadSampleBtn) {
+    DOM.loadSampleBtn.textContent = isNeet ? 'Load NEET-PG Sample' : 'Load INI-CET Sample';
+  }
 
   if (DOM.inputTestName) {
     const defaultPlaceholder = isNeet ? 'NEET-PG Mock Test' : 'INI-CET Mock Test';
@@ -685,34 +716,34 @@ function updateExamModeUI() {
   }
   if (DOM.simulationLockBadge) {
     DOM.simulationLockBadge.textContent = isNeet
-      ? 'LOCKED: 180 Questions (Official NEET-PG Specification • 5 Sections × 36 Qs)'
-      : 'LOCKED: 200 Questions (Official INI-CET Specification • 4 Blocks × 50 Qs)';
+      ? 'Official NEET-PG Format: 5 Sections × 36 Qs (42 min / section • +4 / -1)'
+      : 'Official INI-CET Format: 4 Blocks × 50 Qs (45 min / block • +1 / -0.333)';
   }
 
   if (AppState.sessionMode === 'simulation') {
     if (isNeet) {
-      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Full Mock:</strong> 180 Qs (Official) • 5 Sections (A–E, 36 Qs each) • 42 min / section (210 min total) • +4 / -1 / 0 marking scheme • Sectional lock`;
+      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Exam Mode:</strong> Customizable Qs • Dynamic Sections (36 Qs standard) • 63s/Q Time Budget • Section Lock on Submit`;
     } else {
-      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Full Mock:</strong> 200 Qs (Official) • 4 Blocks (1–4, 50 Qs each) • 45 min / block (180 min total) • +1 / -0.333 / 0 marking scheme • Sectional lock`;
+      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Exam Mode:</strong> Customizable Qs • Dynamic Blocks (50 Qs standard) • 54s/Q Time Budget • Section Lock on Submit`;
     }
   } else {
     if (isNeet) {
-      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Practice Drill:</strong> Custom Question Count • Standard Pace (63s/Q) • Single Timer • Free Navigation`;
+      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Practice Mode:</strong> No Time Limit (Elapsed Timer) • Customizable Total Qs • Continuous Stream (No Sections)`;
     } else {
-      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Practice Drill:</strong> Custom Question Count • Standard Pace (54s/Q) • Single Timer • Free Navigation`;
+      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Practice Mode:</strong> No Time Limit (Elapsed Timer) • Customizable Total Qs • Continuous Stream (No Sections)`;
     }
+  }
 
-    if (DOM.aiCountPresets) {
-      const presetBtns = DOM.aiCountPresets.querySelectorAll('.btn-count-preset');
-      let matchedPreset = false;
-      presetBtns.forEach(btn => {
-        const isMatch = parseInt(btn.dataset.count, 10) === AppState.aiQuestionCount;
-        btn.classList.toggle('active', isMatch);
-        if (isMatch) matchedPreset = true;
-      });
-      if (DOM.aiCustomSizingElement) {
-        DOM.aiCustomSizingElement.classList.toggle('active', !matchedPreset);
-      }
+  if (DOM.aiCountPresets) {
+    const presetBtns = DOM.aiCountPresets.querySelectorAll('.btn-count-preset');
+    let matchedPreset = false;
+    presetBtns.forEach(btn => {
+      const isMatch = parseInt(btn.dataset.count, 10) === AppState.aiQuestionCount;
+      btn.classList.toggle('active', isMatch);
+      if (isMatch) matchedPreset = true;
+    });
+    if (DOM.aiCustomSizingElement) {
+      DOM.aiCustomSizingElement.classList.toggle('active', !matchedPreset);
     }
   }
 
@@ -780,11 +811,84 @@ function attachEventListeners() {
   DOM.dropZone.addEventListener('dragleave', () => DOM.dropZone.classList.remove('dragover'));
   DOM.dropZone.addEventListener('drop', handleFileDrop);
 
-  DOM.jsonTextInput.addEventListener('input', () => validateJsonContent(DOM.jsonTextInput.value));
-  DOM.loadSampleBtn.addEventListener('click', loadDefaultSample);
-  DOM.startExamBtn.addEventListener('click', startExamSession);
+  if (DOM.jsonTextInput) {
+    DOM.jsonTextInput.addEventListener('input', () => validateJsonContent(DOM.jsonTextInput.value));
+  }
 
-  // Setup Mode Switcher (Level 1: Action + Status)
+  if (DOM.loadSampleBtn) {
+    DOM.loadSampleBtn.addEventListener('click', loadDefaultSample);
+  }
+  if (DOM.startExamBtn) {
+    DOM.startExamBtn.addEventListener('click', () => {
+      if (AppState.examData) {
+        openStartTestDialog(AppState.examData);
+      }
+    });
+  }
+
+  // Landing / Home Actions
+  if (DOM.btnLandingSample) {
+    DOM.btnLandingSample.addEventListener('click', () => {
+      if (DOM.modalSampleConfirm) {
+        DOM.modalSampleConfirm.classList.remove('hidden');
+      }
+    });
+  }
+  if (DOM.btnLandingSetup) {
+    DOM.btnLandingSetup.addEventListener('click', () => switchView('setup'));
+  }
+  if (DOM.btnSetupBackHome) {
+    DOM.btnSetupBackHome.addEventListener('click', () => switchView('home'));
+  }
+
+  // Sample Confirmation Modal Actions
+  if (DOM.btnSampleCancel) {
+    DOM.btnSampleCancel.addEventListener('click', () => {
+      if (DOM.modalSampleConfirm) {
+        DOM.modalSampleConfirm.classList.add('hidden');
+      }
+    });
+  }
+  if (DOM.btnSampleConfirm) {
+    DOM.btnSampleConfirm.addEventListener('click', () => {
+      if (DOM.modalSampleConfirm) {
+        DOM.modalSampleConfirm.classList.add('hidden');
+      }
+      startSampleTestDirect();
+    });
+  }
+
+  // Start Test Dialog Modal Actions
+  if (DOM.btnDialogResetName) {
+    DOM.btnDialogResetName.addEventListener('click', () => {
+      if (DOM.inputDialogTestName) {
+        const defaultName = AppState.examMode === 'inicet' ? 'INI-CET CBT Mock Test' : 'NEET-PG CBT Mock Test';
+        DOM.inputDialogTestName.value = defaultName;
+      }
+    });
+  }
+  if (DOM.btnDialogGotoSetup) {
+    DOM.btnDialogGotoSetup.addEventListener('click', () => {
+      closeStartTestDialog();
+      switchView('setup');
+    });
+  }
+  if (DOM.btnDialogStartTest) {
+    DOM.btnDialogStartTest.addEventListener('click', () => {
+      if (!AppState.pendingExamPackage) return;
+      closeStartTestDialog();
+      AppState.isSampleTest = false;
+      const customTitle = DOM.inputDialogTestName ? DOM.inputDialogTestName.value.trim() : '';
+      if (customTitle) {
+        AppState.customTestName = customTitle;
+        AppState.pendingExamPackage.examTitle = customTitle;
+      }
+      AppState.examData = AppState.pendingExamPackage;
+      startExamSession();
+    });
+  }
+
+  // Setup Mode Switcher
   if (DOM.tabSetupAi) {
     DOM.tabSetupAi.addEventListener('click', () => switchSetupMode('ai'));
   }
@@ -1560,16 +1664,30 @@ function setAiScope(scope) {
   if (DOM.btnScopeGrand) DOM.btnScopeGrand.classList.toggle('active', scope === 'grand');
   if (DOM.btnScopeCustom) DOM.btnScopeCustom.classList.toggle('active', scope === 'custom');
   if (DOM.aiCustomScopeDrawer) DOM.aiCustomScopeDrawer.classList.toggle('hidden', scope !== 'custom');
+  updateScopeBadges();
   updateAiConfigSummary();
   persistAppState();
 }
 
 function updateScopeBadges() {
+  const sCount = AppState.aiSelectedSubjects ? AppState.aiSelectedSubjects.length : 0;
+  const sysCount = AppState.aiSelectedSystems ? AppState.aiSelectedSystems.length : 0;
+
   if (DOM.countSelectedSubjects) {
-    DOM.countSelectedSubjects.textContent = AppState.aiSelectedSubjects ? AppState.aiSelectedSubjects.length : 0;
+    DOM.countSelectedSubjects.textContent = sCount;
   }
   if (DOM.countSelectedSystems) {
-    DOM.countSelectedSystems.textContent = AppState.aiSelectedSystems ? AppState.aiSelectedSystems.length : 0;
+    DOM.countSelectedSystems.textContent = sysCount;
+  }
+  if (DOM.aiScopeSummaryPill) {
+    if (AppState.aiScope === 'grand') {
+      DOM.aiScopeSummaryPill.textContent = 'Full Syllabus (All 19 Subjects & 16 Systems)';
+    } else {
+      const topic = (DOM.inputAiCustomTopic && DOM.inputAiCustomTopic.value.trim()) || '';
+      let text = `Custom Syllabus: ${sCount}/19 Subjects, ${sysCount}/16 Systems`;
+      if (topic) text += ` • "${topic}"`;
+      DOM.aiScopeSummaryPill.textContent = text;
+    }
   }
 }
 
@@ -1697,37 +1815,47 @@ function calculateSectionPartition(totalQ, examMode) {
   const paceSeconds = isNeet ? 63 : 54;
 
   if (AppState.sessionMode === 'practice') {
-    const totalSeconds = Math.round(totalQ * paceSeconds);
-    const durationMinutes = totalSeconds / 60;
     return {
       numSections: 1,
       totalQ,
-      totalMinutes: Math.round(durationMinutes),
-      durationMinutes,
-      totalSeconds,
+      totalMinutes: 0,
+      durationMinutes: 0,
+      totalSeconds: 0,
       batchCount: Math.ceil(totalQ / 25),
       sectionsInfo: [
         {
           letter: 'A',
           name: 'Practice Drill',
           count: totalQ,
-          duration: durationMinutes
+          duration: 0
         }
       ]
     };
   }
 
-  // Full Simulation Mode (Official Specifications: NEET 180 Qs / INI 200 Qs)
-  const numSections = isNeet ? 5 : 4;
-  const qPerSec = isNeet ? 36 : 50;
-  const secDuration = isNeet ? 42 : 45;
+  // Exam Mode: Dynamic section division based on total questions
+  const targetSecSize = isNeet ? 36 : 50;
+  const numSections = Math.max(1, Math.ceil(totalQ / targetSecSize));
+  const baseCount = Math.floor(totalQ / numSections);
+  let remainder = totalQ % numSections;
+
   const sectionsInfo = [];
-  let remaining = totalQ;
+  let totalMinutes = 0;
 
   for (let i = 0; i < numSections; i++) {
     const secLetter = String.fromCharCode(65 + i);
-    const secQCount = i === numSections - 1 ? remaining : qPerSec;
-    remaining -= secQCount;
+    const secQCount = baseCount + (remainder > 0 ? 1 : 0);
+    if (remainder > 0) remainder--;
+
+    let secDuration;
+    if (isNeet && secQCount === 36) {
+      secDuration = 42;
+    } else if (!isNeet && secQCount === 50) {
+      secDuration = 45;
+    } else {
+      secDuration = Math.max(1, Math.round((secQCount * paceSeconds) / 60));
+    }
+    totalMinutes += secDuration;
 
     sectionsInfo.push({
       letter: secLetter,
@@ -1737,14 +1865,11 @@ function calculateSectionPartition(totalQ, examMode) {
     });
   }
 
-  const totalMinutes = isNeet ? 210 : 180;
-  const batchCount = Math.ceil(totalQ / 25);
-
   return {
     numSections,
     totalQ,
     totalMinutes,
-    batchCount,
+    batchCount: Math.ceil(totalQ / 25),
     sectionsInfo
   };
 }
@@ -1759,23 +1884,29 @@ function updateAiSizingBreakdown() {
   if (!DOM.aiSizingBreakdown) return;
   const examLabel = AppState.examMode === 'inicet' ? 'INI-CET' : 'NEET-PG';
   const isNeet = AppState.examMode === 'neetpg';
+  const count = parseInt(AppState.aiQuestionCount, 10) || 10;
+  const paceSeconds = isNeet ? 63 : 54;
+  const targetSecSize = isNeet ? 36 : 50;
 
-  if (AppState.sessionMode === 'simulation') {
-    if (isNeet) {
-      DOM.aiSizingBreakdown.innerHTML = `<strong>Official NEET-PG Simulation:</strong> 180 Qs • 5 Sections (A–E, 36 Qs each) • 42 min / section (210 min total) • Strict Sectional Lock`;
-    } else {
-      DOM.aiSizingBreakdown.innerHTML = `<strong>Official INI-CET Simulation:</strong> 200 Qs • 4 Blocks (1–4, 50 Qs each) • 45 min / block (180 min total) • Strict Sectional Lock`;
-    }
+  if (AppState.sessionMode === 'practice') {
+    DOM.aiSizingBreakdown.innerHTML = `<strong>Practice Mode:</strong> Elapsed Timer • 1 Block (${count} Questions) • Free Navigation • Untimed Drill`;
     return;
   }
 
-  // Targeted Practice Mode
-  const count = parseInt(AppState.aiQuestionCount, 10) || 10;
-  const paceSeconds = isNeet ? 63 : 54;
-  const totalSec = Math.round(count * paceSeconds);
-  const timeBudgetStr = formatTimeBudget(totalSec);
-
-  DOM.aiSizingBreakdown.innerHTML = `<strong>${examLabel} Pace:</strong> ${paceSeconds}s/Q • <strong>Time Budget:</strong> ${timeBudgetStr} (${count} Qs) • Single Timer Drill`;
+  // Exam Mode
+  const numSections = Math.max(1, Math.ceil(count / targetSecSize));
+  const avgSecCount = Math.round(count / numSections);
+  let secDurationMinutes;
+  if (isNeet && avgSecCount === 36) {
+    secDurationMinutes = 42;
+  } else if (!isNeet && avgSecCount === 50) {
+    secDurationMinutes = 45;
+  } else {
+    secDurationMinutes = Math.max(1, Math.round((avgSecCount * paceSeconds) / 60));
+  }
+  const totalMinutes = secDurationMinutes * numSections;
+  const secName = isNeet ? 'Section' : 'Block';
+  DOM.aiSizingBreakdown.innerHTML = `<strong>Exam Mode:</strong> ${count} Qs in ${numSections} ${secName}${numSections > 1 ? 's' : ''} (~${avgSecCount} Qs/sec) • ${secDurationMinutes} min/${secName.toLowerCase()} (${totalMinutes} min total • ${paceSeconds}s/Q budget) • Section locks on submit`;
 }
 
 function setAiDifficulty(diff) {
@@ -2132,44 +2263,6 @@ async function generateTestWithGemini() {
   }
 }
 
-function openTestReadyModal(testData) {
-  if (!DOM.modalTestReady) return;
-  DOM.testReadyTitle.textContent = testData.examTitle;
-
-  let totalQ = 0;
-  let totalMin = 0;
-  const subjectsSet = new Set();
-
-  testData.sections.forEach(sec => {
-    totalMin += (sec.durationMinutes || 0);
-    sec.questions.forEach(q => {
-      totalQ++;
-      if (q.subject) subjectsSet.add(q.subject);
-    });
-  });
-
-  DOM.readyStatQuestions.textContent = totalQ;
-  DOM.readyStatSections.textContent = testData.sections.length;
-  DOM.readyStatDuration.textContent = `${totalMin} min`;
-  DOM.readyStatScheme.textContent = testData.examType === 'inicet' ? '+1 / -0.33' : '+4 / -1';
-
-  DOM.testReadySubjects.innerHTML = '';
-  Array.from(subjectsSet).sort().forEach(subj => {
-    const pill = document.createElement('span');
-    pill.className = 'pill';
-    pill.textContent = subj;
-    DOM.testReadySubjects.appendChild(pill);
-  });
-
-  DOM.modalTestReady.classList.remove('hidden');
-}
-
-function closeTestReadyModal() {
-  if (DOM.modalTestReady) {
-    DOM.modalTestReady.classList.add('hidden');
-  }
-}
-
 function openCopyPromptModal() {
   if (!DOM.modalCopyPrompt) return;
   const prompt = buildAiTestPrompt({
@@ -2182,9 +2275,9 @@ function openCopyPromptModal() {
     selectedSystems: AppState.aiSelectedSystems,
     customTopic: DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : ''
   });
-  DOM.copyPromptTextarea.value = prompt;
-  DOM.copyPromptChars.textContent = `${prompt.length.toLocaleString()} characters`;
-  DOM.copyPromptTokens.textContent = `~${Math.round(prompt.length / 4).toLocaleString()} tokens`;
+  if (DOM.copyPromptTextarea) DOM.copyPromptTextarea.value = prompt;
+  if (DOM.copyPromptChars) DOM.copyPromptChars.textContent = `${prompt.length.toLocaleString()} characters`;
+  if (DOM.copyPromptTokens) DOM.copyPromptTokens.textContent = `~${Math.round(prompt.length / 4).toLocaleString()} tokens`;
   DOM.modalCopyPrompt.classList.remove('hidden');
 }
 
@@ -2196,19 +2289,25 @@ function closeCopyPromptModal() {
 
 function copyPromptToClipboard() {
   if (!DOM.copyPromptTextarea) return;
-  navigator.clipboard.writeText(DOM.copyPromptTextarea.value)
-    .then(() => {
-      showToast("Prompt copied to clipboard!");
-      DOM.btnCopyPromptAction.textContent = "Copied to Clipboard!";
-      setTimeout(() => {
+  if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(DOM.copyPromptTextarea.value)
+      .then(() => {
+        showToast("Prompt copied to clipboard!");
         if (DOM.btnCopyPromptAction) {
-          DOM.btnCopyPromptAction.textContent = "Copy Prompt to Clipboard";
+          DOM.btnCopyPromptAction.textContent = "Copied to Clipboard!";
+          setTimeout(() => {
+            if (DOM.btnCopyPromptAction) {
+              DOM.btnCopyPromptAction.textContent = "Copy Prompt to Clipboard";
+            }
+          }, 2000);
         }
-      }, 2000);
-    })
-    .catch(() => {
-      showToast("Could not access clipboard. Please copy manually.");
-    });
+      })
+      .catch(() => {
+        showToast("Could not access clipboard. Please copy manually.");
+      });
+  } else {
+    showToast("Clipboard not supported in this browser.");
+  }
 }
 
 function downloadGeneratedTestJson() {
@@ -2227,26 +2326,287 @@ function downloadGeneratedTestJson() {
   showToast("Test JSON downloaded.");
 }
 
-// ==========================================================================
-// 7. Exam Session Controller
-// ==========================================================================
+function openStartTestDialog(testData) {
+  if (!testData || !DOM.modalStartTest) return;
+  AppState.pendingExamPackage = testData;
+
+  const isPractice = AppState.sessionMode === 'practice';
+  const isNeet = AppState.examMode === 'neetpg';
+
+  // Count questions and gather metadata
+  let totalQ = 0;
+  const subjectsSet = new Set();
+  const formatsSet = new Set();
+  const diffsSet = new Set();
+
+  if (Array.isArray(testData.sections)) {
+    testData.sections.forEach(sec => {
+      if (Array.isArray(sec.questions)) {
+        sec.questions.forEach(q => {
+          totalQ++;
+          if (Array.isArray(q.subject)) {
+            q.subject.forEach(s => subjectsSet.add(s));
+          } else if (q.subject) {
+            subjectsSet.add(q.subject);
+          }
+          if (q.format) formatsSet.add(q.format);
+          if (q.difficulty) diffsSet.add(q.difficulty);
+        });
+      }
+    });
+  } else if (Array.isArray(testData.questions)) {
+    testData.questions.forEach(q => {
+      totalQ++;
+      if (Array.isArray(q.subject)) {
+        q.subject.forEach(s => subjectsSet.add(s));
+      } else if (q.subject) {
+        subjectsSet.add(q.subject);
+      }
+      if (q.format) formatsSet.add(q.format);
+      if (q.difficulty) diffsSet.add(q.difficulty);
+    });
+  }
+
+  // 1. Mode
+  if (DOM.dialogStatMode) {
+    DOM.dialogStatMode.textContent = isPractice ? 'Practice Mode' : 'Exam Mode';
+  }
+
+  // 2. Exam Type & Marking
+  if (DOM.dialogStatExam) {
+    DOM.dialogStatExam.textContent = isNeet ? 'NEET-PG (+4 / -1)' : 'INI-CET (+1 / -0.333)';
+  }
+
+  // 3. Questions & Sections
+  if (DOM.dialogStatQuestions) {
+    if (isPractice) {
+      DOM.dialogStatQuestions.textContent = `${totalQ} Questions (1 Block • Continuous)`;
+    } else {
+      const targetSecSize = isNeet ? 36 : 50;
+      const numSections = Math.max(1, Math.ceil(totalQ / targetSecSize));
+      const secName = isNeet ? 'Section' : 'Block';
+      DOM.dialogStatQuestions.textContent = `${totalQ} Questions (${numSections} ${secName}${numSections > 1 ? 's' : ''})`;
+    }
+  }
+
+  // 4. Time Budget
+  if (DOM.dialogStatTime) {
+    if (isPractice) {
+      DOM.dialogStatTime.textContent = 'No time limit (Elapsed Timer)';
+    } else {
+      const paceSec = isNeet ? 63 : 54;
+      const targetSecSize = isNeet ? 36 : 50;
+      const numSections = Math.max(1, Math.ceil(totalQ / targetSecSize));
+      const avgSecCount = Math.round(totalQ / numSections);
+      let secDurationMinutes;
+      if (isNeet && avgSecCount === 36) {
+        secDurationMinutes = 42;
+      } else if (!isNeet && avgSecCount === 50) {
+        secDurationMinutes = 45;
+      } else {
+        secDurationMinutes = Math.max(1, Math.round((avgSecCount * paceSec) / 60));
+      }
+      const totalMinutes = secDurationMinutes * numSections;
+      DOM.dialogStatTime.textContent = `${totalMinutes} min total (~${secDurationMinutes} min/section • ${paceSec}s/Q)`;
+    }
+  }
+
+  // 5. Syllabus Scope
+  if (DOM.dialogStatSyllabus) {
+    if (AppState.setupMode === 'ai') {
+      if (AppState.aiScope === 'grand') {
+        DOM.dialogStatSyllabus.textContent = 'Full Syllabus (Grand Test • All 19 MBBS Subjects)';
+      } else {
+        const subjs = AppState.aiSelectedSubjects.length > 0
+          ? AppState.aiSelectedSubjects.slice(0, 3).join(', ') + (AppState.aiSelectedSubjects.length > 3 ? ` +${AppState.aiSelectedSubjects.length - 3} more` : '')
+          : 'Custom Subjects';
+        const topic = (DOM.inputAiCustomTopic && DOM.inputAiCustomTopic.value.trim()) || '';
+        DOM.dialogStatSyllabus.textContent = `Custom: ${subjs}${topic ? ` • "${topic}"` : ''}`;
+      }
+    } else {
+      const subjsArr = Array.from(subjectsSet);
+      if (subjsArr.length === 0) {
+        DOM.dialogStatSyllabus.textContent = 'Curriculum Mapped';
+      } else if (subjsArr.length >= 15) {
+        DOM.dialogStatSyllabus.textContent = `Full Syllabus (${subjsArr.length} MBBS Subjects)`;
+      } else {
+        DOM.dialogStatSyllabus.textContent = subjsArr.slice(0, 3).join(', ') + (subjsArr.length > 3 ? ` +${subjsArr.length - 3} more` : '');
+      }
+    }
+  }
+
+  // 6. Difficulty & Format
+  if (DOM.dialogStatDiffFormat) {
+    if (AppState.setupMode === 'ai') {
+      const diffStr = AppState.aiDifficulty ? (AppState.aiDifficulty.charAt(0).toUpperCase() + AppState.aiDifficulty.slice(1)) : 'Balanced';
+      const formStr = AppState.aiStyle ? (AppState.aiStyle.charAt(0).toUpperCase() + AppState.aiStyle.slice(1)) : 'Mixed';
+      DOM.dialogStatDiffFormat.textContent = `${diffStr} • ${formStr}`;
+    } else {
+      const diffStr = diffsSet.size > 0 ? Array.from(diffsSet).join(', ') : 'Standard';
+      const formStr = formatsSet.size > 0 ? Array.from(formatsSet).join(', ') : 'Mixed';
+      DOM.dialogStatDiffFormat.textContent = `${diffStr} • ${formStr}`;
+    }
+  }
+
+  // 7. Optional Test Name
+  if (DOM.inputDialogTestName) {
+    const defaultName = isNeet ? 'NEET-PG CBT Mock Test' : 'INI-CET CBT Mock Test';
+    const initName = (AppState.customTestName && AppState.customTestName.trim()) || testData.examTitle || defaultName;
+    DOM.inputDialogTestName.value = initName;
+    DOM.inputDialogTestName.placeholder = defaultName;
+  }
+
+  DOM.modalStartTest.classList.remove('hidden');
+}
+
+function closeStartTestDialog() {
+  if (DOM.modalStartTest) {
+    DOM.modalStartTest.classList.add('hidden');
+  }
+}
+
+// Backward compatibility aliases
+const openTestReadyModal = openStartTestDialog;
+const closeTestReadyModal = closeStartTestDialog;
+
+function startSampleTestDirect() {
+  AppState.isSampleTest = true;
+  AppState.examMode = 'neetpg';
+  AppState.sessionMode = 'practice';
+
+  const sample10 = [];
+  if (FALLBACK_NEET_DATA && Array.isArray(FALLBACK_NEET_DATA.sections)) {
+    FALLBACK_NEET_DATA.sections.forEach(sec => {
+      if (Array.isArray(sec.questions)) {
+        sec.questions.forEach(q => {
+          if (sample10.length < 10) {
+            sample10.push(JSON.parse(JSON.stringify(q)));
+          }
+        });
+      }
+    });
+  }
+
+  AppState.examData = {
+    examType: 'neetpg',
+    examTitle: 'NEET-PG Sample Mock Test',
+    totalBlocks: 1,
+    defaultBlockDurationMinutes: 0,
+    markingScheme: { correct: 4, incorrect: -1, unattempted: 0 },
+    sections: [{
+      id: 'sec_sample',
+      name: 'Sample Test',
+      durationMinutes: 0,
+      questions: sample10
+    }]
+  };
+
+  startExamSession();
+}
+
+function prepareExamDataForSession(rawExamData) {
+  if (!rawExamData) return null;
+  // If this is a sample test, preserve its defined structure
+  if (AppState.isSampleTest) {
+    return rawExamData;
+  }
+
+  let allQuestions = [];
+  if (Array.isArray(rawExamData.sections)) {
+    rawExamData.sections.forEach(sec => {
+      if (Array.isArray(sec.questions)) {
+        allQuestions.push(...sec.questions);
+      }
+    });
+  } else if (Array.isArray(rawExamData.questions)) {
+    allQuestions = [...rawExamData.questions];
+  }
+
+  const isPractice = AppState.sessionMode === 'practice';
+  const isNeet = AppState.examMode === 'neetpg';
+
+  if (isPractice) {
+    return {
+      examType: AppState.examMode,
+      examTitle: rawExamData.examTitle || (isNeet ? 'NEET-PG Practice Drill' : 'INI-CET Practice Drill'),
+      totalBlocks: 1,
+      defaultBlockDurationMinutes: 0,
+      markingScheme: rawExamData.markingScheme || (isNeet ? { correct: 4, incorrect: -1, unattempted: 0 } : { correct: 1, incorrect: -0.333, unattempted: 0 }),
+      sections: [{
+        id: 'sec_practice',
+        name: 'Practice Drill',
+        durationMinutes: 0,
+        questions: allQuestions
+      }]
+    };
+  } else {
+    // Exam mode: dynamic section division based on total questions
+    const targetSecSize = isNeet ? 36 : 50;
+    const paceSeconds = isNeet ? 63 : 54;
+    const numSections = Math.max(1, Math.ceil(allQuestions.length / targetSecSize));
+    const baseCount = Math.floor(allQuestions.length / numSections);
+    let remainder = allQuestions.length % numSections;
+
+    const sections = [];
+    let qOffset = 0;
+
+    for (let i = 0; i < numSections; i++) {
+      const secLetter = String.fromCharCode(65 + i);
+      const secQCount = baseCount + (remainder > 0 ? 1 : 0);
+      if (remainder > 0) remainder--;
+
+      const secQuestions = allQuestions.slice(qOffset, qOffset + secQCount);
+      qOffset += secQCount;
+
+      let secDuration;
+      if (isNeet && secQCount === 36) {
+        secDuration = 42;
+      } else if (!isNeet && secQCount === 50) {
+        secDuration = 45;
+      } else {
+        secDuration = Math.max(1, Math.round((secQCount * paceSeconds) / 60));
+      }
+
+      sections.push({
+        id: `sec_${secLetter.toLowerCase()}`,
+        name: isNeet ? `Section ${secLetter}` : `Block ${i + 1}`,
+        durationMinutes: secDuration,
+        questions: secQuestions
+      });
+    }
+
+    return {
+      examType: AppState.examMode,
+      examTitle: rawExamData.examTitle || (isNeet ? 'NEET-PG CBT Mock Test' : 'INI-CET CBT Mock Test'),
+      totalBlocks: sections.length,
+      defaultBlockDurationMinutes: sections[0] ? sections[0].durationMinutes : (isNeet ? 42 : 45),
+      markingScheme: rawExamData.markingScheme || (isNeet ? { correct: 4, incorrect: -1, unattempted: 0 } : { correct: 1, incorrect: -0.333, unattempted: 0 }),
+      sections
+    };
+  }
+}
+
 function startExamSession() {
   if (!AppState.examData) return;
 
-  const customTitle = (DOM.inputTestName && DOM.inputTestName.value.trim()) || (AppState.customTestName && AppState.customTestName.trim()) || '';
+  AppState.examData = prepareExamDataForSession(AppState.examData);
+
+  const customTitle = (DOM.inputDialogTestName && DOM.inputDialogTestName.value.trim()) || (DOM.inputTestName && DOM.inputTestName.value.trim()) || (AppState.customTestName && AppState.customTestName.trim()) || '';
   const defaultTitle = AppState.examMode === 'inicet' ? 'INI-CET Mock Test' : 'NEET-PG Mock Test';
-  if (customTitle || !AppState.examData.examTitle || AppState.examData.examTitle.includes('CBT Mock') || AppState.examData.examTitle.includes('Practice Drill')) {
-    AppState.examData.examTitle = customTitle || defaultTitle;
+  if (customTitle) {
+    AppState.examData.examTitle = customTitle;
+  } else if (!AppState.examData.examTitle || AppState.examData.examTitle.includes('CBT Mock') || AppState.examData.examTitle.includes('Practice Drill')) {
+    AppState.examData.examTitle = defaultTitle;
   }
 
   // Deep clone examData to guarantee a clean, isolated session state and enable random option shuffling
-  // without mutating raw input source
   AppState.examData = JSON.parse(JSON.stringify(AppState.examData));
   shuffleExamOptions(AppState.examData);
 
   AppState.responses = {};
   AppState.sectionTimesLeft = {};
   AppState.sectionStatus = {};
+  AppState.practiceElapsedTime = 0;
 
   const defaultDuration = AppState.examMode === 'inicet' ? 45 : 42;
 
@@ -2284,15 +2644,28 @@ function switchView(viewName) {
     document.activeElement.blur();
   }
 
+  const validViews = ['home', 'setup', 'exam', 'review'];
+  if (!validViews.includes(viewName)) viewName = 'home';
   AppState.view = viewName;
-  DOM.viewHome.classList.toggle('active', viewName === 'home');
-  DOM.viewHome.classList.toggle('hidden', viewName !== 'home');
-  DOM.viewExam.classList.toggle('active', viewName === 'exam');
-  DOM.viewExam.classList.toggle('hidden', viewName !== 'exam');
-  DOM.viewReview.classList.toggle('active', viewName === 'review');
-  DOM.viewReview.classList.toggle('hidden', viewName !== 'review');
 
-  const targetHash = '#' + (viewName === 'home' ? 'setup' : viewName);
+  if (DOM.viewHome) {
+    DOM.viewHome.classList.toggle('active', viewName === 'home');
+    DOM.viewHome.classList.toggle('hidden', viewName !== 'home');
+  }
+  if (DOM.viewSetup) {
+    DOM.viewSetup.classList.toggle('active', viewName === 'setup');
+    DOM.viewSetup.classList.toggle('hidden', viewName !== 'setup');
+  }
+  if (DOM.viewExam) {
+    DOM.viewExam.classList.toggle('active', viewName === 'exam');
+    DOM.viewExam.classList.toggle('hidden', viewName !== 'exam');
+  }
+  if (DOM.viewReview) {
+    DOM.viewReview.classList.toggle('active', viewName === 'review');
+    DOM.viewReview.classList.toggle('hidden', viewName !== 'review');
+  }
+
+  const targetHash = '#' + viewName;
   if (typeof window !== 'undefined' && window.location && window.location.hash !== targetHash && typeof history !== 'undefined' && history.replaceState) {
     history.replaceState(null, '', targetHash);
   }
@@ -2311,7 +2684,31 @@ function renderHeaderNavActions() {
     historyBtn.title = 'View Test History';
     historyBtn.onclick = openHistoryView;
     DOM.dynamicNavActions.appendChild(historyBtn);
+  } else if (AppState.view === 'setup') {
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'btn btn-outline';
+    homeBtn.id = 'btn-header-home';
+    homeBtn.textContent = 'Home';
+    homeBtn.title = 'Return to Home';
+    homeBtn.onclick = () => switchView('home');
+    DOM.dynamicNavActions.appendChild(homeBtn);
+
+    const historyBtn = document.createElement('button');
+    historyBtn.className = 'btn btn-outline';
+    historyBtn.id = 'btn-header-history';
+    historyBtn.textContent = 'History';
+    historyBtn.title = 'View Test History';
+    historyBtn.onclick = openHistoryView;
+    DOM.dynamicNavActions.appendChild(historyBtn);
   } else if (AppState.view === 'exam') {
+    if (AppState.isSampleTest) {
+      DOM.headerExamBadge.textContent = 'SAMPLE';
+      DOM.headerExamBadge.className = 'brand-badge brand-badge-sample';
+    } else {
+      DOM.headerExamBadge.textContent = AppState.examMode === 'inicet' ? 'INI-CET' : 'NEET-PG';
+      DOM.headerExamBadge.className = 'brand-badge';
+    }
+
     const helpBtn = document.createElement('button');
     helpBtn.className = 'btn btn-outline';
     helpBtn.id = 'btn-keyboard-help';
@@ -2355,6 +2752,9 @@ function handleNewTest() {
   AppState.activeQuestionIndex = 0;
   AppState.viewingAttemptId = null;
   AppState.reviewActiveQuestionId = null;
+  AppState.isSampleTest = false;
+  AppState.pendingExamPackage = null;
+  AppState.practiceElapsedTime = 0;
 
   if (DOM.pastAttemptBanner) {
     DOM.pastAttemptBanner.classList.add('hidden');
@@ -2368,6 +2768,7 @@ function handleNewTest() {
       delete s.reviewExamData;
       delete s.reviewResponses;
       s.viewingAttemptId = null;
+      s.isSampleTest = false;
       localStorage.setItem('triage_app_state', JSON.stringify(s));
     } catch (e) {}
   }
@@ -2894,29 +3295,52 @@ function updatePaletteSummaryCounters() {
 function startActiveSectionTimer() {
   if (AppState.timerInterval) clearInterval(AppState.timerInterval);
 
-  const activeSecId = AppState.examData.sections[AppState.activeSectionIndex].id;
-  updateTimerDisplay(AppState.sectionTimesLeft[activeSecId]);
+  const curSec = AppState.examData.sections[AppState.activeSectionIndex];
+  if (!curSec) return;
+  const activeSecId = curSec.id;
+  const isPractice = AppState.sessionMode === 'practice';
 
-  AppState.timerInterval = setInterval(() => {
-    if (AppState.sectionTimesLeft[activeSecId] > 0) {
-      AppState.sectionTimesLeft[activeSecId]--;
+  if (isPractice) {
+    AppState.practiceElapsedTime = AppState.practiceElapsedTime || 0;
+    updateTimerDisplay(AppState.practiceElapsedTime, true);
 
-      const curSec = AppState.examData.sections[AppState.activeSectionIndex];
-      const curQ = curSec.questions[AppState.activeQuestionIndex];
+    AppState.timerInterval = setInterval(() => {
+      AppState.practiceElapsedTime++;
+
+      const activeSection = AppState.examData.sections[AppState.activeSectionIndex];
+      const curQ = activeSection && activeSection.questions ? activeSection.questions[AppState.activeQuestionIndex] : null;
       if (curQ && AppState.responses[curQ.id]) {
         AppState.responses[curQ.id].timeSpent = (AppState.responses[curQ.id].timeSpent || 0) + 1;
       }
 
-      updateTimerDisplay(AppState.sectionTimesLeft[activeSecId]);
-      if (AppState.sectionTimesLeft[activeSecId] % 10 === 0) persistExamState();
-    } else {
-      clearInterval(AppState.timerInterval);
-      handleSectionAutoSubmit();
-    }
-  }, 1000);
+      updateTimerDisplay(AppState.practiceElapsedTime, true);
+      if (AppState.practiceElapsedTime % 10 === 0) persistExamState();
+    }, 1000);
+  } else {
+    // Exam mode countdown
+    updateTimerDisplay(AppState.sectionTimesLeft[activeSecId], false);
+
+    AppState.timerInterval = setInterval(() => {
+      if (AppState.sectionTimesLeft[activeSecId] > 0) {
+        AppState.sectionTimesLeft[activeSecId]--;
+
+        const activeSection = AppState.examData.sections[AppState.activeSectionIndex];
+        const curQ = activeSection && activeSection.questions ? activeSection.questions[AppState.activeQuestionIndex] : null;
+        if (curQ && AppState.responses[curQ.id]) {
+          AppState.responses[curQ.id].timeSpent = (AppState.responses[curQ.id].timeSpent || 0) + 1;
+        }
+
+        updateTimerDisplay(AppState.sectionTimesLeft[activeSecId], false);
+        if (AppState.sectionTimesLeft[activeSecId] % 10 === 0) persistExamState();
+      } else {
+        clearInterval(AppState.timerInterval);
+        handleSectionAutoSubmit();
+      }
+    }, 1000);
+  }
 }
 
-function updatePaletteToggleState(seconds) {
+function updatePaletteToggleState(seconds, isElapsed = false) {
   if (!DOM.btnPaletteNavToggle) return;
   const isDrawerOpen = DOM.examProgressSidebar && DOM.examProgressSidebar.classList.contains('drawer-open');
   DOM.btnPaletteNavToggle.classList.toggle('active', Boolean(isDrawerOpen));
@@ -2928,47 +3352,66 @@ function updatePaletteToggleState(seconds) {
     DOM.btnPaletteNavToggle.classList.remove('timer-warning', 'timer-critical');
   } else {
     // When collapsed, display the timer instead of "palette" (strictly no icons/glyphs)
-    let secLeft = seconds;
-    if (secLeft === undefined) {
-      const activeSec = AppState.examData && AppState.examData.sections && AppState.examData.sections[AppState.activeSectionIndex];
-      secLeft = activeSec && AppState.sectionTimesLeft ? AppState.sectionTimesLeft[activeSec.id] : 0;
+    let secVal = seconds;
+    if (secVal === undefined) {
+      if (AppState.sessionMode === 'practice') {
+        secVal = AppState.practiceElapsedTime || 0;
+      } else {
+        const activeSec = AppState.examData && AppState.examData.sections && AppState.examData.sections[AppState.activeSectionIndex];
+        secVal = activeSec && AppState.sectionTimesLeft ? AppState.sectionTimesLeft[activeSec.id] : 0;
+      }
     }
-    const h = String(Math.floor(secLeft / 3600)).padStart(2, '0');
-    const m = String(Math.floor((secLeft % 3600) / 60)).padStart(2, '0');
-    const s = String(secLeft % 60).padStart(2, '0');
+    const h = String(Math.floor(secVal / 3600)).padStart(2, '0');
+    const m = String(Math.floor((secVal % 3600) / 60)).padStart(2, '0');
+    const s = String(secVal % 60).padStart(2, '0');
     DOM.btnPaletteNavToggle.innerHTML = `<span class="timer-digits">${h}:${m}:${s}</span>`;
-    DOM.btnPaletteNavToggle.setAttribute('aria-label', `Section Time Remaining: ${h}:${m}:${s}. Tap to toggle Question Palette`);
 
-    if (secLeft <= 60) {
-      DOM.btnPaletteNavToggle.classList.add('timer-critical');
-      DOM.btnPaletteNavToggle.classList.remove('timer-warning');
-    } else if (secLeft <= 300) {
-      DOM.btnPaletteNavToggle.classList.add('timer-warning');
-      DOM.btnPaletteNavToggle.classList.remove('timer-critical');
-    } else {
+    if (isElapsed) {
+      DOM.btnPaletteNavToggle.setAttribute('aria-label', `Time Elapsed: ${h}:${m}:${s}. Tap to toggle Question Palette`);
       DOM.btnPaletteNavToggle.classList.remove('timer-warning', 'timer-critical');
+    } else {
+      DOM.btnPaletteNavToggle.setAttribute('aria-label', `Section Time Remaining: ${h}:${m}:${s}. Tap to toggle Question Palette`);
+      if (secVal <= 60) {
+        DOM.btnPaletteNavToggle.classList.add('timer-critical');
+        DOM.btnPaletteNavToggle.classList.remove('timer-warning');
+      } else if (secVal <= 300) {
+        DOM.btnPaletteNavToggle.classList.add('timer-warning');
+        DOM.btnPaletteNavToggle.classList.remove('timer-critical');
+      } else {
+        DOM.btnPaletteNavToggle.classList.remove('timer-warning', 'timer-critical');
+      }
     }
   }
 }
 
-function updateTimerDisplay(seconds) {
+function updateTimerDisplay(seconds, isElapsed = false) {
   const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
   const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
   const s = String(seconds % 60).padStart(2, '0');
-  DOM.sectionClockDisplay.textContent = `${h}:${m}:${s}`;
+  
+  if (DOM.timerSecLabel) {
+    DOM.timerSecLabel.textContent = isElapsed ? 'TIME ELAPSED' : 'TIME REMAINING';
+  }
 
-  if (seconds <= 60) {
-    DOM.sectionClockDisplay.classList.add('timer-critical');
-    DOM.sectionClockDisplay.classList.remove('timer-warning');
-  } else if (seconds <= 300) {
-    DOM.sectionClockDisplay.classList.add('timer-warning');
-    DOM.sectionClockDisplay.classList.remove('timer-critical');
-  } else {
-    DOM.sectionClockDisplay.classList.remove('timer-warning', 'timer-critical');
+  if (DOM.sectionClockDisplay) {
+    DOM.sectionClockDisplay.textContent = `${h}:${m}:${s}`;
+    if (isElapsed) {
+      DOM.sectionClockDisplay.classList.remove('timer-warning', 'timer-critical');
+    } else {
+      if (seconds <= 60) {
+        DOM.sectionClockDisplay.classList.add('timer-critical');
+        DOM.sectionClockDisplay.classList.remove('timer-warning');
+      } else if (seconds <= 300) {
+        DOM.sectionClockDisplay.classList.add('timer-warning');
+        DOM.sectionClockDisplay.classList.remove('timer-critical');
+      } else {
+        DOM.sectionClockDisplay.classList.remove('timer-warning', 'timer-critical');
+      }
+    }
   }
 
   // When collapsed, display the timer on the toggle button instead of "palette"
-  updatePaletteToggleState(seconds);
+  updatePaletteToggleState(seconds, isElapsed);
 }
 
 function handleSectionAutoSubmit() {
@@ -4135,6 +4578,10 @@ async function loadHistoryFromDB() {
 // 13.5. Test History & Session Comparison Engine
 // ==========================================================================
 function recordCurrentAttempt() {
+  if (AppState.isSampleTest) {
+    return;
+  }
+
   const scheme = AppState.examData.markingScheme || { correct: 4, incorrect: -1, unattempted: 0 };
   let correct = 0, incorrect = 0, unattempted = 0, totalQuestions = 0;
   let mastered = 0, silly = 0, lucky = 0, gaps = 0;
@@ -4703,6 +5150,9 @@ function persistExamState() {
   if (AppState.view !== 'exam') return;
   const payload = {
     examMode: AppState.examMode,
+    sessionMode: AppState.sessionMode,
+    isSampleTest: AppState.isSampleTest,
+    practiceElapsedTime: AppState.practiceElapsedTime,
     examData: AppState.examData,
     activeSectionIndex: AppState.activeSectionIndex,
     activeQuestionIndex: AppState.activeQuestionIndex,
@@ -4722,6 +5172,7 @@ function persistAppState() {
     const customTestName = (DOM.inputTestName ? DOM.inputTestName.value.trim() : '') || AppState.customTestName || '';
     const payload = {
       view: AppState.view || 'home',
+      isSampleTest: AppState.isSampleTest,
       customTestName,
       examMode: AppState.examMode || 'neetpg',
       sessionMode: AppState.sessionMode || 'practice',
@@ -4775,6 +5226,9 @@ function checkPersistedState() {
       const data = JSON.parse(rawExam);
       if (data && data.examData && data.responses && data.examData.sections && data.examData.sections.length > 0) {
         AppState.examMode = data.examMode || 'neetpg';
+        AppState.sessionMode = data.sessionMode || 'practice';
+        AppState.isSampleTest = Boolean(data.isSampleTest);
+        AppState.practiceElapsedTime = data.practiceElapsedTime || 0;
         AppState.examData = data.examData;
         AppState.activeSectionIndex = data.activeSectionIndex || 0;
         AppState.activeQuestionIndex = data.activeQuestionIndex || 0;
@@ -4885,7 +5339,9 @@ function checkPersistedState() {
 }
 
 function restoreHomeState(savedState) {
-  switchView('home');
+  const hash = (typeof window !== 'undefined' && window.location) ? window.location.hash : '';
+  const targetView = (hash === '#setup' || (savedState && savedState.view === 'setup')) ? 'setup' : 'home';
+  switchView(targetView);
   if (savedState) {
     if (savedState.customTestName) {
       AppState.customTestName = savedState.customTestName;

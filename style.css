@@ -3900,3 +3900,258 @@ kbd {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   Home Landing Page, Setup Page Split & Start Test Dialog Styles
+   ========================================================================== */
+
+/* 1. Landing View */
+.landing-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+.landing-hero {
+  text-align: center;
+  margin-bottom: 2.75rem;
+}
+
+.landing-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.landing-tagline {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.landing-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.landing-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.landing-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-focus);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.landing-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.landing-card-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.landing-card-badge.badge-primary {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+}
+
+.landing-card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.landing-card-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+  flex-grow: 1;
+}
+
+.landing-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.landing-card-meta .meta-sep {
+  opacity: 0.5;
+}
+
+.landing-card-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+}
+
+/* 2. Setup Navigation & Step Hierarchy */
+.setup-nav-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn-setup-back {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.setup-section-block {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.25rem;
+}
+
+.setup-section-block:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.setup-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
+}
+
+.setup-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mode-explanation-box {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.explanation-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--pastel-green);
+  margin-right: 0.4rem;
+}
+
+.explanation-pill.pill-exam {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-blue);
+}
+
+.scope-summary-pill {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* 3. Sample Badge in Header */
+.brand-badge-sample {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* 4. Start Test Dialog Summary Grid */
+.start-test-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.start-test-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem 1.25rem;
+}
+
+.start-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.start-summary-item-full {
+  grid-column: 1 / -1;
+}
+
+.start-summary-lbl {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.start-summary-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sample-dialog-notice {
+  border-radius: 6px;
+}

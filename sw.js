@@ -1,5 +1,5 @@
 // triage - Service Worker (Offline-First CBT Architecture)
-const CACHE_NAME = 'triage-static-v39';
+const CACHE_NAME = 'triage-static-v40';
 
 const PRECACHE_ASSETS = [
   './',

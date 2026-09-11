@@ -42,84 +42,75 @@
 
     <!-- Main Views -->
     <main id="app-root">
-      <!-- 1. HOME / SETUP VIEW -->
+      <!-- 1. HOME / LANDING VIEW -->
       <section id="view-home" class="view-panel active">
-        <div class="home-container">
-          <!-- Session Mode Switcher (Full Simulation vs Targeted Practice) -->
-          <div class="session-mode-bar-wrapper">
-            <div class="session-mode-toggle-bar">
-              <button
-                type="button"
-                class="btn btn-session-mode active"
-                id="btn-mode-practice"
-                data-session-mode="practice"
-              >
-                Targeted Practice Mode
-              </button>
-              <button
-                type="button"
-                class="btn btn-session-mode"
-                id="btn-mode-simulation"
-                data-session-mode="simulation"
-              >
-                Full Simulation Mode
-              </button>
-            </div>
+        <div class="landing-container">
+          <div class="landing-hero">
+            <h1 class="landing-title">triage</h1>
+            <p class="landing-tagline">Computer Based Test (CBT) platform for NEET-PG & INI-CET aspirants</p>
+            <p class="landing-desc">
+              Distraction-free, timed examination simulation and curriculum-mapped practice with real-time confidence tracking and Triage Matrix analytics.
+            </p>
           </div>
 
-          <!-- Compact Header Row (Title + Target Exam Toggle) -->
-          <div class="home-header-row">
-            <div class="home-header-text">
-              <h1 class="panel-title">Test Setup</h1>
-              <div class="exam-format-details" id="exam-format-details">
-                NEET-PG Practice Drill • Custom Question Count • Standard Pace (63s/Q) • Single Timer
+          <div class="landing-cards-grid">
+            <!-- Sample Test Card -->
+            <div class="landing-card" id="card-landing-sample">
+              <div class="landing-card-header">
+                <span class="landing-card-badge">Instant Preview</span>
+                <h2 class="landing-card-title">Sample Test</h2>
               </div>
-            </div>
-            <!-- Target Test (Level 1: Action + Status) -->
-            <div class="exam-toggle-bar">
-              <button
-                type="button"
-                class="btn btn-exam-mode active"
-                id="mode-btn-neet"
-                data-mode="neetpg"
-              >
-                NEET-PG
+              <p class="landing-card-text">
+                Start a verified 10-question NEET-PG sample drill with instant scoring. Zero setup required. Sample tests are not saved into test history.
+              </p>
+              <div class="landing-card-meta">
+                <span>10 Questions</span>
+                <span class="meta-sep">•</span>
+                <span>NEET-PG Pace</span>
+                <span class="meta-sep">•</span>
+                <span>Not Saved in History</span>
+              </div>
+              <button type="button" class="btn btn-secondary landing-card-btn" id="btn-landing-sample">
+                Start Sample Test
               </button>
-              <button
-                type="button"
-                class="btn btn-exam-mode"
-                id="mode-btn-ini"
-                data-mode="inicet"
-              >
-                INI-CET
+            </div>
+
+            <!-- Setup Test Card -->
+            <div class="landing-card landing-card-primary" id="card-landing-setup">
+              <div class="landing-card-header">
+                <span class="landing-card-badge badge-primary">Custom Drill & Mock</span>
+                <h2 class="landing-card-title">Setup Test</h2>
+              </div>
+              <p class="landing-card-text">
+                Configure a tailored practice drill or full exam simulation. Choose practice or exam mode, target NEET-PG or INI-CET, select subjects, and generate with AI or upload JSON.
+              </p>
+              <div class="landing-card-meta">
+                <span>AI Generator</span>
+                <span class="meta-sep">•</span>
+                <span>Practice / Exam Mode</span>
+                <span class="meta-sep">•</span>
+                <span>Upload JSON</span>
+              </div>
+              <button type="button" class="btn btn-primary landing-card-btn" id="btn-landing-setup">
+                Setup Test
               </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Test Name / Rename Row -->
-          <div class="test-name-field-row">
-            <div class="test-name-input-wrap">
-              <label for="input-test-name" class="test-name-label">Test Name:</label>
-              <input
-                type="text"
-                id="input-test-name"
-                class="form-input test-name-input"
-                placeholder="NEET-PG Mock Test"
-                maxlength="100"
-                autocomplete="off"
-              />
-              <button
-                type="button"
-                class="btn btn-outline btn-xs"
-                id="btn-reset-test-name"
-                title="Reset to default test name"
-              >
-                Reset
-              </button>
-            </div>
+      <!-- 2. TEST SETUP VIEW -->
+      <section id="view-setup" class="view-panel hidden">
+        <div class="home-container">
+          <!-- Setup Header with Back Button -->
+          <div class="setup-nav-header">
+            <button type="button" class="btn btn-outline btn-sm btn-setup-back" id="btn-setup-back-home">
+              ← Home
+            </button>
+            <h1 class="panel-title" style="margin: 0;">Test Setup</h1>
           </div>
 
-          <!-- Setup Mode Switcher (Level 1: Action + Status) -->
+          <!-- Setup Mode Switcher (AI Generator vs Upload JSON) -->
           <div class="setup-mode-toggle-group">
             <div class="setup-toggle-bar">
               <button
@@ -128,15 +119,7 @@
                 id="tab-setup-ai"
                 data-target="setup-ai-panel"
               >
-                AI Test Generator
-              </button>
-              <button
-                type="button"
-                class="btn btn-setup-mode"
-                id="tab-setup-sample"
-                data-target="setup-sample-panel"
-              >
-                Instant Sample Test
+                Generate with AI
               </button>
               <button
                 type="button"
@@ -149,20 +132,123 @@
             </div>
           </div>
 
-          <!-- AI Generator Panel (Streamlined Single-Card Layout) -->
+          <!-- AI Generator Panel (Ordered 1 to 5) -->
           <div id="setup-ai-panel" class="setup-subpanel active">
             <div class="setup-compact-card">
-              <!-- Row 1: Syllabus & Topic Scope -->
-              <div class="setup-row">
-                <span class="setup-row-label">Syllabus & Topic Scope</span>
-                <div class="scope-select-wrap">
+              <!-- 1. Test Mode -->
+              <div class="setup-row setup-section-block">
+                <div class="setup-step-heading">
+                  <span class="setup-step-num">1</span>
+                  <span class="setup-row-label">Test Mode</span>
+                </div>
+                <div class="session-mode-toggle-bar" style="margin-top: 0.5rem;">
+                  <button
+                    type="button"
+                    class="btn btn-session-mode active"
+                    id="btn-mode-practice"
+                    data-session-mode="practice"
+                  >
+                    Practice Mode
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-session-mode"
+                    id="btn-mode-simulation"
+                    data-session-mode="simulation"
+                  >
+                    Exam Mode
+                  </button>
+                </div>
+
+                <!-- Mode Description / Help Text -->
+                <div class="mode-explanation-box" id="mode-explanation-practice">
+                  <span class="explanation-pill">Practice Mode</span>
+                  No time limit (timer shows total time elapsed) • Customisable total questions • No sections/blocks (continuous question stream).
+                </div>
+                <div class="mode-explanation-box hidden" id="mode-explanation-exam">
+                  <span class="explanation-pill pill-exam">Exam Mode</span>
+                  Customisable questions • Dynamic section division • Per-section time limits (standard exam budget) • Section locks after submission.
+                </div>
+
+                <!-- Question Sizing & Partitioning -->
+                <div class="ai-sizing-row" id="ai-sizing-row-practice" style="margin-top: 0.75rem;">
+                  <div class="ai-preset-chips" id="ai-count-presets">
+                    <button type="button" class="btn btn-count-preset active" data-count="10">10 Qs</button>
+                    <button type="button" class="btn btn-count-preset" data-count="25">25 Qs</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-unit" data-count="36">36 Qs (Block)</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-mock" data-count="180">180 Qs (Full Test)</button>
+                  </div>
+
+                  <!-- Distinct Custom Question Sizing Element -->
+                  <div class="ai-custom-sizing-element" id="ai-custom-sizing-element">
+                    <label for="input-ai-custom-count" class="ai-custom-label">Custom:</label>
+                    <input
+                      type="number"
+                      id="input-ai-custom-count"
+                      class="ai-custom-number-input"
+                      min="5"
+                      max="200"
+                      value="10"
+                      aria-label="Custom Question Count"
+                    />
+                    <span class="ai-custom-suffix">Qs</span>
+                  </div>
+                </div>
+
+                <!-- Dynamic Time Budget & Section Feedback -->
+                <div class="ai-sizing-breakdown" id="ai-sizing-breakdown" style="margin-top: 0.5rem;">
+                  Practice Mode: Elapsed Timer • 1 Block • Untimed Drill
+                </div>
+              </div>
+
+              <!-- 2. Test Type -->
+              <div class="setup-row setup-section-block">
+                <div class="setup-step-heading">
+                  <span class="setup-step-num">2</span>
+                  <span class="setup-row-label">Test Type</span>
+                </div>
+                <div class="exam-toggle-bar" style="margin-top: 0.5rem;">
+                  <button
+                    type="button"
+                    class="btn btn-exam-mode active"
+                    id="mode-btn-neet"
+                    data-mode="neetpg"
+                  >
+                    NEET-PG
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-exam-mode"
+                    id="mode-btn-ini"
+                    data-mode="inicet"
+                  >
+                    INI-CET
+                  </button>
+                </div>
+                <div class="exam-format-details" id="exam-format-details" style="margin-top: 0.4rem;">
+                  NEET-PG: +4 / -1 Marking • 63s/Question Standard Time-Budget
+                </div>
+              </div>
+
+              <!-- 3. Syllabus Scope -->
+              <div class="setup-row setup-section-block">
+                <div class="setup-step-heading">
+                  <span class="setup-step-num">3</span>
+                  <span class="setup-row-label">Syllabus</span>
+                </div>
+                <div class="scope-select-wrap" style="margin-top: 0.5rem;">
                   <select id="select-ai-scope" class="form-select">
-                    <option value="grand" selected>Grand Test (Full Syllabus)</option>
-                    <option value="custom">Custom Scope (Multiple Subjects, Systems & Topics)...</option>
+                    <option value="grand" selected>Full Syllabus (Grand Test)</option>
+                    <option value="custom">Custom Syllabus (Select Subjects, Systems & Topics)...</option>
                   </select>
 
-                  <!-- Custom Scope Drawer (Expanded when Custom Scope is selected) -->
-                  <div id="ai-custom-scope-drawer" class="custom-scope-drawer hidden">
+                  <!-- Live Syllabus Scope Summary Pill -->
+                  <div class="scope-summary-pill" id="ai-scope-summary-pill" style="margin-top: 0.5rem;">
+                    Full Syllabus (All 19 Subjects & 16 Systems)
+                  </div>
+
+                  <!-- Custom Scope Drawer (Expanded when Custom Syllabus is selected) -->
+                  <div id="ai-custom-scope-drawer" class="custom-scope-drawer hidden" style="margin-top: 0.75rem;">
                     <!-- Subjects Section -->
                     <div class="scope-subset-group">
                       <div class="scope-subset-header">
@@ -204,50 +290,13 @@
                 </div>
               </div>
 
-              <!-- Row 2: Question Sizing & Partitioning -->
-              <div class="setup-row" id="setup-row-sizing">
-                <span class="setup-row-label">Question Sizing & Partitioning</span>
-                
-                <!-- Practice Mode Sizing Row -->
-                <div class="ai-sizing-row" id="ai-sizing-row-practice">
-                  <div class="ai-preset-chips" id="ai-count-presets">
-                    <button type="button" class="btn btn-count-preset active" data-count="10">10 Qs</button>
-                    <button type="button" class="btn btn-count-preset" data-count="25">25 Qs</button>
-                    <button type="button" class="btn btn-count-preset" id="btn-count-unit" data-count="36">36 Qs (Section)</button>
-                    <button type="button" class="btn btn-count-preset" id="btn-count-mock" data-count="180">180 Qs (Full Test)</button>
-                  </div>
-
-                  <!-- Distinct Custom Question Sizing Element -->
-                  <div class="ai-custom-sizing-element" id="ai-custom-sizing-element">
-                    <label for="input-ai-custom-count" class="ai-custom-label">Custom:</label>
-                    <input
-                      type="number"
-                      id="input-ai-custom-count"
-                      class="ai-custom-number-input"
-                      min="5"
-                      max="200"
-                      value="10"
-                      aria-label="Custom Question Count"
-                    />
-                    <span class="ai-custom-suffix">Qs</span>
-                  </div>
+              <!-- 4. Difficulty and Question Format -->
+              <div class="setup-row setup-section-block">
+                <div class="setup-step-heading">
+                  <span class="setup-step-num">4</span>
+                  <span class="setup-row-label">Difficulty and Format</span>
                 </div>
-
-                <!-- Simulation Mode Sizing Notice (Shown only in Full Simulation) -->
-                <div class="simulation-sizing-notice hidden" id="simulation-sizing-notice">
-                  <span class="simulation-lock-badge" id="simulation-lock-badge">LOCKED: 180 Questions (Official NEET-PG Specification • 5 Sections × 36 Qs)</span>
-                </div>
-
-                <!-- Dynamic Time Budget & Pace Feedback -->
-                <div class="ai-sizing-breakdown" id="ai-sizing-breakdown">
-                  NEET-PG Pace: 63s/Q • Time Budget: 10 min 30s • Single Timer Drill
-                </div>
-              </div>
-
-              <!-- Row 3: Clinical Configuration -->
-              <div class="setup-row">
-                <span class="setup-row-label">Clinical Configuration</span>
-                <div class="ai-grid-2col">
+                <div class="ai-grid-2col" style="margin-top: 0.5rem;">
                   <div class="ai-col">
                     <label for="select-ai-difficulty" class="selector-label">Difficulty Level</label>
                     <select id="select-ai-difficulty" class="form-select">
@@ -258,7 +307,7 @@
                     </select>
                   </div>
                   <div class="ai-col">
-                    <label for="select-ai-style" class="selector-label">Question Formats</label>
+                    <label for="select-ai-style" class="selector-label">Question Format</label>
                     <select id="select-ai-style" class="form-select">
                       <option value="mixed" selected>Mixed</option>
                       <option value="oneliner">One-liners</option>
@@ -269,18 +318,21 @@
                 </div>
               </div>
 
-              <!-- Row 4: Gemini AI Engine & API Key -->
-              <div class="setup-row">
-                <span class="setup-row-label">Gemini AI Engine & API Key</span>
+              <!-- 5. AI Settings & Generation -->
+              <div class="setup-row setup-section-block">
+                <div class="setup-step-heading">
+                  <span class="setup-step-num">5</span>
+                  <span class="setup-row-label">AI Settings</span>
+                </div>
                 <!-- Compact Key Strip -->
-                <div class="key-compact-strip" id="key-compact-strip">
+                <div class="key-compact-strip" id="key-compact-strip" style="margin-top: 0.5rem;">
                   <div class="key-status-display" id="key-status-display">
                     <span class="ai-key-status-pill configured" id="ai-key-status-pill">CONFIGURED</span>
                     <span class="key-mask-text" id="key-mask-text">API Key: AIzaSy••••••••</span>
-                    <span class="key-engine-badge">Engine: Gemini 3.5 Flash (0.15 Temp)</span>
+                    <span class="key-engine-badge">Gemini 3.5 Flash</span>
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-change-api-key">Change</button>
                   </div>
-                  <!-- Hidden/Expandable Key Editor -->
+                  <!-- Expandable Key Editor -->
                   <div class="key-editor-row hidden" id="key-editor-row">
                     <input
                       type="password"
@@ -296,125 +348,92 @@
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-key-edit">Cancel</button>
                   </div>
                 </div>
-              </div>
 
-              <!-- Generation Progress Box -->
-              <div id="ai-generation-progress" class="ai-progress-card hidden">
-                <div class="ai-progress-header">
-                  <span class="ai-progress-status" id="ai-progress-status">Initializing test generation...</span>
-                  <span class="ai-progress-percentage" id="ai-progress-percentage">0%</span>
+                <!-- Generation Progress Box -->
+                <div id="ai-generation-progress" class="ai-progress-card hidden" style="margin-top: 0.75rem;">
+                  <div class="ai-progress-header">
+                    <span class="ai-progress-status" id="ai-progress-status">Initializing test generation...</span>
+                    <span class="ai-progress-percentage" id="ai-progress-percentage">0%</span>
+                  </div>
+                  <div class="ai-progress-track">
+                    <div class="ai-progress-fill" id="ai-progress-fill" style="width: 0%;"></div>
+                  </div>
+                  <div class="ai-progress-footer">
+                    <span class="ai-progress-batch" id="ai-progress-batch">Batch 1 of 1</span>
+                    <button type="button" class="btn btn-danger btn-sm" id="btn-cancel-ai-generation">Cancel Generation</button>
+                  </div>
                 </div>
-                <div class="ai-progress-track">
-                  <div class="ai-progress-fill" id="ai-progress-fill" style="width: 0%;"></div>
-                </div>
-                <div class="ai-progress-footer">
-                  <span class="ai-progress-batch" id="ai-progress-batch">Batch 1 of 1</span>
-                  <button type="button" class="btn btn-danger" id="btn-cancel-ai-generation">Cancel Generation</button>
-                </div>
-              </div>
 
-              <!-- Primary Action Buttons (Level 2: Pure Action) -->
-              <div class="home-actions ai-actions-bar" style="margin-top: 1.25rem;">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  id="btn-ai-copy-prompt"
-                >
-                  Copy AI Prompt
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary btn-start"
-                  id="btn-ai-generate"
-                >
-                  Generate Test with Gemini
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Sample Test Panel -->
-          <div id="setup-sample-panel" class="setup-subpanel hidden">
-            <div class="setup-compact-card">
-              <div class="sample-direct-content">
-                <h3 class="sample-title" id="sample-panel-title">NEET-PG Practice Mock Test</h3>
-                <p class="sample-desc" id="sample-panel-desc">
-                  Load a verified, curriculum-mapped sample dataset covering high-yield MBBS clinical vignettes and start a full CBT testing session immediately.
-                </p>
-                <div class="sample-stats-row">
-                  <span class="sample-stat-tag" id="sample-tag-sections">1 Section</span>
-                  <span class="summary-sep">•</span>
-                  <span class="sample-stat-tag" id="sample-tag-questions">10 Questions</span>
-                  <span class="summary-sep">•</span>
-                  <span class="sample-stat-tag" id="sample-tag-marking">+4 / -1 Marking</span>
+                <!-- Actions Bar -->
+                <div class="home-actions ai-actions-bar" style="margin-top: 1.25rem;">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="btn-ai-copy-prompt"
+                  >
+                    Copy AI Prompt
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-start"
+                    id="btn-ai-generate"
+                  >
+                    Generate Test
+                  </button>
                 </div>
-              </div>
-              <div class="home-actions" style="margin-top: 1.25rem;">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-start"
-                  id="btn-start-sample-direct"
-                >
-                  Start Practice Test
-                </button>
               </div>
             </div>
           </div>
 
           <!-- Manual Upload / Paste Panel -->
           <div id="setup-manual-panel" class="setup-subpanel hidden">
-            <!-- Upload Drop Zone -->
-            <div class="upload-dropzone" id="drop-zone">
-              <input
-                type="file"
-                id="json-file-input"
-                accept=".json"
-                class="file-input-hidden"
-              />
-              <div class="dropzone-text">
-                Drop AI-generated JSON here or
-                <button type="button" class="btn-link" id="browse-btn">
-                  browse file
+            <div class="setup-compact-card">
+              <!-- Upload Drop Zone -->
+              <div class="upload-dropzone" id="drop-zone">
+                <input
+                  type="file"
+                  id="json-file-input"
+                  accept=".json"
+                  class="file-input-hidden"
+                />
+                <div class="dropzone-text">
+                  Drop questions JSON here or
+                  <button type="button" class="btn-link" id="browse-btn">
+                    browse file
+                  </button>
+                </div>
+                <div id="file-name-display" class="file-name-tag"></div>
+              </div>
+
+              <div class="divider-line"><span>OR PASTE JSON</span></div>
+
+              <!-- Paste Area -->
+              <div class="paste-container">
+                <textarea
+                  id="json-text-input"
+                  placeholder="Paste questions JSON here..."
+                  rows="6"
+                  spellcheck="false"
+                ></textarea>
+              </div>
+
+              <!-- Validation Alert Box -->
+              <div id="validation-alert" class="alert-box alert-warning hidden">
+                <span class="alert-symbol">!</span>
+                <span id="validation-msg">Invalid format: Check JSON structure.</span>
+              </div>
+
+              <!-- Actions -->
+              <div class="home-actions" style="margin-top: 1rem;">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-start"
+                  id="start-exam-btn"
+                  disabled
+                >
+                  Load JSON
                 </button>
               </div>
-              <div id="file-name-display" class="file-name-tag"></div>
-            </div>
-
-            <div class="divider-line"><span>OR PASTE JSON CONFIGURATION</span></div>
-
-            <!-- Paste Area -->
-            <div class="paste-container">
-              <textarea
-                id="json-text-input"
-                placeholder="Paste questions JSON here..."
-                rows="6"
-                spellcheck="false"
-              ></textarea>
-            </div>
-
-            <!-- Validation Alert Box -->
-            <div id="validation-alert" class="alert-box alert-warning hidden">
-              <span class="alert-symbol">!</span>
-              <span id="validation-msg">Invalid format: Check JSON structure.</span>
-            </div>
-
-            <!-- Actions -->
-            <div class="home-actions">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                id="load-sample-btn"
-              >
-                Load NEET-PG Sample
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary btn-start"
-                id="start-exam-btn"
-                disabled
-              >
-                Start CBT Session
-              </button>
             </div>
           </div>
         </div>
@@ -1016,41 +1035,80 @@
       </div>
     </div>
 
-    <!-- Test Ready Modal -->
-    <div id="modal-test-ready" class="modal-backdrop hidden">
-      <div class="modal-dialog modal-dialog-wide">
+    <!-- Sample Test Confirmation Modal -->
+    <div id="modal-sample-confirm" class="modal-backdrop hidden">
+      <div class="modal-dialog">
         <div class="modal-header">
-          <h3 id="modal-test-ready-header-title">Test Generated Successfully</h3>
+          <h3>Start Sample Test</h3>
         </div>
         <div class="modal-body">
-          <p id="test-ready-title" class="test-ready-title">NEET-PG CBT Mock Test</p>
-          <div class="test-ready-stats-grid">
-            <div class="ready-stat-box">
-              <span class="ready-stat-val" id="ready-stat-questions">50</span>
-              <span class="ready-stat-lbl">Questions</span>
-            </div>
-            <div class="ready-stat-box">
-              <span class="ready-stat-val" id="ready-stat-sections">2</span>
-              <span class="ready-stat-lbl">Sections</span>
-            </div>
-            <div class="ready-stat-box">
-              <span class="ready-stat-val" id="ready-stat-duration">52 min</span>
-              <span class="ready-stat-lbl">Total Time</span>
-            </div>
-            <div class="ready-stat-box">
-              <span class="ready-stat-val" id="ready-stat-scheme">+4 / -1</span>
-              <span class="ready-stat-lbl">Marking Scheme</span>
-            </div>
-          </div>
-          <div class="test-ready-subjects-wrap">
-            <span class="selector-label">Subjects Included:</span>
-            <div class="test-ready-subjects" id="test-ready-subjects"></div>
+          <p>Start a verified NEET-PG sample mock test (10 clinical questions)?</p>
+          <div class="sample-dialog-notice" style="margin-top: 0.85rem; padding: 0.75rem 1rem; border-left: 3px solid var(--pastel-amber); background: rgba(245, 158, 11, 0.08); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+            <strong>Note:</strong> Sample tests are designed for quick preview and practice. Your answers and score will <strong>not</strong> be saved into your test history.
           </div>
         </div>
-        <div class="modal-footer test-ready-footer">
-          <button type="button" class="btn btn-secondary" id="btn-test-ready-inspect">Inspect in JSON Editor</button>
-          <button type="button" class="btn btn-secondary" id="btn-test-ready-download">Download Test JSON</button>
-          <button type="button" class="btn btn-primary btn-start" id="btn-test-ready-start">Start CBT Session Now</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-sample-cancel">Cancel</button>
+          <button type="button" class="btn btn-primary btn-start" id="btn-sample-confirm">Start Test</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start Test Dialog Modal (Common Landing for AI and JSON Tests) -->
+    <div id="modal-start-test" class="modal-backdrop hidden">
+      <div class="modal-dialog modal-dialog-wide">
+        <div class="modal-header">
+          <h3 id="modal-start-test-header-title">Start Test</h3>
+        </div>
+        <div class="modal-body">
+          <div class="start-test-summary-card">
+            <div class="start-test-summary-grid">
+              <div class="start-summary-item">
+                <span class="start-summary-lbl">Test Mode</span>
+                <span class="start-summary-val" id="dialog-stat-mode">Practice Mode</span>
+              </div>
+              <div class="start-summary-item">
+                <span class="start-summary-lbl">Target Exam</span>
+                <span class="start-summary-val" id="dialog-stat-exam">NEET-PG (+4 / -1)</span>
+              </div>
+              <div class="start-summary-item">
+                <span class="start-summary-lbl">Questions & Sections</span>
+                <span class="start-summary-val" id="dialog-stat-questions">10 Questions (1 Block)</span>
+              </div>
+              <div class="start-summary-item">
+                <span class="start-summary-lbl">Time Budget</span>
+                <span class="start-summary-val" id="dialog-stat-time">No time limit (Elapsed Timer)</span>
+              </div>
+              <div class="start-summary-item start-summary-item-full">
+                <span class="start-summary-lbl">Syllabus Scope</span>
+                <span class="start-summary-val" id="dialog-stat-syllabus">Full Syllabus (Grand Test)</span>
+              </div>
+              <div class="start-summary-item start-summary-item-full">
+                <span class="start-summary-lbl">Difficulty & Format</span>
+                <span class="start-summary-val" id="dialog-stat-diff-format">Balanced • Mixed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional Test Name -->
+          <div class="dialog-test-name-wrap" style="margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label for="input-dialog-test-name" class="selector-label" style="margin-bottom: 0;">Test Name (Optional):</label>
+              <button type="button" class="btn-link btn-xs" id="btn-dialog-reset-name">Reset Default</button>
+            </div>
+            <input
+              type="text"
+              id="input-dialog-test-name"
+              class="form-input test-name-input"
+              placeholder="NEET-PG CBT Mock Test"
+              maxlength="100"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="modal-footer start-test-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn btn-secondary" id="btn-dialog-goto-setup">Go to Test Setup</button>
+          <button type="button" class="btn btn-primary btn-start" id="btn-dialog-start-test">Start Test</button>
         </div>
       </div>
     </div>
