@@ -277,6 +277,14 @@ const DOM = {
   modeExplanationExam: document.getElementById('mode-explanation-exam'),
   aiScopeSummaryPill: document.getElementById('ai-scope-summary-pill'),
 
+  // Setup Step Badges (Collapsible Accordion)
+  badgeStepMode: document.getElementById('badge-step-mode'),
+  badgeStepType: document.getElementById('badge-step-type'),
+  badgeStepLength: document.getElementById('badge-step-length'),
+  badgeStepSyllabus: document.getElementById('badge-step-syllabus'),
+  badgeStepFormat: document.getElementById('badge-step-format'),
+  badgeStepAi: document.getElementById('badge-step-ai'),
+
   // Sample Confirmation Modal
   modalSampleConfirm: document.getElementById('modal-sample-confirm'),
   btnSampleCancel: document.getElementById('btn-sample-cancel'),
@@ -630,7 +638,94 @@ function toggleTheme() {
   applyTheme(AppState.theme === 'dark' ? 'light' : 'dark');
 }
 
-function setSessionMode(mode) {
+function updateStepHeaderBadges() {
+  // Step 1: Mode
+  if (DOM.badgeStepMode) {
+    DOM.badgeStepMode.textContent = AppState.sessionMode === 'practice' ? 'Practice Mode' : 'Exam Mode';
+  }
+
+  // Step 2: Type
+  if (DOM.badgeStepType) {
+    DOM.badgeStepType.textContent = AppState.examMode === 'neetpg' ? 'NEET-PG (+4 / -1)' : 'INI-CET (+1 / -0.333)';
+  }
+
+  // Step 3: Length & Partitioning
+  if (DOM.badgeStepLength) {
+    const isPractice = AppState.sessionMode === 'practice';
+    const isNeet = AppState.examMode === 'neetpg';
+    const count = AppState.aiQuestionCount || 10;
+    if (isPractice) {
+      DOM.badgeStepLength.textContent = `${count} Qs (Untimed Drill)`;
+    } else {
+      const targetSec = isNeet ? 36 : 50;
+      const numSec = Math.max(1, Math.ceil(count / targetSec));
+      DOM.badgeStepLength.textContent = `${count} Qs (${numSec} ${isNeet ? 'Sec' : 'Blk'})`;
+    }
+  }
+
+  // Step 4: Syllabus
+  if (DOM.badgeStepSyllabus) {
+    if (AppState.aiScope === 'grand') {
+      DOM.badgeStepSyllabus.textContent = 'Full Syllabus';
+    } else {
+      const subjCount = AppState.aiSelectedSubjects ? AppState.aiSelectedSubjects.length : 0;
+      const sysCount = AppState.aiSelectedSystems ? AppState.aiSelectedSystems.length : 0;
+      if (subjCount === 0 && sysCount === 0) {
+        DOM.badgeStepSyllabus.textContent = 'Custom Syllabus';
+      } else {
+        DOM.badgeStepSyllabus.textContent = `${subjCount} Subj, ${sysCount} Sys`;
+      }
+    }
+  }
+
+  // Step 5: Difficulty & Format
+  if (DOM.badgeStepFormat) {
+    const diffMap = { balanced: 'Balanced', easy: 'Easy', medium: 'Medium', hard: 'Hard' };
+    const styleMap = { mixed: 'Mixed', oneliner: 'One-Liners', conceptual: 'Conceptual', vignette: 'Vignettes' };
+    const diff = diffMap[AppState.aiDifficulty] || 'Balanced';
+    const style = styleMap[AppState.aiStyle] || 'Mixed';
+    DOM.badgeStepFormat.textContent = `${diff} • ${style}`;
+  }
+
+  // Step 6: AI Settings
+  if (DOM.badgeStepAi) {
+    const savedKey = (typeof localStorage !== 'undefined' && localStorage.getItem('triage_gemini_api_key')) || (DOM.inputGeminiApiKey ? DOM.inputGeminiApiKey.value.trim() : '');
+    const isKeySet = Boolean(savedKey);
+    DOM.badgeStepAi.textContent = isKeySet ? 'Configured' : 'Key Required';
+  }
+}
+
+function toggleSetupStep(stepNum, forceOpen) {
+  const stepMap = {
+    1: 'step-card-mode',
+    2: 'step-card-type',
+    3: 'step-card-length',
+    4: 'step-card-syllabus',
+    5: 'step-card-format',
+    6: 'step-card-ai'
+  };
+  const targetId = stepMap[stepNum];
+  const targetCard = document.getElementById(targetId);
+  if (!targetCard) return;
+
+  if (forceOpen === true) {
+    document.querySelectorAll('.setup-step-card').forEach(c => {
+      c.classList.toggle('active', c === targetCard);
+    });
+    if (typeof targetCard.scrollIntoView === 'function') {
+      try {
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (e) {}
+    }
+  } else if (forceOpen === false) {
+    targetCard.classList.remove('active');
+  } else {
+    targetCard.classList.toggle('active');
+  }
+  updateStepHeaderBadges();
+}
+
+function setSessionMode(mode, autoAdvance = true) {
   AppState.sessionMode = mode; // 'practice' | 'simulation'
   if (DOM.btnModePractice) {
     DOM.btnModePractice.classList.toggle('active', mode === 'practice');
@@ -669,10 +764,15 @@ function setSessionMode(mode) {
   if (typeof updateAiConfigSummary === 'function') {
     updateAiConfigSummary();
   }
+  updateStepHeaderBadges();
   persistAppState();
+
+  if (autoAdvance) {
+    toggleSetupStep(2, true);
+  }
 }
 
-function setExamMode(mode) {
+function setExamMode(mode, autoAdvance = true) {
   AppState.examMode = mode;
   // If the active preset was the unit (36/50) or mock (180/200), update to match the new exam mode
   if (AppState.aiQuestionCount === 36 && mode === 'inicet') {
@@ -686,13 +786,18 @@ function setExamMode(mode) {
   }
 
   updateExamModeUI();
+  updateStepHeaderBadges();
   persistAppState();
+
+  if (autoAdvance) {
+    toggleSetupStep(3, true);
+  }
 }
+
 function updateExamModeUI() {
   const isNeet = AppState.examMode === 'neetpg';
   DOM.modeBtnNeet.classList.toggle('active', isNeet);
   DOM.modeBtnIni.classList.toggle('active', !isNeet);
-  DOM.headerExamBadge.textContent = isNeet ? 'NEET-PG' : 'INI-CET';
   if (DOM.loadSampleBtn) {
     DOM.loadSampleBtn.textContent = isNeet ? 'Load NEET-PG Sample' : 'Load INI-CET Sample';
   }
@@ -720,17 +825,12 @@ function updateExamModeUI() {
       : 'Official INI-CET Format: 4 Blocks × 50 Qs (45 min / block • +1 / -0.333)';
   }
 
-  if (AppState.sessionMode === 'simulation') {
+  // Deduplicated Exam Format Details: shows marking scheme and pacing without repeating mode description
+  if (DOM.examFormatDetails) {
     if (isNeet) {
-      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Exam Mode:</strong> Customizable Qs • Dynamic Sections (36 Qs standard) • 63s/Q Time Budget • Section Lock on Submit`;
+      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG:</strong> +4 / -1 Marking Scheme • 63s/Question Standard Time-Budget`;
     } else {
-      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Exam Mode:</strong> Customizable Qs • Dynamic Blocks (50 Qs standard) • 54s/Q Time Budget • Section Lock on Submit`;
-    }
-  } else {
-    if (isNeet) {
-      DOM.examFormatDetails.innerHTML = `<strong>NEET-PG Practice Mode:</strong> No Time Limit (Elapsed Timer) • Customizable Total Qs • Continuous Stream (No Sections)`;
-    } else {
-      DOM.examFormatDetails.innerHTML = `<strong>INI-CET Practice Mode:</strong> No Time Limit (Elapsed Timer) • Customizable Total Qs • Continuous Stream (No Sections)`;
+      DOM.examFormatDetails.innerHTML = `<strong>INI-CET:</strong> +1 / -0.333 Marking Scheme • 54s/Question Standard Time-Budget`;
     }
   }
 
@@ -929,6 +1029,10 @@ function attachEventListeners() {
   if (DOM.selectAiScope) {
     DOM.selectAiScope.addEventListener('change', () => {
       setAiScope(DOM.selectAiScope.value);
+      updateStepHeaderBadges();
+      if (DOM.selectAiScope.value === 'grand') {
+        toggleSetupStep(5, true);
+      }
     });
   }
   if (DOM.selectAiSubject) {
@@ -1015,6 +1119,8 @@ function attachEventListeners() {
       if (!btn) return;
       const count = parseInt(btn.dataset.count, 10);
       setAiQuestionCount(count);
+      updateStepHeaderBadges();
+      toggleSetupStep(4, true);
     });
   }
 
@@ -1037,6 +1143,7 @@ function attachEventListeners() {
       const val = parseInt(DOM.inputAiCustomCount.value, 10);
       if (!isNaN(val) && val >= 1 && val <= 200) {
         setAiQuestionCount(val, false);
+        updateStepHeaderBadges();
       }
     };
 
@@ -1049,13 +1156,31 @@ function attachEventListeners() {
     DOM.selectAiDifficulty.addEventListener('change', () => {
       AppState.aiDifficulty = DOM.selectAiDifficulty.value;
       updateAiConfigSummary();
+      updateStepHeaderBadges();
     });
   }
   if (DOM.selectAiStyle) {
     DOM.selectAiStyle.addEventListener('change', () => {
       AppState.aiStyle = DOM.selectAiStyle.value;
+      updateStepHeaderBadges();
     });
   }
+
+  // Setup Step Accordion Headers (Collapse / Expand on click)
+  document.querySelectorAll('.setup-step-header').forEach(header => {
+    header.addEventListener('click', (e) => {
+      e.preventDefault();
+      const card = header.closest('.setup-step-card');
+      if (card) {
+        const isOpen = card.classList.contains('active');
+        document.querySelectorAll('.setup-step-card').forEach(c => c.classList.remove('active'));
+        if (!isOpen) {
+          card.classList.add('active');
+        }
+        updateStepHeaderBadges();
+      }
+    });
+  });
   if (DOM.aiDifficultyGroup) {
     DOM.aiDifficultyGroup.addEventListener('click', (e) => {
       const btn = e.target.closest('.btn-segmented');
@@ -1504,6 +1629,7 @@ function renderApiKeyStatus() {
     if (DOM.keyStatusDisplay) DOM.keyStatusDisplay.classList.add('hidden');
     if (DOM.keyEditorRow) DOM.keyEditorRow.classList.remove('hidden');
   }
+  updateStepHeaderBadges();
 }
 
 async function startSampleDirect() {
@@ -1636,12 +1762,14 @@ function saveApiKey() {
   }
   localStorage.setItem('triage_gemini_api_key', key);
   renderApiKeyStatus();
+  updateStepHeaderBadges();
   showToast("Gemini API key saved to browser local storage.");
 }
 
 function clearApiKey() {
   localStorage.removeItem('triage_gemini_api_key');
   renderApiKeyStatus();
+  updateStepHeaderBadges();
   showToast("Gemini API key removed.");
 }
 
@@ -2676,6 +2804,17 @@ function switchView(viewName) {
 
 function renderHeaderNavActions() {
   DOM.dynamicNavActions.innerHTML = '';
+
+  if (DOM.headerExamBadge) {
+    if (AppState.view === 'exam' && AppState.isSampleTest) {
+      DOM.headerExamBadge.textContent = 'SAMPLE';
+      DOM.headerExamBadge.className = 'brand-badge brand-badge-sample';
+    } else {
+      DOM.headerExamBadge.textContent = '';
+      DOM.headerExamBadge.className = 'brand-badge hidden';
+    }
+  }
+
   if (AppState.view === 'home') {
     const historyBtn = document.createElement('button');
     historyBtn.className = 'btn btn-outline';
@@ -2701,14 +2840,6 @@ function renderHeaderNavActions() {
     historyBtn.onclick = openHistoryView;
     DOM.dynamicNavActions.appendChild(historyBtn);
   } else if (AppState.view === 'exam') {
-    if (AppState.isSampleTest) {
-      DOM.headerExamBadge.textContent = 'SAMPLE';
-      DOM.headerExamBadge.className = 'brand-badge brand-badge-sample';
-    } else {
-      DOM.headerExamBadge.textContent = AppState.examMode === 'inicet' ? 'INI-CET' : 'NEET-PG';
-      DOM.headerExamBadge.className = 'brand-badge';
-    }
-
     const helpBtn = document.createElement('button');
     helpBtn.className = 'btn btn-outline';
     helpBtn.id = 'btn-keyboard-help';
@@ -2731,12 +2862,13 @@ function renderHeaderNavActions() {
     retakeBtn.onclick = handleRetakeTest;
     DOM.dynamicNavActions.appendChild(retakeBtn);
 
-    const newTestBtn = document.createElement('button');
-    newTestBtn.className = 'btn btn-primary';
-    newTestBtn.id = 'btn-header-new-test';
-    newTestBtn.textContent = 'New Test';
-    newTestBtn.onclick = handleNewTest;
-    DOM.dynamicNavActions.appendChild(newTestBtn);
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'btn btn-primary';
+    homeBtn.id = 'btn-header-home';
+    homeBtn.textContent = 'Home';
+    homeBtn.title = 'Return to Home';
+    homeBtn.onclick = handleNewTest;
+    DOM.dynamicNavActions.appendChild(homeBtn);
   }
 }
 
@@ -3004,7 +3136,11 @@ function loadQuestion(secIdx, qIdx) {
 
   const isLastSection = secIdx === AppState.examData.sections.length - 1;
   DOM.btnSubmitSection.textContent = isLastSection ? 'Submit Test' : 'Submit Section';
-  DOM.timerSecLabel.textContent = currentSec.name;
+
+  if (DOM.timerSecLabel) {
+    const isPractice = AppState.sessionMode === 'practice' || (currentSec && currentSec.id === 'sec_practice');
+    DOM.timerSecLabel.textContent = isPractice ? 'TIME ELAPSED' : (currentSec ? currentSec.name : 'Section');
+  }
 
   updatePaletteGrid();
   updatePaletteSummaryCounters();
@@ -3390,7 +3526,12 @@ function updateTimerDisplay(seconds, isElapsed = false) {
   const s = String(seconds % 60).padStart(2, '0');
   
   if (DOM.timerSecLabel) {
-    DOM.timerSecLabel.textContent = isElapsed ? 'TIME ELAPSED' : 'TIME REMAINING';
+    if (isElapsed || AppState.sessionMode === 'practice') {
+      DOM.timerSecLabel.textContent = 'TIME ELAPSED';
+    } else {
+      const activeSec = (AppState.examData && AppState.examData.sections) ? AppState.examData.sections[AppState.activeSectionIndex] : null;
+      DOM.timerSecLabel.textContent = activeSec ? activeSec.name : 'TIME REMAINING';
+    }
   }
 
   if (DOM.sectionClockDisplay) {
@@ -3833,10 +3974,17 @@ function renderFilteredReviewQuestions() {
     const row = document.createElement('div');
     row.className = 'mini-palette-section-row';
 
-    const label = document.createElement('span');
-    label.className = 'mini-palette-sec-label';
-    label.textContent = section.name.replace(/Section|Block\s*/i, '').trim() || section.name.charAt(0);
-    row.appendChild(label);
+    const isPracticeSection = (section.id === 'sec_practice') || 
+                              (section.name && /practice/i.test(section.name)) ||
+                              (AppState.sessionMode === 'practice') ||
+                              (sectionMap.size === 1 && !/^(section|block)\b/i.test(section.name.trim()));
+
+    if (!isPracticeSection) {
+      const label = document.createElement('span');
+      label.className = 'mini-palette-sec-label';
+      label.textContent = section.name.replace(/Section|Block\s*/i, '').trim() || section.name.charAt(0);
+      row.appendChild(label);
+    }
 
     const track = document.createElement('div');
     track.className = 'mini-palette-buttons-track';
@@ -3898,7 +4046,13 @@ function handleReviewNextQuestion() {
 function renderActiveReviewCard(item) {
   const { question, section, indexInSection, isCorrect, isIncorrect, quadrant, resp } = item;
 
-  DOM.reviewQNum.textContent = `${section.name} — Question ${indexInSection}`;
+  const isPracticeSection = (section && section.id === 'sec_practice') || 
+                            (section && section.name && /practice/i.test(section.name)) ||
+                            (AppState.sessionMode === 'practice');
+
+  DOM.reviewQNum.textContent = isPracticeSection
+    ? `Question ${indexInSection}`
+    : `${section.name} — Question ${indexInSection}`;
 
   // Badges
   if (isCorrect) {
@@ -3964,9 +4118,10 @@ function renderActiveReviewCard(item) {
 
   // Tag Pills
   DOM.reviewTagPills.innerHTML = '';
-  const tags = [
-    { label: section.name, key: 'section', val: section.name }
-  ];
+  const tags = [];
+  if (!isPracticeSection) {
+    tags.push({ label: section.name, key: 'section', val: section.name });
+  }
 
   normalizeToArray(question.subject).forEach(s => {
     const norm = normalizeSubject(s);
@@ -5348,10 +5503,10 @@ function restoreHomeState(savedState) {
       if (DOM.inputTestName) DOM.inputTestName.value = savedState.customTestName;
     }
     if (savedState.examMode && ['neetpg', 'inicet'].includes(savedState.examMode)) {
-      setExamMode(savedState.examMode);
+      setExamMode(savedState.examMode, false);
     }
     if (savedState.sessionMode && ['practice', 'simulation'].includes(savedState.sessionMode)) {
-      setSessionMode(savedState.sessionMode);
+      setSessionMode(savedState.sessionMode, false);
     }
     if (savedState.setupMode && ['ai', 'sample', 'manual'].includes(savedState.setupMode)) {
       switchSetupMode(savedState.setupMode);
@@ -5402,6 +5557,9 @@ function restoreHomeState(savedState) {
     updateAiSizingBreakdown();
     updateAiConfigSummary();
   }
+
+  updateStepHeaderBadges();
+  toggleSetupStep(1, true);
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

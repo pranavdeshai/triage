@@ -3,8 +3,8 @@
    ========================================================================== */
 
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: var(--font-mono);
   --transition-fast: 0.15s ease;
   font-size: 15px;
 }
@@ -139,7 +139,7 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   background-color: var(--bg-app);
   color: var(--text-primary);
   min-height: 100vh;
@@ -172,7 +172,7 @@ button, input, select, textarea, a, .option-row {
 }
 
 button, input, select, textarea {
-  font-family: inherit;
+  font-family: var(--font-mono);
   font-size: inherit;
   color: inherit;
   background: transparent;
@@ -434,10 +434,13 @@ button {
 /* --------------------------------------------------------------------------
    1. HOME VIEW: SETUP & QUESTION LOADING
    -------------------------------------------------------------------------- */
-#view-home {
+#view-home,
+#view-setup {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem max(1rem, env(safe-area-inset-right, 0px)) max(2.5rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px));
+  justify-content: flex-start;
+  padding: 2rem max(1rem, env(safe-area-inset-right, 0px)) max(3.5rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px));
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -446,10 +449,13 @@ button {
 
 .home-container {
   width: 100%;
-  max-width: 640px;
+  max-width: 680px;
+  margin: 0 auto;
+  box-sizing: border-box;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   padding: 2rem;
+  border-radius: 12px;
 }
 
 .panel-header {
@@ -832,7 +838,7 @@ button {
 }
 
 .sec-tooltip .tooltip-title {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -868,7 +874,7 @@ button {
 .sec-tooltip .tooltip-row .legend-text {
   flex: 1;
   text-align: left;
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
 }
 
 .sec-tab-btn:hover .sec-tooltip,
@@ -962,7 +968,7 @@ button {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.35rem 0.75rem;
@@ -3540,13 +3546,17 @@ kbd {
 }
 
 .ai-sizing-breakdown {
-  margin-top: 0.75rem;
+  margin-top: 0.65rem;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 4px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
+  line-height: 1.45;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Difficulty & Clinical Style (2 Columns) */
@@ -4035,23 +4045,94 @@ kbd {
   font-size: 0.82rem;
 }
 
-.setup-section-block {
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1.25rem;
+/* 2. Setup Step Cards (Collapsible Accordion) */
+.setup-step-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  background: var(--bg-card);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
 }
 
-.setup-section-block:last-child {
-  border-bottom: none;
+.setup-step-card:last-child {
   margin-bottom: 0;
-  padding-bottom: 0;
 }
 
-.setup-step-heading {
+.setup-step-card.active {
+  border-color: var(--border-focus);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.setup-step-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+  user-select: none;
+  transition: background-color 0.12s ease;
+}
+
+.setup-step-header:hover {
+  background-color: var(--bg-hover);
+}
+
+.setup-step-header-left {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.35rem;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.setup-step-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.setup-step-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.setup-step-card.active .setup-step-badge {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--accent-blue);
+}
+
+.setup-step-chevron {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.setup-step-card.active .setup-step-chevron {
+  transform: rotate(180deg);
+}
+
+.setup-step-body {
+  padding: 0.25rem 1rem 1rem 1rem;
+  display: none;
+}
+
+.setup-step-card.active .setup-step-body {
+  display: block;
 }
 
 .setup-step-num {
@@ -4068,14 +4149,28 @@ kbd {
   color: var(--text-primary);
 }
 
-.mode-explanation-box {
-  margin-top: 0.5rem;
+.mode-explanation-box,
+.exam-format-details {
+  margin-top: 0.65rem;
   padding: 0.6rem 0.85rem;
-  border-radius: 6px;
-  background: var(--bg-hover);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.45;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.setup-actions-persistent {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
 }
 
 .explanation-pill {

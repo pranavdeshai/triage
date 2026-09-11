@@ -25,7 +25,7 @@
           <rect x="1" y="6" width="14" height="4" />
         </svg>
         <span class="brand-title">triage</span>
-        <span class="brand-badge" id="header-exam-badge">cbt</span>
+        <span class="brand-badge hidden" id="header-exam-badge"></span>
       </div>
       <div class="header-right">
         <button
@@ -132,16 +132,20 @@
             </div>
           </div>
 
-          <!-- AI Generator Panel (Ordered 1 to 5) -->
+          <!-- AI Generator Panel (Collapsible 6-Step Accordion) -->
           <div id="setup-ai-panel" class="setup-subpanel active">
-            <div class="setup-compact-card">
-              <!-- 1. Test Mode -->
-              <div class="setup-row setup-section-block">
-                <div class="setup-step-heading">
+            <!-- Step 1: Test Mode -->
+            <div class="setup-step-card active" id="step-card-mode">
+              <button type="button" class="setup-step-header" data-step="1">
+                <div class="setup-step-header-left">
                   <span class="setup-step-num">1</span>
-                  <span class="setup-row-label">Test Mode</span>
+                  <span class="setup-step-title">Test Mode</span>
+                  <span class="setup-step-badge" id="badge-step-mode">Practice Mode</span>
                 </div>
-                <div class="session-mode-toggle-bar" style="margin-top: 0.5rem;">
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-mode">
+                <div class="session-mode-toggle-bar">
                   <button
                     type="button"
                     class="btn btn-session-mode active"
@@ -159,55 +163,29 @@
                     Exam Mode
                   </button>
                 </div>
-
-                <!-- Mode Description / Help Text -->
                 <div class="mode-explanation-box" id="mode-explanation-practice">
                   <span class="explanation-pill">Practice Mode</span>
-                  No time limit (timer shows total time elapsed) • Customisable total questions • No sections/blocks (continuous question stream).
+                  No time limit (timer shows elapsed time) • Untimed drill • 1 continuous section (no block locks).
                 </div>
                 <div class="mode-explanation-box hidden" id="mode-explanation-exam">
                   <span class="explanation-pill pill-exam">Exam Mode</span>
-                  Customisable questions • Dynamic section division • Per-section time limits (standard exam budget) • Section locks after submission.
-                </div>
-
-                <!-- Question Sizing & Partitioning -->
-                <div class="ai-sizing-row" id="ai-sizing-row-practice" style="margin-top: 0.75rem;">
-                  <div class="ai-preset-chips" id="ai-count-presets">
-                    <button type="button" class="btn btn-count-preset active" data-count="10">10 Qs</button>
-                    <button type="button" class="btn btn-count-preset" data-count="25">25 Qs</button>
-                    <button type="button" class="btn btn-count-preset" id="btn-count-unit" data-count="36">36 Qs (Block)</button>
-                    <button type="button" class="btn btn-count-preset" id="btn-count-mock" data-count="180">180 Qs (Full Test)</button>
-                  </div>
-
-                  <!-- Distinct Custom Question Sizing Element -->
-                  <div class="ai-custom-sizing-element" id="ai-custom-sizing-element">
-                    <label for="input-ai-custom-count" class="ai-custom-label">Custom:</label>
-                    <input
-                      type="number"
-                      id="input-ai-custom-count"
-                      class="ai-custom-number-input"
-                      min="5"
-                      max="200"
-                      value="10"
-                      aria-label="Custom Question Count"
-                    />
-                    <span class="ai-custom-suffix">Qs</span>
-                  </div>
-                </div>
-
-                <!-- Dynamic Time Budget & Section Feedback -->
-                <div class="ai-sizing-breakdown" id="ai-sizing-breakdown" style="margin-top: 0.5rem;">
-                  Practice Mode: Elapsed Timer • 1 Block • Untimed Drill
+                  Standard countdown timer • Dynamic sections • Per-section time limits • Section locks on submission.
                 </div>
               </div>
+            </div>
 
-              <!-- 2. Test Type -->
-              <div class="setup-row setup-section-block">
-                <div class="setup-step-heading">
+            <!-- Step 2: Test Type -->
+            <div class="setup-step-card" id="step-card-type">
+              <button type="button" class="setup-step-header" data-step="2">
+                <div class="setup-step-header-left">
                   <span class="setup-step-num">2</span>
-                  <span class="setup-row-label">Test Type</span>
+                  <span class="setup-step-title">Test Type</span>
+                  <span class="setup-step-badge" id="badge-step-type">NEET-PG (+4 / -1)</span>
                 </div>
-                <div class="exam-toggle-bar" style="margin-top: 0.5rem;">
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-type">
+                <div class="exam-toggle-bar">
                   <button
                     type="button"
                     class="btn btn-exam-mode active"
@@ -225,27 +203,70 @@
                     INI-CET
                   </button>
                 </div>
-                <div class="exam-format-details" id="exam-format-details" style="margin-top: 0.4rem;">
-                  NEET-PG: +4 / -1 Marking • 63s/Question Standard Time-Budget
+                <div class="exam-format-details" id="exam-format-details">
+                  NEET-PG: +4 / -1 Marking Scheme • 63s/Question Standard Time-Budget
                 </div>
               </div>
+            </div>
 
-              <!-- 3. Syllabus Scope -->
-              <div class="setup-row setup-section-block">
-                <div class="setup-step-heading">
+            <!-- Step 3: Test Length & Partitioning (Shown after Test Type) -->
+            <div class="setup-step-card" id="step-card-length">
+              <button type="button" class="setup-step-header" data-step="3">
+                <div class="setup-step-header-left">
                   <span class="setup-step-num">3</span>
-                  <span class="setup-row-label">Syllabus</span>
+                  <span class="setup-step-title">Test Length & Partitioning</span>
+                  <span class="setup-step-badge" id="badge-step-length">10 Qs (Practice Drill)</span>
                 </div>
-                <div class="scope-select-wrap" style="margin-top: 0.5rem;">
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-length">
+                <div class="ai-sizing-row" id="ai-sizing-row-practice">
+                  <div class="ai-preset-chips" id="ai-count-presets">
+                    <button type="button" class="btn btn-count-preset active" data-count="10">10 Qs</button>
+                    <button type="button" class="btn btn-count-preset" data-count="25">25 Qs</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-unit" data-count="36">36 Qs (Section)</button>
+                    <button type="button" class="btn btn-count-preset" id="btn-count-mock" data-count="180">180 Qs (Full Test)</button>
+                  </div>
+
+                  <!-- Custom Question Sizing Element -->
+                  <div class="ai-custom-sizing-element" id="ai-custom-sizing-element">
+                    <label for="input-ai-custom-count" class="ai-custom-label">Custom:</label>
+                    <input
+                      type="number"
+                      id="input-ai-custom-count"
+                      class="ai-custom-number-input"
+                      min="5"
+                      max="200"
+                      value="10"
+                      aria-label="Custom Question Count"
+                    />
+                    <span class="ai-custom-suffix">Qs</span>
+                  </div>
+                </div>
+
+                <!-- Dynamic Time Budget & Section Feedback -->
+                <div class="ai-sizing-breakdown" id="ai-sizing-breakdown" style="margin-top: 0.65rem;">
+                  Practice Mode: Elapsed Timer • 1 Block • Untimed Drill
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Syllabus Scope -->
+            <div class="setup-step-card" id="step-card-syllabus">
+              <button type="button" class="setup-step-header" data-step="4">
+                <div class="setup-step-header-left">
+                  <span class="setup-step-num">4</span>
+                  <span class="setup-step-title">Syllabus</span>
+                  <span class="setup-step-badge" id="badge-step-syllabus">Full Syllabus</span>
+                </div>
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-syllabus">
+                <div class="scope-select-wrap">
                   <select id="select-ai-scope" class="form-select">
                     <option value="grand" selected>Full Syllabus (Grand Test)</option>
                     <option value="custom">Custom Syllabus (Select Subjects, Systems & Topics)...</option>
                   </select>
-
-                  <!-- Live Syllabus Scope Summary Pill -->
-                  <div class="scope-summary-pill" id="ai-scope-summary-pill" style="margin-top: 0.5rem;">
-                    Full Syllabus (All 19 Subjects & 16 Systems)
-                  </div>
 
                   <!-- Custom Scope Drawer (Expanded when Custom Syllabus is selected) -->
                   <div id="ai-custom-scope-drawer" class="custom-scope-drawer hidden" style="margin-top: 0.75rem;">
@@ -289,14 +310,20 @@
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- 4. Difficulty and Question Format -->
-              <div class="setup-row setup-section-block">
-                <div class="setup-step-heading">
-                  <span class="setup-step-num">4</span>
-                  <span class="setup-row-label">Difficulty and Format</span>
+            <!-- Step 5: Difficulty & Question Format -->
+            <div class="setup-step-card" id="step-card-format">
+              <button type="button" class="setup-step-header" data-step="5">
+                <div class="setup-step-header-left">
+                  <span class="setup-step-num">5</span>
+                  <span class="setup-step-title">Difficulty & Format</span>
+                  <span class="setup-step-badge" id="badge-step-format">Balanced • Mixed</span>
                 </div>
-                <div class="ai-grid-2col" style="margin-top: 0.5rem;">
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-format">
+                <div class="ai-grid-2col">
                   <div class="ai-col">
                     <label for="select-ai-difficulty" class="selector-label">Difficulty Level</label>
                     <select id="select-ai-difficulty" class="form-select">
@@ -317,15 +344,21 @@
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- 5. AI Settings & Generation -->
-              <div class="setup-row setup-section-block">
-                <div class="setup-step-heading">
-                  <span class="setup-step-num">5</span>
-                  <span class="setup-row-label">AI Settings</span>
+            <!-- Step 6: AI Settings & Generation -->
+            <div class="setup-step-card" id="step-card-ai">
+              <button type="button" class="setup-step-header" data-step="6">
+                <div class="setup-step-header-left">
+                  <span class="setup-step-num">6</span>
+                  <span class="setup-step-title">AI Settings</span>
+                  <span class="setup-step-badge" id="badge-step-ai">Key Required</span>
                 </div>
+                <span class="setup-step-chevron">▼</span>
+              </button>
+              <div class="setup-step-body" id="step-body-ai">
                 <!-- Compact Key Strip -->
-                <div class="key-compact-strip" id="key-compact-strip" style="margin-top: 0.5rem;">
+                <div class="key-compact-strip" id="key-compact-strip">
                   <div class="key-status-display" id="key-status-display">
                     <span class="ai-key-status-pill configured" id="ai-key-status-pill">CONFIGURED</span>
                     <span class="key-mask-text" id="key-mask-text">API Key: AIzaSy••••••••</span>
@@ -348,40 +381,40 @@
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-key-edit">Cancel</button>
                   </div>
                 </div>
-
-                <!-- Generation Progress Box -->
-                <div id="ai-generation-progress" class="ai-progress-card hidden" style="margin-top: 0.75rem;">
-                  <div class="ai-progress-header">
-                    <span class="ai-progress-status" id="ai-progress-status">Initializing test generation...</span>
-                    <span class="ai-progress-percentage" id="ai-progress-percentage">0%</span>
-                  </div>
-                  <div class="ai-progress-track">
-                    <div class="ai-progress-fill" id="ai-progress-fill" style="width: 0%;"></div>
-                  </div>
-                  <div class="ai-progress-footer">
-                    <span class="ai-progress-batch" id="ai-progress-batch">Batch 1 of 1</span>
-                    <button type="button" class="btn btn-danger btn-sm" id="btn-cancel-ai-generation">Cancel Generation</button>
-                  </div>
-                </div>
-
-                <!-- Actions Bar -->
-                <div class="home-actions ai-actions-bar" style="margin-top: 1.25rem;">
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    id="btn-ai-copy-prompt"
-                  >
-                    Copy AI Prompt
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-primary btn-start"
-                    id="btn-ai-generate"
-                  >
-                    Generate Test
-                  </button>
-                </div>
               </div>
+            </div>
+
+            <!-- Generation Progress Box -->
+            <div id="ai-generation-progress" class="ai-progress-card hidden" style="margin-top: 1rem;">
+              <div class="ai-progress-header">
+                <span class="ai-progress-status" id="ai-progress-status">Initializing test generation...</span>
+                <span class="ai-progress-percentage" id="ai-progress-percentage">0%</span>
+              </div>
+              <div class="ai-progress-track">
+                <div class="ai-progress-fill" id="ai-progress-fill" style="width: 0%;"></div>
+              </div>
+              <div class="ai-progress-footer">
+                <span class="ai-progress-batch" id="ai-progress-batch">Batch 1 of 1</span>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-cancel-ai-generation">Cancel Generation</button>
+              </div>
+            </div>
+
+            <!-- Persistent Setup Actions Bar (Outside collapsible sections) -->
+            <div class="home-actions ai-actions-bar setup-actions-persistent">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="btn-ai-copy-prompt"
+              >
+                Copy AI Prompt
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-start"
+                id="btn-ai-generate"
+              >
+                Generate Test
+              </button>
             </div>
           </div>
 
