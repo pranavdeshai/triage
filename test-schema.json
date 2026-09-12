@@ -102,6 +102,7 @@
         "subject",
         "system",
         "format",
+        "style",
         "difficulty",
         "explanation"
       ],
@@ -188,8 +189,24 @@
         },
         "format": {
           "type": "string",
-          "enum": ["Clinical Vignette", "One-Liner", "Conceptual"],
-          "description": "Clinical item format / style."
+          "enum": [
+            "Single Best Answer",
+            "Multiple Completion Type",
+            "Assertion and Reason",
+            "Match the Following",
+            "Sequential Arrangement",
+            "Multiple True–False"
+          ],
+          "description": "Structural item architecture (Single Best Answer, Multiple Completion Type, Assertion and Reason, Match the Following, Sequential Arrangement, Multiple True–False)."
+        },
+        "style": {
+          "type": "string",
+          "enum": [
+            "Clinical Vignette",
+            "Conceptual",
+            "One-Liner"
+          ],
+          "description": "Cognitive presentation flavor of the question stem (Clinical Vignette, Conceptual, One-Liner)."
         },
         "difficulty": {
           "type": "string",

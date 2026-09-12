@@ -2,7 +2,7 @@
   "examType": "neetpg",
   "examTitle": "NEET-PG CBT Mock Test",
   "totalBlocks": 5,
-  "defaultBlockDurationMinutes": 42,
+  "defaultBlockDurationMinutes": 5,
   "markingScheme": {
     "correct": 4,
     "incorrect": -1,
@@ -12,7 +12,7 @@
     {
       "id": "sec_a",
       "name": "Section A",
-      "durationMinutes": 42,
+      "durationMinutes": 5,
       "questions": [
         {
           "id": "neet_q_1",
@@ -25,7 +25,7 @@
             "Central Nervous System",
             "Musculoskeletal System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Radial Nerve Injury & Spiral Groove Anatomy",
           "reference": "Gray's Anatomy for Students, 4th ed., Ch. 7; Bailey & Love's Short Practice of Surgery, 28th ed.",
@@ -37,7 +37,8 @@
             "Axillary nerve and posterior circumflex humeral artery"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The radial nerve and profunda brachii artery course together along the spiral (radial) groove on the posterior surface of the mid-shaft of the humerus. Injury causes radial nerve palsy presenting as wrist drop and first dorsal web space sensory loss."
+          "explanation": "The radial nerve and profunda brachii artery course together along the spiral (radial) groove on the posterior surface of the mid-shaft of the humerus. Injury causes radial nerve palsy presenting as wrist drop and first dorsal web space sensory loss.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_2",
@@ -47,7 +48,7 @@
           "system": [
             "Cardiovascular System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Cardiac Cycle Mechanics",
           "reference": "Guyton and Hall Textbook of Medical Physiology, 14th ed., Ch. 9",
@@ -59,7 +60,8 @@
             "Reduced ventricular filling phase"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Isovolumetric contraction begins with AV valve closure (producing the S1 heart sound). During this brief phase, all four valves are closed and intraventricular pressure rises steeply until it exceeds aortic/pulmonary diastolic pressure."
+          "explanation": "Isovolumetric contraction begins with AV valve closure (producing the S1 heart sound). During this brief phase, all four valves are closed and intraventricular pressure rises steeply until it exceeds aortic/pulmonary diastolic pressure.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_3",
@@ -72,7 +74,7 @@
             "Head & Neck",
             "Endocrine System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Laryngeal Nerve Anatomy & Thyroid Surgery",
           "reference": "Bailey & Love's Short Practice of Surgery, 28th ed., Ch. 52",
@@ -84,7 +86,8 @@
             "Thyroarytenoid muscle"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The external branch of the superior laryngeal nerve innervates only the cricothyroid muscle (the chief tensor of the vocal folds). All other intrinsic laryngeal muscles are innervated by the recurrent laryngeal nerve."
+          "explanation": "The external branch of the superior laryngeal nerve innervates only the cricothyroid muscle (the chief tensor of the vocal folds). All other intrinsic laryngeal muscles are innervated by the recurrent laryngeal nerve.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_4",
@@ -95,7 +98,7 @@
             "Renal & Urinary System",
             "Cardiovascular System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Tubuloglomerular Feedback & Juxtaglomerular Apparatus",
           "reference": "Ganong's Review of Medical Physiology, 26th ed., Ch. 38",
@@ -107,14 +110,15 @@
             "Osmolality of the medullary collecting duct"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Macula densa cells located in the wall of the early distal tubule sense luminal NaCl concentration via the NKCC2 cotransporter, modulating renin release by adjacent juxtaglomerular cells through tubuloglomerular feedback."
+          "explanation": "Macula densa cells located in the wall of the early distal tubule sense luminal NaCl concentration via the NKCC2 cotransporter, modulating renin release by adjacent juxtaglomerular cells through tubuloglomerular feedback.",
+          "style": "One-Liner"
         }
       ]
     },
     {
       "id": "sec_b",
       "name": "Section B",
-      "durationMinutes": 42,
+      "durationMinutes": 5,
       "questions": [
         {
           "id": "neet_q_5",
@@ -126,7 +130,7 @@
             "Gastrointestinal System",
             "Endocrine System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Glycogen Storage Diseases",
           "reference": "Nelson Textbook of Pediatrics, 21st ed., Ch. 104; Harper's Illustrated Biochemistry, 32nd ed.",
@@ -138,7 +142,8 @@
             "Amylo-1,6-glucosidase (debranching enzyme)"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Von Gierke disease (Glycogen Storage Disease Type Ia) is caused by Glucose-6-phosphatase deficiency. It leads to severe fasting hypoglycemia, hepatomegaly, lactic acidosis, and hyperuricemia."
+          "explanation": "Von Gierke disease (Glycogen Storage Disease Type Ia) is caused by Glucose-6-phosphatase deficiency. It leads to severe fasting hypoglycemia, hepatomegaly, lactic acidosis, and hyperuricemia.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_6",
@@ -149,7 +154,7 @@
           "system": [
             "Hematology & Oncology"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Chronic Myeloid Leukemia & Cytogenetics",
           "reference": "Robbins and Cotran Pathologic Basis of Disease, 10th ed., Ch. 13",
@@ -161,7 +166,8 @@
             "Follicular Lymphoma"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The Philadelphia chromosome t(9;22)(q34;q11) creates the BCR-ABL1 fusion gene, diagnostic of Chronic Myeloid Leukemia (CML) and responsive to tyrosine kinase inhibitors like Imatinib."
+          "explanation": "The Philadelphia chromosome t(9;22)(q34;q11) creates the BCR-ABL1 fusion gene, diagnostic of Chronic Myeloid Leukemia (CML) and responsive to tyrosine kinase inhibitors like Imatinib.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_7",
@@ -172,7 +178,7 @@
           "system": [
             "Integumentary System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "DNA Repair Mechanisms & Genodermatoses",
           "reference": "Harper's Illustrated Biochemistry, 32nd ed., Ch. 35; Rook's Textbook of Dermatology, 9th ed.",
@@ -184,7 +190,8 @@
             "Non-homologous end joining"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Xeroderma Pigmentosum is caused by inherited defects in nucleotide excision repair (NER), preventing excision of ultraviolet radiation-induced pyrimidine (thymine) dimers."
+          "explanation": "Xeroderma Pigmentosum is caused by inherited defects in nucleotide excision repair (NER), preventing excision of ultraviolet radiation-induced pyrimidine (thymine) dimers.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_8",
@@ -196,7 +203,7 @@
             "Renal & Urinary System",
             "Immune System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Hard",
           "topic": "Lupus Nephritis Pathology & Classification",
           "reference": "Heptinstall's Pathology of the Kidney, 7th ed.; Harrison's Principles of Internal Medicine, 21st ed., Ch. 356",
@@ -208,14 +215,15 @@
             "Class V Membranous Lupus Nephritis"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Class IV Diffuse Lupus Nephritis is characterized by involvement of >=50% of glomeruli, prominent wire-loop subendothelial deposits, and extensive IgG, IgA, IgM, C3, and C1q deposition (full-house)."
+          "explanation": "Class IV Diffuse Lupus Nephritis is characterized by involvement of >=50% of glomeruli, prominent wire-loop subendothelial deposits, and extensive IgG, IgA, IgM, C3, and C1q deposition (full-house).",
+          "style": "Clinical Vignette"
         }
       ]
     },
     {
       "id": "sec_c",
       "name": "Section C",
-      "durationMinutes": 42,
+      "durationMinutes": 5,
       "questions": [
         {
           "id": "neet_q_9",
@@ -226,7 +234,7 @@
           "system": [
             "Cardiovascular System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Heart Failure Pharmacotherapy & ARNI Washout",
           "reference": "2022 AHA/ACC/HFSA Guideline for the Management of Heart Failure; Goodman & Gilman's Pharmacological Basis of Therapeutics, 14th ed.",
@@ -238,7 +246,8 @@
             "72 hours"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "A strict 36-hour washout period is required when transitioning from an ACE inhibitor to Sacubitril/Valsartan to avoid dual inhibition of bradykinin degradation, which drastically increases angioedema risk."
+          "explanation": "A strict 36-hour washout period is required when transitioning from an ACE inhibitor to Sacubitril/Valsartan to avoid dual inhibition of bradykinin degradation, which drastically increases angioedema risk.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_10",
@@ -249,7 +258,7 @@
           "system": [
             "Immune System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Bacterial Exotoxins & Translation Arrest",
           "reference": "Jawetz, Melnick & Adelberg's Medical Microbiology, 28th ed., Ch. 12",
@@ -261,7 +270,8 @@
             "Clostridium perfringens Alpha toxin"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Diphtheria toxin produced by Corynebacterium diphtheriae (and Exotoxin A by Pseudomonas) inactivates EF-2 via ADP-ribosylation, arresting ribosomal peptide synthesis."
+          "explanation": "Diphtheria toxin produced by Corynebacterium diphtheriae (and Exotoxin A by Pseudomonas) inactivates EF-2 via ADP-ribosylation, arresting ribosomal peptide synthesis.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_11",
@@ -273,7 +283,7 @@
             "Central Nervous System",
             "Cardiovascular System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Monoamine Oxidase Inhibitors & Hypertensive Crisis",
           "reference": "Katzung Basic & Clinical Pharmacology, 15th ed., Ch. 30",
@@ -285,7 +295,8 @@
             "Atropine"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Tyramine reaction ('cheese reaction') in patients taking non-selective MAO inhibitors causes massive norepinephrine release. The treatment of choice is the reversible, non-selective alpha-adrenergic antagonist Phentolamine."
+          "explanation": "Tyramine reaction ('cheese reaction') in patients taking non-selective MAO inhibitors causes massive norepinephrine release. The treatment of choice is the reversible, non-selective alpha-adrenergic antagonist Phentolamine.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_12",
@@ -296,7 +307,7 @@
             "Gastrointestinal System",
             "Hepatobiliary System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Viral Hepatitis Microbiology",
           "reference": "Harrison's Principles of Internal Medicine, 21st ed., Ch. 338",
@@ -308,14 +319,15 @@
             "Hepatitis A virus (HAV)"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Hepatitis D (Delta) virus is a defective RNA viroid-like pathogen that depends entirely on HBV to provide HBsAg for packaging its envelope and establishing infection."
+          "explanation": "Hepatitis D (Delta) virus is a defective RNA viroid-like pathogen that depends entirely on HBV to provide HBsAg for packaging its envelope and establishing infection.",
+          "style": "One-Liner"
         }
       ]
     },
     {
       "id": "sec_d",
       "name": "Section D",
-      "durationMinutes": 42,
+      "durationMinutes": 5,
       "questions": [
         {
           "id": "neet_q_13",
@@ -325,7 +337,7 @@
           "system": [
             "General"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Post-Mortem Lividity & Toxicology",
           "reference": "Reddy's The Essentials of Forensic Medicine and Toxicology, 34th ed., Ch. 7",
@@ -337,7 +349,8 @@
             "Phosphorus"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Cherry-red hypostasis is characteristic of carbon monoxide poisoning due to the formation of carboxyhemoglobin. Cyanide causes a brick-pink/bright red discoloration, whereas hydrogen sulfide causes dark bluish-green lividity."
+          "explanation": "Cherry-red hypostasis is characteristic of carbon monoxide poisoning due to the formation of carboxyhemoglobin. Cyanide causes a brick-pink/bright red discoloration, whereas hydrogen sulfide causes dark bluish-green lividity.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_14",
@@ -347,7 +360,7 @@
           "system": [
             "General"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Screening Tests & Predictive Values",
           "reference": "Park's Textbook of Preventive and Social Medicine, 26th ed., Ch. 3",
@@ -359,7 +372,8 @@
             "PPV will become 100%"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Positive Predictive Value (PPV) is directly proportional to disease prevalence. When prevalence decreases in the screened population, the proportion of true positives among all test positives falls, decreasing PPV."
+          "explanation": "Positive Predictive Value (PPV) is directly proportional to disease prevalence. When prevalence decreases in the screened population, the proportion of true positives among all test positives falls, decreasing PPV.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_15",
@@ -369,7 +383,7 @@
           "system": [
             "Musculoskeletal System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Thermal Injuries & Post-Mortem Stiffening",
           "reference": "Modi's Medical Jurisprudence and Toxicology, 26th ed., Ch. 16",
@@ -381,7 +395,8 @@
             "Heat hyperpyrexia"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Pugilistic attitude results from heat coagulation and contracture of muscle proteins (flexors being stronger than extensors), giving the body a defensive boxing posture after burns."
+          "explanation": "Pugilistic attitude results from heat coagulation and contracture of muscle proteins (flexors being stronger than extensors), giving the body a defensive boxing posture after burns.",
+          "style": "One-Liner"
         },
         {
           "id": "neet_q_16",
@@ -392,7 +407,7 @@
           "system": [
             "Immune System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Universal Immunization Programme & Vaccine Administration",
           "reference": "Park's Textbook of Preventive and Social Medicine, 26th ed., Ch. 5",
@@ -404,14 +419,15 @@
             "Pentavalent vaccine"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "BCG vaccine is given intradermally at birth (0.05 mL before 1 month, 0.1 mL after) over the left deltoid insertion to ensure uniform scar monitoring."
+          "explanation": "BCG vaccine is given intradermally at birth (0.05 mL before 1 month, 0.1 mL after) over the left deltoid insertion to ensure uniform scar monitoring.",
+          "style": "One-Liner"
         }
       ]
     },
     {
       "id": "sec_e",
       "name": "Section E",
-      "durationMinutes": 42,
+      "durationMinutes": 5,
       "questions": [
         {
           "id": "neet_q_17",
@@ -421,7 +437,7 @@
           "system": [
             "Respiratory System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "COPD Management & Updated GOLD Guidelines",
           "reference": "Global Initiative for Chronic Obstructive Lung Disease (GOLD) 2024 Report; Harrison's, 21st ed., Ch. 286",
@@ -433,7 +449,8 @@
             "SABA as needed plus oral Theophylline"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Under GOLD Group E (frequent exacerbators), initial Triple Therapy (LABA+LAMA+ICS) is recommended if blood eosinophils are >=300 cells/uL to significantly reduce exacerbations and hospitalization."
+          "explanation": "Under GOLD Group E (frequent exacerbators), initial Triple Therapy (LABA+LAMA+ICS) is recommended if blood eosinophils are >=300 cells/uL to significantly reduce exacerbations and hospitalization.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_18",
@@ -444,7 +461,7 @@
             "Gastrointestinal System",
             "Hepatobiliary System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Medium",
           "topic": "Acute Pancreatitis Initial Resuscitation",
           "reference": "American College of Gastroenterology (ACG) Acute Pancreatitis Guidelines; Bailey & Love's, 28th ed.",
@@ -456,7 +473,8 @@
             "Immediate diagnostic percutaneous transhepatic cholangiography"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Early, goal-directed intravenous hydration with isotonic crystalloids (e.g., Ringer's Lactate) along with multimodal analgesia is the foundation of early acute pancreatitis therapy. Urgent ERCP is reserved for concurrent cholangitis."
+          "explanation": "Early, goal-directed intravenous hydration with isotonic crystalloids (e.g., Ringer's Lactate) along with multimodal analgesia is the foundation of early acute pancreatitis therapy. Urgent ERCP is reserved for concurrent cholangitis.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_19",
@@ -468,7 +486,7 @@
             "Reproductive System",
             "Central Nervous System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
           "difficulty": "Hard",
           "topic": "Preeclampsia Management & Magnesium Toxicity",
           "reference": "Williams Obstetrics, 26th ed., Ch. 34; Dutta's Textbook of Obstetrics, 9th ed.",
@@ -480,7 +498,8 @@
             "Oliguria (<20 mL/hour)"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Loss of deep tendon (patellar) reflexes occurs at serum magnesium levels of 8-10 mg/dL and serves as the earliest warning sign of toxicity before respiratory depression (12 mg/dL) or cardiac arrest."
+          "explanation": "Loss of deep tendon (patellar) reflexes occurs at serum magnesium levels of 8-10 mg/dL and serves as the earliest warning sign of toxicity before respiratory depression (12 mg/dL) or cardiac arrest.",
+          "style": "Clinical Vignette"
         },
         {
           "id": "neet_q_20",
@@ -490,7 +509,7 @@
           "system": [
             "Cardiovascular System"
           ],
-          "format": "One-Liner",
+          "format": "Single Best Answer",
           "difficulty": "Easy",
           "topic": "Congenital Heart Disease & Ductus Arteriosus Patency",
           "reference": "Nelson Textbook of Pediatrics, 21st ed., Ch. 458",
@@ -502,7 +521,8 @@
             "Furosemide"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Prostaglandin E1 (Alprostadil) maintains patency of the ductus arteriosus in ductal-dependent lesions (e.g., Transposition of the Great Arteries, hypoplastic left heart syndrome). NSAIDs like Indomethacin close the ductus."
+          "explanation": "Prostaglandin E1 (Alprostadil) maintains patency of the ductus arteriosus in ductal-dependent lesions (e.g., Transposition of the Great Arteries, hypoplastic left heart syndrome). NSAIDs like Indomethacin close the ductus.",
+          "style": "One-Liner"
         }
       ]
     }

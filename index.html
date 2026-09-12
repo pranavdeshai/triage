@@ -65,12 +65,12 @@
                 <h2 class="landing-card-title">Sample Test</h2>
               </div>
               <p class="landing-card-text">
-                Start a verified 10-question NEET-PG sample drill with instant scoring. Zero setup required. Sample tests are not saved into test history.
+                Start a verified sample exam simulation with authentic multi-section CBT navigation and instant scoring. Zero setup required. Sample tests are not saved into test history.
               </p>
               <div class="landing-card-meta">
-                <span>10 Questions</span>
+                <span>NEET-PG (20 Qs) &amp; INI-CET (16 Qs)</span>
                 <span class="meta-sep">•</span>
-                <span>NEET-PG Pace</span>
+                <span>Timed Exam Mode</span>
                 <span class="meta-sep">•</span>
                 <span>Not Saved in History</span>
               </div>
@@ -324,20 +324,20 @@
               </div>
             </div>
 
-            <!-- Step 5: Difficulty & Question Format -->
+            <!-- Step 5: Difficulty, Style & Format -->
             <div class="setup-step-card" id="step-card-format">
               <button type="button" class="setup-step-header" data-step="5">
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">5</span>
-                  <span class="setup-step-title">Difficulty & Format</span>
+                  <span class="setup-step-title">Difficulty, Style &amp; Format</span>
                 </div>
                 <div class="setup-step-header-right">
-                  <span class="setup-step-badge" id="badge-step-format">Balanced • Mixed</span>
+                  <span class="setup-step-badge" id="badge-step-format">Balanced • Mixed Style • All Formats</span>
                   <span class="setup-step-chevron">▼</span>
                 </div>
               </button>
               <div class="setup-step-body" id="step-body-format">
-                <div class="ai-grid-2col">
+                <div class="ai-grid-3col">
                   <div class="ai-col">
                     <label for="select-ai-difficulty" class="selector-label">Difficulty Level</label>
                     <select id="select-ai-difficulty" class="form-select">
@@ -348,12 +348,24 @@
                     </select>
                   </div>
                   <div class="ai-col">
-                    <label for="select-ai-style" class="selector-label">Question Format</label>
+                    <label for="select-ai-style" class="selector-label">Presentation Style</label>
                     <select id="select-ai-style" class="form-select">
-                      <option value="mixed" selected>Mixed</option>
-                      <option value="oneliner">One-liners</option>
+                      <option value="mixed" selected>Mixed Styles</option>
+                      <option value="vignette">Clinical Vignettes</option>
                       <option value="conceptual">Conceptual</option>
-                      <option value="vignette">Clinical Case Scenarios</option>
+                      <option value="oneliner">One-Liners</option>
+                    </select>
+                  </div>
+                  <div class="ai-col">
+                    <label for="select-ai-format" class="selector-label">Structural Format</label>
+                    <select id="select-ai-format" class="form-select">
+                      <option value="mixed" selected>Mixed (All 6 Formats)</option>
+                      <option value="sba">Single Best Answer (SBA)</option>
+                      <option value="multiple_completion">Multiple Completion Type</option>
+                      <option value="assertion_reason">Assertion and Reason</option>
+                      <option value="match_following">Match the Following</option>
+                      <option value="sequential">Sequential Arrangement</option>
+                      <option value="true_false">Multiple True–False</option>
                     </select>
                   </div>
                 </div>
@@ -740,6 +752,7 @@
                   <button type="button" class="subnav-item" data-subtab="tab-system-analysis">System Analysis</button>
                   <button type="button" class="subnav-item" data-subtab="tab-difficulty-analysis">Difficulty Breakdown</button>
                   <button type="button" class="subnav-item" data-subtab="tab-format-analysis">Question Formats</button>
+                  <button type="button" class="subnav-item" data-subtab="tab-style-analysis">Question Styles</button>
                   <button type="button" class="subnav-item" data-subtab="tab-time-analysis">Time &amp; Pacing</button>
                   <button type="button" class="subnav-item" data-subtab="tab-behavior-analysis">Option Switches</button>
                 </nav>
@@ -1050,6 +1063,13 @@
                   <option value="all">All Formats</option>
                 </select>
               </div>
+
+              <div class="form-group">
+                <label for="filter-style">Style</label>
+                <select id="filter-style" class="form-select">
+                  <option value="all">All Styles</option>
+                </select>
+              </div>
             </div>
 
             <!-- Filtered Mini-Palette -->
@@ -1099,14 +1119,24 @@
           <h3>Start Sample Test</h3>
         </div>
         <div class="modal-body">
-          <p>Start a verified NEET-PG sample mock test (10 clinical questions)?</p>
+          <p>Choose an authentic timed exam simulation to experience multi-section CBT navigation:</p>
+          <div class="sample-exam-picker" id="sample-exam-picker">
+            <button type="button" class="sample-picker-btn active" id="btn-sample-pick-neet" data-mode="neetpg">
+              <div class="sample-picker-title">NEET-PG Sample Exam</div>
+              <div class="sample-picker-desc">20 Questions • 5 Sections (A–E, 4 Qs each) • 25 min • +4 / -1 Marking</div>
+            </button>
+            <button type="button" class="sample-picker-btn" id="btn-sample-pick-ini" data-mode="inicet">
+              <div class="sample-picker-title">INI-CET Sample Exam</div>
+              <div class="sample-picker-desc">16 Questions • 4 Blocks (1–4, 4 Qs each) • 16 min • +1 / -0.333 Marking • All 6 Formats</div>
+            </button>
+          </div>
           <div class="sample-dialog-notice">
-            <strong>Note:</strong> Sample tests are designed for quick preview and practice. Your answers and score will <strong>not</strong> be saved into your test history.
+            <strong>Note:</strong> Runs in authentic timed <strong>Exam Mode</strong> with section navigation. Your answers and score will <strong>not</strong> be saved into your test history.
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-sample-cancel">Cancel</button>
-          <button type="button" class="btn btn-primary btn-start" id="btn-sample-confirm">Start Test</button>
+          <button type="button" class="btn btn-primary btn-start" id="btn-sample-confirm">Start Exam</button>
         </div>
       </div>
     </div>

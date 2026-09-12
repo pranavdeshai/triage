@@ -2,7 +2,7 @@
   "examType": "inicet",
   "examTitle": "INI-CET CBT Mock Test",
   "totalBlocks": 4,
-  "defaultBlockDurationMinutes": 45,
+  "defaultBlockDurationMinutes": 4,
   "markingScheme": {
     "correct": 1,
     "incorrect": -0.333,
@@ -12,7 +12,7 @@
     {
       "id": "block_1",
       "name": "Block 1",
-      "durationMinutes": 45,
+      "durationMinutes": 4,
       "questions": [
         {
           "id": "ini_q_1",
@@ -23,11 +23,12 @@
           "system": [
             "Cardiovascular System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
+          "style": "Clinical Vignette",
           "difficulty": "Medium",
           "topic": "DOAC Pharmacokinetics & Renal Impairment",
           "reference": "Goodman & Gilman's Pharmacological Basis of Therapeutics, 14th ed., Ch. 32; KDIGO 2023 Guidelines",
-          "text": "A 54-year-old male with chronic kidney disease (eGFR 26 mL/min/1.73m²) and persistent non-valvular atrial fibrillation requires anticoagulation for stroke prophylaxis. Which of the following Direct Oral Anticoagulants (DOACs) has the lowest degree of renal clearance (<30%) and is safest for use without extensive dosage reduction?",
+          "text": "A 54-year-old male with chronic kidney disease (eGFR 26 mL/min/1.73m\u00b2) and persistent non-valvular atrial fibrillation requires anticoagulation for stroke prophylaxis. Which Direct Oral Anticoagulant (DOAC) has the lowest proportion of renal clearance (<30%) and is safest for use without extensive dosage reduction?",
           "options": [
             "Apixaban",
             "Dabigatran etexilate",
@@ -35,106 +36,113 @@
             "Edoxaban"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Apixaban undergoes predominantly fecal/biliary excretion (~73%) with only ~27% renal clearance, making it the preferred DOAC in patients with severe renal impairment compared to Dabigatran (80% renal) or Rivaroxaban (35% active renal)."
+          "explanation": "Apixaban undergoes predominantly fecal and biliary elimination (~73%) with only approximately 27% renal clearance, making it the safest DOAC in severe renal dysfunction compared to Dabigatran (80% renal), Rivaroxaban (35% active renal), or Edoxaban (50% renal)."
         },
         {
           "id": "ini_q_2",
           "subject": [
             "Biochemistry",
-            "Pathology"
+            "Pathology",
+            "Pediatrics"
           ],
           "system": [
             "Endocrine System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Multiple Completion Type",
+          "style": "Conceptual",
           "difficulty": "Hard",
           "topic": "Congenital Adrenal Hyperplasia & Steroidogenesis",
-          "reference": "Williams Textbook of Endocrinology, 14th ed., Ch. 15; Nelson, 21st ed.",
-          "text": "A newborn presents with ambiguous genitalia, severe salt-wasting crisis, hyponatremia, and hyperkalemia on day 10 of life. Serum 17-hydroxyprogesterone is elevated markedly. Which specific cytochrome P450 steroid hydroxylase is deficient in over 90% of such congenital adrenal hyperplasia presentations?",
+          "reference": "Williams Textbook of Endocrinology, 14th ed., Ch. 15; Nelson Textbook of Pediatrics, 21st ed.",
+          "text": "Regarding the classic salt-wasting form of Congenital Adrenal Hyperplasia (CAH) secondary to 21-hydroxylase (CYP21A2) deficiency, consider the following statements:\n1. Serum levels of 17-hydroxyprogesterone and androstenedione are markedly elevated.\n2. Deficient aldosterone biosynthesis results in hyponatremia, hyperkalemia, and metabolic acidosis.\n3. Genetic females (46,XX) demonstrate normal female external genitalia without virilization.\n4. Deficient synthesis of cortisol eliminates negative feedback on the anterior pituitary, escalating ACTH secretion.\nWhich of the statements given above are correct?",
           "options": [
-            "21-hydroxylase (CYP21A2)",
-            "11-beta-hydroxylase (CYP11B1)",
-            "17-alpha-hydroxylase (CYP17A1)",
-            "3-beta-hydroxysteroid dehydrogenase"
+            "Statements 1, 2, and 4 are correct",
+            "Statements 1 and 3 only are correct",
+            "Statements 2, 3, and 4 are correct",
+            "Statements 1, 2, 3, and 4 are correct"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "21-hydroxylase deficiency (CYP21A2 gene) accounts for >90% of congenital adrenal hyperplasia. Shunting of steroid precursors into adrenal androgens causes ambiguous genitalia in females, while aldosterone deficiency produces salt wasting, hyponatremia, and hyperkalemia."
+          "explanation": "Statements 1, 2, and 4 are correct. In 21-hydroxylase deficiency, accumulated 17-OHP is shunted into adrenal androgens, producing ambiguous genitalia and progressive virilization in 46,XX genetic females (making Statement 3 false). Deficient aldosterone causes renal salt wasting, hyponatremia, and hyperkalemia. Cortisol deficiency drives compensatory pituitary ACTH hypersecretion."
         },
         {
           "id": "ini_q_3",
           "subject": [
             "Anatomy",
-            "Radiology"
+            "Radiology",
+            "Surgery"
           ],
           "system": [
             "Central Nervous System"
           ],
-          "format": "One-Liner",
+          "format": "Assertion and Reason",
+          "style": "Conceptual",
           "difficulty": "Medium",
           "topic": "Cavernous Sinus Neuroanatomy",
           "reference": "Rhoton's Cranial Anatomy and Surgical Approaches; Snell's Clinical Neuroanatomy, 8th ed.",
-          "text": "In high-resolution magnetic resonance imaging of the cavernous sinus, which cranial nerve traverses the central venous lumen in direct physical contact with the cavernous internal carotid artery, making it most vulnerable to early compression by intracavernous aneurysms?",
+          "text": "Given below are two statements: one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A): An expanding aneurysm of the intracavernous internal carotid artery characteristically produces isolated abducens nerve (CN VI) palsy as its earliest neural sign.\nReason (R): The abducens nerve runs freely within the venous lumen of the cavernous sinus immediately inferolateral to the internal carotid artery, whereas other oculomotor nerves course within the fibrous lateral dural wall.\nIn light of the above statements, choose the most appropriate answer:",
           "options": [
-            "Abducens nerve (CN VI)",
-            "Oculomotor nerve (CN III)",
-            "Trochlear nerve (CN IV)",
-            "Ophthalmic nerve (CN V1)"
+            "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)",
+            "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)",
+            "Assertion (A) is true but Reason (R) is false",
+            "Assertion (A) is false but Reason (R) is true"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The Abducens nerve (CN VI) runs freely within the cavernous sinus venous space immediately inferolateral to the internal carotid artery. CN III, IV, V1, and V2 are embedded securely in the sinus lateral dural wall."
+          "explanation": "Both Assertion (A) and Reason (R) are true, and Reason (R) correctly explains Assertion (A). CN VI traverses the venous blood of the cavernous sinus immediately adjacent to the ICA. By contrast, CN III, IV, V1, and V2 are embedded within the protective connective tissue of the sinus lateral wall."
         },
         {
           "id": "ini_q_4",
           "subject": [
             "Microbiology",
-            "Medicine"
+            "Medicine",
+            "Pharmacology"
           ],
           "system": [
             "Immune System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Match the Following",
+          "style": "One-Liner",
           "difficulty": "Medium",
           "topic": "Opportunistic Infections in Immunocompromised Host",
           "reference": "CDC/NIH/IDSA Opportunistic Infections Guidelines; Harrison's, 21st ed., Ch. 219",
-          "text": "A 44-year-old renal transplant recipient on Tacrolimus and Mycophenolate Mofetil develops low-grade fever, dry cough, and exertional hypoxemia. Induced sputum with silver methenamine staining shows cup-shaped cysts with central dark spots. What is the definitive first-line therapeutic regimen?",
+          "text": "Match the opportunistic pathogen in an immunocompromised host (Column I) with its definitive diagnostic hallmark or drug of choice (Column II):\n\nColumn I:\n1. Pneumocystis jirovecii\n2. Cryptococcus neoformans\n3. Cytomegalovirus\n4. Toxoplasma gondii\n\nColumn II:\np. India ink capsular halo; Amphotericin B + Flucytosine\nq. Multiple ring-enhancing basal ganglia lesions; Pyrimethamine + Sulfadiazine\nr. Silver methenamine cup-shaped cysts; High-dose Trimethoprim-Sulfamethoxazole\ns. Owl's eye intranuclear inclusions; Ganciclovir\n\nSelect the correct matching code:",
           "options": [
-            "High-dose Trimethoprim-Sulfamethoxazole plus systemic corticosteroids",
-            "Intravenous Liposomal Amphotericin B",
-            "Inhaled Pentamidine isethionate",
-            "Oral Voriconazole"
+            "1-r, 2-p, 3-s, 4-q",
+            "1-p, 2-r, 3-q, 4-s",
+            "1-r, 2-q, 3-p, 4-s",
+            "1-s, 2-p, 3-r, 4-q"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Pneumocystis jirovecii pneumonia (PJP) is treated first-line with high-dose TMP-SMX (cotrimoxazole). Adjunctive corticosteroids (prednisone) are mandated in moderate-to-severe disease (PaO2 <70 mmHg or A-a gradient >=35 mmHg) to prevent paradoxical deterioration."
+          "explanation": "Pneumocystis jirovecii is identified by silver methenamine stained cup-shaped cysts and treated with high-dose TMP-SMX (1-r). Cryptococcus displays prominent polysaccharide halos on India ink and is treated with Amphotericin B + Flucytosine (2-p). CMV shows basophilic intranuclear 'owl's eye' inclusions and responds to Ganciclovir (3-s). Toxoplasma forms ring-enhancing lesions treated with Pyrimethamine + Sulfadiazine (4-q)."
         }
       ]
     },
     {
       "id": "block_2",
       "name": "Block 2",
-      "durationMinutes": 45,
+      "durationMinutes": 4,
       "questions": [
         {
           "id": "ini_q_5",
           "subject": [
-            "Pathology",
-            "Medicine"
+            "Surgery",
+            "Emergency Medicine"
           ],
           "system": [
-            "Renal & Urinary System"
+            "Gastrointestinal System"
           ],
-          "format": "Clinical Vignette",
-          "difficulty": "Hard",
-          "topic": "Hereditary Nephropathies & Glomerular Basement Membrane",
-          "reference": "Robbins and Cotran Pathologic Basis of Disease, 10th ed., Ch. 20",
-          "text": "A 19-year-old male with persistent asymptomatic microscopic hematuria and sensorineural hearing loss undergoes renal biopsy. Electron microscopy of the glomerular basement membrane reveals alternating areas of thinning and marked lamellation with a 'basket-weave' appearance. What is the underlying molecular defect?",
+          "format": "Sequential Arrangement",
+          "style": "Clinical Vignette",
+          "difficulty": "Medium",
+          "topic": "Small Bowel Obstruction Management Algorithm",
+          "reference": "Bailey & Love's Short Practice of Surgery, 28th ed., Ch. 69; Sabiston Textbook of Surgery, 21st ed.",
+          "text": "A 42-year-old male with a history of open appendectomy presents with obstipation, bilious vomiting, central colicky abdominal pain, and abdominal distension. Plain abdominal radiograph demonstrates multiple step-ladder air-fluid levels. Arrange the standard sequential management steps in correct chronological order:\n1. Nasogastric decompression and large-bore intravenous isotonic crystalloid resuscitation\n2. Placement of urinary catheter to monitor hourly urine output\n3. Contrast-enhanced computed tomography (CECT) of the abdomen to identify the transition point\n4. Urgent exploratory laparotomy upon developing rebound tenderness, fever, and leukocytosis\nSelect the correct sequence:",
           "options": [
-            "Mutation in COL4A5 encoding the alpha-5 chain of type IV collagen",
-            "Defect in podocin (NPHS2) stomatin-family scaffold protein",
-            "Antibodies directed against phospholipase A2 receptor (PLA2R)",
-            "Splice-site mutation in PKD1 polycystin-1 protein"
+            "1 \u2192 2 \u2192 3 \u2192 4",
+            "3 \u2192 1 \u2192 2 \u2192 4",
+            "2 \u2192 1 \u2192 4 \u2192 3",
+            "1 \u2192 3 \u2192 4 \u2192 2"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Alport syndrome is an X-linked dominant disorder caused by mutations in the COL4A5 gene encoding the alpha-5 chain of type IV collagen. EM demonstrates characteristic splitting, thickening, and lamellation of the lamina densa (basket-weave pattern) alongside sensorineural hearing loss and anterior lenticonus."
+          "explanation": "Standard sequential protocol for mechanical small bowel obstruction mandates immediate 'drip and suck' resuscitation with IV isotonic fluids and NG tube decompression (1), Foley catheterization to assess tissue perfusion via urine output (2), cross-sectional imaging with abdominal CECT to delineate location and etiology (3), followed by emergent surgical exploration if signs of peritonitis, strangulation, or bowel ischemia emerge (4)."
         },
         {
           "id": "ini_q_6",
@@ -145,42 +153,45 @@
           "system": [
             "Respiratory System"
           ],
-          "format": "One-Liner",
+          "format": "Multiple True\u2013False",
+          "style": "Conceptual",
           "difficulty": "Medium",
           "topic": "High Altitude Acclimatization & Hemoglobin Kinetics",
-          "reference": "Guyton and Hall Textbook of Medical Physiology, 14th ed., Ch. 41",
-          "text": "During ascent to high altitude (4,000 meters above sea level), the respiratory alkalosis caused by hypoxic hyperventilation shifts the oxyhemoglobin dissociation curve to the left. Within 24-72 hours, which erythrocyte metabolic adaptation shifts the curve back to the right to facilitate tissue oxygen delivery?",
+          "reference": "Guyton and Hall Textbook of Medical Physiology, 14th ed., Ch. 41; Ganong's Review of Medical Physiology, 26th ed.",
+          "text": "Evaluate the following statements regarding physiological acclimatization to high altitude (4,000 meters above sea level):\nStatement 1: Hypoxic ventilatory stimulation reduces arterial PCO2, inducing acute respiratory alkalosis.\nStatement 2: Intra-erythrocyte 2,3-bisphosphoglycerate (2,3-BPG) concentration increases within 24\u201372 hours, shifting the oxyhemoglobin dissociation curve to the right.\nStatement 3: Renal bicarbonate excretion decreases during acclimatization to maintain systemic alkalemia.\nStatement 4: Hypoxia induces erythropoietin secretion from peritubular interstitial cells of the kidney.\nWhich of the following evaluations is correct?",
           "options": [
-            "Increased production of 2,3-Bisphosphoglycerate (2,3-BPG)",
-            "Decreased carbonic anhydrase activity inside erythrocytes",
-            "Downregulation of glucose-6-phosphate dehydrogenase",
-            "Elevated intra-erythrocyte methemoglobin content"
+            "Statement 1: True; Statement 2: True; Statement 3: False; Statement 4: True",
+            "Statement 1: True; Statement 2: False; Statement 3: True; Statement 4: True",
+            "Statement 1: False; Statement 2: True; Statement 3: False; Statement 4: False",
+            "Statement 1: True; Statement 2: True; Statement 3: True; Statement 4: False"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Erythrocytes respond to prolonged hypoxia and alkalemia by stimulating phosphofructokinase and bisphosphoglycerate mutase, increasing intra-erythrocyte 2,3-BPG synthesis. 2,3-BPG binds deoxyhemoglobin, stabilizing the T-state and right-shifting the dissociation curve."
+          "explanation": "Statements 1, 2, and 4 are True. Statement 3 is False because the kidneys compensatory response is to INCREASE bicarbonate excretion (reducing plasma HCO3-) to restore normal blood pH toward 7.40 over several days. Peripheral chemoreceptors drive hyperventilation (inducing alkalosis), RBCs generate 2,3-BPG to right-shift hemoglobin delivery, and renal interstitial fibroblasts secrete erythropoietin."
         },
         {
           "id": "ini_q_7",
           "subject": [
-            "Surgery",
-            "Radiology"
+            "Pathology",
+            "Medicine",
+            "Pediatrics"
           ],
           "system": [
-            "Gastrointestinal System"
+            "Renal & Urinary System"
           ],
-          "format": "Clinical Vignette",
-          "difficulty": "Medium",
-          "topic": "Intestinal Obstruction & Abdominal Radiology",
-          "reference": "Bailey & Love's Short Practice of Surgery, 28th ed., Ch. 69; Grainger & Allison's Diagnostic Radiology",
-          "text": "A 35-year-old male presents with acute intestinal obstruction. Abdominal CT demonstrates a segment of small bowel, its mesentery, and associated mesenteric vessels twisting around the axis of a prior surgical adhesive band, producing the classic 'whirlpool sign'. What is the diagnosis?",
+          "format": "Single Best Answer",
+          "style": "Clinical Vignette",
+          "difficulty": "Hard",
+          "topic": "Alport Syndrome & Type IV Collagen Alpha-5 Chain",
+          "reference": "Robbins and Cotran Pathologic Basis of Disease, 10th ed., Ch. 20; Heptinstall's Pathology of the Kidney, 7th ed.",
+          "text": "A 19-year-old male with persistent microscopic hematuria, bilateral high-frequency sensorineural hearing loss, and anterior lenticonus undergoes renal biopsy. Electron microscopy reveals marked thinning, splitting, and lamellation of the glomerular basement membrane lamina densa ('basket-weave' appearance). What is the primary molecular defect?",
           "options": [
-            "Closed-loop small bowel volvulus",
-            "Retrograde jejunogastric intussusception",
-            "Paraduodenal internal herniation",
-            "Gallstone ileus with Rigler triad"
+            "Mutation in COL4A5 encoding the alpha-5 chain of type IV collagen",
+            "Defect in NPHS2 encoding the podocin stomatin-family scaffold protein",
+            "Autoantibodies targeting phospholipase A2 receptor (PLA2R)",
+            "Splice-site mutation in PKD1 encoding polycystin-1"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The 'whirl sign' or 'whirlpool sign' on cross-sectional CT is created by the torsion of mesenteric vasculature and bowel loops around a central point of rotation, pathognomonic of volvulus / closed-loop obstruction requiring urgent exploration."
+          "explanation": "Alport syndrome is an X-linked dominant disorder caused by mutations in the COL4A5 gene encoding the alpha-5 chain of type IV collagen. EM demonstrates characteristic splitting, thickening, and lamellation of the lamina densa ('basket-weave' pattern) alongside sensorineural hearing loss and ocular anterior lenticonus."
         },
         {
           "id": "ini_q_8",
@@ -189,28 +200,29 @@
             "Anesthesiology"
           ],
           "system": [
-            "Central Nervous System"
+            "Musculoskeletal System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Assertion and Reason",
+          "style": "Clinical Vignette",
           "difficulty": "Hard",
           "topic": "Malignant Hyperthermia & Calcium Channel Dynamics",
-          "reference": "Miller's Anesthesia, 9th ed., Ch. 44; Katzung, 15th ed.",
-          "text": "During emergency rapid sequence induction for laparotomy, a patient is administered Succinylcholine and Sevoflurane. Five minutes later, the anesthesiologist notes jaw muscle rigidity (masseter spasm), rapidly escalating end-tidal CO2 (from 35 to 88 mmHg), core temperature rising to 40.2°C, and ventricular tachycardia. What is the immediate antidote mechanism?",
+          "reference": "Miller's Anesthesia, 9th ed., Ch. 44; Katzung Basic & Clinical Pharmacology, 15th ed.",
+          "text": "Given below are two statements: one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A): During rapid-sequence induction with Succinylcholine and Sevoflurane, sudden masseter muscle rigidity and hypercapnia out of proportion to ventilation indicate administration of intravenous Dantrolene sodium.\nReason (R): Dantrolene sodium directly antagonizes Ryanodine Receptor 1 (RYR1) ion channels, inhibiting uncontrolled calcium efflux from the sarcoplasmic reticulum into the skeletal myoplasm.\nIn light of the above statements, choose the most appropriate answer:",
           "options": [
-            "Ryanodine receptor 1 (RYR1) antagonism by Dantrolene sodium",
-            "Acetylcholinesterase reactivation by Pralidoxime",
-            "Central dopamine receptor agonism by Bromocriptine",
-            "Voltage-gated calcium channel blockade by Verapamil"
+            "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)",
+            "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)",
+            "Assertion (A) is true but Reason (R) is false",
+            "Assertion (A) is false but Reason (R) is true"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Malignant hyperthermia is caused by uncontrolled calcium release from the sarcoplasmic reticulum via mutated Ryanodine Receptor 1 (RYR1). Dantrolene sodium acts directly on RYR1 to inhibit calcium efflux and arrest the hypermetabolic cascade."
+          "explanation": "Both Assertion (A) and Reason (R) are true, and Reason (R) provides the definitive pharmacodynamic rationale. Malignant hyperthermia triggers masseter spasm, severe respiratory acidosis, and hyperthermia due to sustained calcium release through mutated RYR1 channels. Dantrolene arrests the hypermetabolic crisis by binding RYR1 and halting intracellular calcium efflux."
         }
       ]
     },
     {
       "id": "block_3",
       "name": "Block 3",
-      "durationMinutes": 45,
+      "durationMinutes": 4,
       "questions": [
         {
           "id": "ini_q_9",
@@ -221,95 +233,101 @@
           "system": [
             "Reproductive System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Multiple Completion Type",
+          "style": "Clinical Vignette",
           "difficulty": "Medium",
           "topic": "Gestational Trophoblastic Disease & Cytogenetics",
-          "reference": "Williams Obstetrics, 26th ed., Ch. 20; Robbins, 10th ed., Ch. 22",
-          "text": "A 24-year-old woman presents with heavy vaginal bleeding and hyperemesis gravidarum at 11 weeks gestation. Serum beta-hCG is 240,000 mIU/mL. Pelvic ultrasound reveals a 'snowstorm' intrauterine appearance with bilaterally enlarged multilocular theca lutein cysts. Cytogenetic karyotyping of the evacuated tissue will most likely demonstrate:",
+          "reference": "Williams Obstetrics, 26th ed., Ch. 20; Robbins and Cotran Pathologic Basis of Disease, 10th ed., Ch. 22",
+          "text": "A 24-year-old primigravida at 11 weeks of gestation presents with painless vaginal bleeding and severe hyperemesis. Serum beta-hCG is 240,000 mIU/mL. Ultrasonography reveals a 'snowstorm' intrauterine pattern and bilateral theca lutein cysts. Histopathology of evacuated tissue confirms a complete hydatidiform mole. Consider the following statements:\n1. The karyotype is most frequently 46,XX with both sets of chromosomes derived from paternal origin.\n2. Fetal tissue, nucleated fetal red blood cells, and amnion are characteristically absent.\n3. The risk of subsequent development of choriocarcinoma is significantly higher than in partial mole.\n4. Microscopic examination demonstrates focal, patchy trophoblastic hyperplasia with scalloped villi.\nWhich of the statements given above are correct?",
           "options": [
-            "46,XX entirely of paternal origin (androgenetic)",
-            "69,XXY with triploid diandric fertilization",
-            "45,X monosomy of maternal origin",
-            "47,XX,+21 maternal meiotic non-disjunction"
+            "Statements 1, 2, and 3 are correct",
+            "Statements 1 and 4 only are correct",
+            "Statements 2, 3, and 4 are correct",
+            "Statements 1, 2, 3, and 4 are correct"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Complete hydatidiform mole is characteristically diploid (predominantly 46,XX, ~90%) arising when an anucleate 'empty' ovum is fertilized by a single haploid sperm that duplicates its genome (all 46 chromosomes are of paternal origin)."
+          "explanation": "Statements 1, 2, and 3 are correct. Complete moles are diploid (usually 46,XX) from androgenetic duplication of a single sperm in an empty ovum, completely lack embryogenesis/fetal RBCs, and carry a ~2.5% risk of progression to choriocarcinoma. Statement 4 is false because focal scalloped villous proliferation describes a partial triploid mole, whereas complete moles display generalized hydropic swelling and circumferential trophoblastic hyperplasia."
         },
         {
           "id": "ini_q_10",
           "subject": [
             "Pediatrics",
-            "Microbiology"
+            "Microbiology",
+            "ENT"
           ],
           "system": [
             "Respiratory System"
           ],
-          "format": "Clinical Vignette",
-          "difficulty": "Easy",
-          "topic": "Pediatric Upper Airway Infections",
-          "reference": "Nelson Textbook of Pediatrics, 21st ed., Ch. 412",
-          "text": "A 2-year-old boy presents in winter with a 2-day history of rhinitis, followed by a hoarse voice, a harsh barking cough, and inspiratory stridor that worsens with agitation. Neck radiography shows subglottic tracheal narrowing ('steeple sign'). Which pathogen is the primary etiological agent?",
+          "format": "Match the Following",
+          "style": "Clinical Vignette",
+          "difficulty": "Medium",
+          "topic": "Pediatric Upper Airway Emergencies",
+          "reference": "Nelson Textbook of Pediatrics, 21st ed., Ch. 412; Cummings Otolaryngology, 7th ed.",
+          "text": "Match each pediatric upper airway emergency (Column I) with its characteristic clinical presentation and radiography finding (Column II):\n\nColumn I:\n1. Acute Laryngotracheobronchitis (Croup)\n2. Acute Epiglottitis\n3. Bacterial Tracheitis\n4. Retropharyngeal Abscess\n\nColumn II:\np. Cherry-red swollen epiglottis, tripod posture, 'thumbprint sign' on lateral neck radiograph\nq. Barking cough, inspiratory stridor, subglottic tracheal narrowing ('steeple sign')\nr. Toxic child, brassy cough, purulent tracheal pseudomembranes with subglottic irregular haziness\ns. Neck stiffness, torticollis, posterior pharyngeal wall bulging with widened prevertebral space\n\nSelect the correct matching code:",
           "options": [
-            "Parainfluenza virus Type 1",
-            "Respiratory Syncytial Virus (RSV)",
-            "Haemophilus influenzae type b",
-            "Adenovirus serotype 7"
+            "1-q, 2-p, 3-r, 4-s",
+            "1-p, 2-q, 3-s, 4-r",
+            "1-q, 2-r, 3-p, 4-s",
+            "1-s, 2-p, 3-q, 4-r"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Acute laryngotracheobronchitis (Croup) is most commonly caused by Human Parainfluenza Virus Type 1 (followed by type 2 and 3). Classic findings include barking seal-like cough, inspiratory stridor, and subglottic narrowing ('steeple sign')."
+          "explanation": "Croup (Parainfluenza) shows subglottic narrowing ('steeple sign') with barking cough (1-q). Epiglottitis (Hib) presents with high fever, tripod position, and thumbprint sign (2-p). Bacterial tracheitis (S. aureus) shows thick purulent membranes and subglottic haziness (3-r). Retropharyngeal abscess causes torticollis, dysphagia, and widened prevertebral soft tissue (4-s)."
         },
         {
           "id": "ini_q_11",
           "subject": [
-            "Ophthalmology",
-            "Medicine"
+            "Physiology",
+            "Biochemistry"
           ],
           "system": [
-            "Head & Neck"
+            "Hematology & Oncology"
           ],
-          "format": "One-Liner",
+          "format": "Sequential Arrangement",
+          "style": "Conceptual",
           "difficulty": "Medium",
-          "topic": "Ischemic Optic Neuropathies & Giant Cell Arteritis",
-          "reference": "Kanski's Clinical Ophthalmology, 9th ed., Ch. 19; Harrison's, 21st ed., Ch. 363",
-          "text": "An elderly patient with acute painful loss of vision in the right eye is found to have an RAPD, optic disc swelling with chalky-white pallor, and an ESR of 98 mm/hr. Which artery is occluded in this classic presentation of Arteritic Anterior Ischemic Optic Neuropathy (AAION)?",
+          "topic": "Erythrocyte Lineage Maturation Stages",
+          "reference": "Guyton and Hall Textbook of Medical Physiology, 14th ed., Ch. 33; Hoffbrand's Essential Haematology, 8th ed.",
+          "text": "Arrange the developmental stages of erythroid lineage maturation in the human bone marrow in chronological order from earliest committed precursor to mature circulating red blood cell:\n1. Basophilic normoblast (Early erythroblast)\n2. Proerythroblast (Pronormoblast)\n3. Polychromatophilic normoblast (Intermediate erythroblast)\n4. Orthochromatophilic normoblast (Late erythroblast / Nucleus extrusion)\n5. Reticulocyte\nSelect the correct sequence:",
           "options": [
-            "Short posterior ciliary arteries",
-            "Central retinal artery",
-            "Anterior ethmoidal artery",
-            "Lacrimal artery"
+            "2 \u2192 1 \u2192 3 \u2192 4 \u2192 5",
+            "1 \u2192 2 \u2192 3 \u2192 4 \u2192 5",
+            "2 \u2192 3 \u2192 1 \u2192 4 \u2192 5",
+            "2 \u2192 1 \u2192 4 \u2192 3 \u2192 5"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Arteritic Anterior Ischemic Optic Neuropathy (AAION), secondary to Giant Cell Arteritis (Temporal Arteritis), is caused by occlusion of the short posterior ciliary arteries supplying the optic nerve head."
+          "explanation": "Erythropoiesis proceeds sequentially: Proerythroblast (pronormoblast, 2) \u2192 Basophilic normoblast (RNA synthesis, 1) \u2192 Polychromatophilic normoblast (first appearance of hemoglobin, 3) \u2192 Orthochromatophilic normoblast (condensed nucleus extruded, 4) \u2192 Reticulocyte (residual ribosomal RNA, 5) \u2192 Mature Erythrocyte."
         },
         {
           "id": "ini_q_12",
           "subject": [
             "ENT",
-            "Surgery"
+            "Surgery",
+            "Anatomy"
           ],
           "system": [
             "Head & Neck"
           ],
-          "format": "Clinical Vignette",
+          "format": "Single Best Answer",
+          "style": "Conceptual",
           "difficulty": "Medium",
           "topic": "Temporal Bone Surgical Anatomy & Mastoidectomy",
           "reference": "Scott-Brown's Otorhinolaryngology and Head and Neck Surgery, 8th ed., Vol. 2",
-          "text": "During cortical mastoidectomy for chronic suppurative otitis media with cholesteatoma, the surgeon works in Macewen triangle. Which of the following defines the superior boundary of Macewen (suprameatal) triangle?",
+          "text": "During cortical mastoidectomy for chronic suppurative otitis media, the surgeon identifies Macewen (suprameatal) triangle to safely enter the mastoid antrum. Which anatomical landmark forms the superior boundary of Macewen triangle?",
           "options": [
             "Supramastoid crest (linea temporalis)",
-            "Posterosuperior margin of external acoustic meatus",
-            "Vertical tangent to posterior meatal wall",
-            "Spine of Henle"
+            "Posterosuperior margin of the external acoustic meatus",
+            "Vertical tangent drawn to the posterior meatal wall",
+            "Spine of Henle (suprameatal spine)"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Macewen triangle (suprameatal triangle) borders: Superiorly by the supramastoid crest (temporal line); Anteroinferiorly by the posterosuperior rim of the bony external acoustic meatus; Posteriorly by a vertical line tangent to the meatus. It overlies the mastoid antrum."
+          "explanation": "Macewen (suprameatal) triangle boundaries: Superiorly by the supramastoid crest (linea temporalis); Anteroinferiorly by the posterosuperior margin of the bony external acoustic meatus; Posteriorly by a vertical tangent to the posterior meatal wall. It provides the direct surgical corridor to the mastoid antrum."
         }
       ]
     },
     {
       "id": "block_4",
       "name": "Block 4",
-      "durationMinutes": 45,
+      "durationMinutes": 4,
       "questions": [
         {
           "id": "ini_q_13",
@@ -320,19 +338,20 @@
           "system": [
             "Central Nervous System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Assertion and Reason",
+          "style": "Conceptual",
           "difficulty": "Medium",
-          "topic": "Psychopharmacology & Renal Lithium Transport",
-          "reference": "Stahl's Essential Psychopharmacology, 5th ed.; Goodman & Gilman, 14th ed.",
-          "text": "A 29-year-old man with bipolar affective disorder receiving lithium carbonate develops polyuria (5.5 L/day), polydipsia, and mild hypernatremia. Water deprivation testing confirms nephrogenic diabetes insipidus. Which potassium-sparing diuretic is the agent of choice to block lithium entry through epithelial sodium channels (ENaC) in principal cells?",
+          "topic": "Psychopharmacology & Lithium-Induced Nephrogenic DI",
+          "reference": "Stahl's Essential Psychopharmacology, 5th ed.; Goodman & Gilman, 14th ed., Ch. 16",
+          "text": "Given below are two statements: one is labelled as Assertion (A) and the other is labelled as Reason (R).\nAssertion (A): Amiloride is the preferred pharmacotherapeutic agent for managing lithium-induced nephrogenic diabetes insipidus in patients with bipolar affective disorder.\nReason (R): Amiloride selectively blocks epithelial sodium channels (ENaC) on the apical membrane of principal cells in the collecting tubule, preventing intracellular accumulation of lithium.\nIn light of the above statements, choose the most appropriate answer:",
           "options": [
-            "Amiloride",
-            "Spironolactone",
-            "Eplerenone",
-            "Triamterene"
+            "Both Assertion (A) and Reason (R) are true and Reason (R) is the correct explanation of Assertion (A)",
+            "Both Assertion (A) and Reason (R) are true but Reason (R) is not the correct explanation of Assertion (A)",
+            "Assertion (A) is true but Reason (R) is false",
+            "Assertion (A) is false but Reason (R) is true"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Lithium enters principal cells of the collecting duct via luminal ENaC channels, inhibiting adenylyl cyclase. Amiloride selectively blocks ENaC, preventing lithium uptake and treating lithium-induced nephrogenic diabetes insipidus without aggravating lithium clearance."
+          "explanation": "Both Assertion (A) and Reason (R) are true, and Reason (R) correctly explains Assertion (A). Lithium enters collecting duct principal cells via luminal ENaC channels, disrupting cAMP-mediated aquaporin-2 insertion. Amiloride blocks ENaC selectively, shutting down lithium entry without altering systemic lithium clearance."
         },
         {
           "id": "ini_q_14",
@@ -343,65 +362,67 @@
           "system": [
             "Integumentary System"
           ],
-          "format": "One-Liner",
-          "difficulty": "Easy",
-          "topic": "Autoimmune Bullous Dermatoses",
-          "reference": "Fitzpatrick's Dermatology, 9th ed., Ch. 54; Rook's, 9th ed.",
-          "text": "Direct immunofluorescence of perilesional skin demonstrating intercellular epidermal IgG and C3 deposition in a classic 'fishnet' or 'chicken-wire' pattern against desmoglein-3 is diagnostic of:",
+          "format": "Multiple True\u2013False",
+          "style": "Conceptual",
+          "difficulty": "Medium",
+          "topic": "Autoimmune Bullous Diseases & Immunofluorescence",
+          "reference": "Fitzpatrick's Dermatology, 9th ed., Ch. 54; Rook's Textbook of Dermatology, 9th ed.",
+          "text": "Evaluate the following statements regarding autoimmune bullous diseases and their immunofluorescence findings:\nStatement 1: Pemphigus vulgaris is characterized by IgG autoantibodies targeting desmoglein 3, demonstrating intraepidermal 'fishnet' or intercellular staining on direct immunofluorescence.\nStatement 2: Bullous pemphigoid features subepidermal bullae with continuous linear deposition of IgG and C3 along the dermo-epidermal basement membrane zone.\nStatement 3: Dermatitis herpetiformis is characterized by continuous linear IgA deposition along the epidermal basement membrane.\nStatement 4: Acantholysis (loss of intercellular keratinocyte connections) is the hallmark histopathological feature of pemphigus vulgaris but is absent in bullous pemphigoid.\nWhich of the following evaluations is correct?",
           "options": [
-            "Pemphigus vulgaris",
-            "Bullous pemphigoid",
-            "Dermatitis herpetiformis",
-            "Erythema multiforme"
+            "Statement 1: True; Statement 2: True; Statement 3: False; Statement 4: True",
+            "Statement 1: True; Statement 2: False; Statement 3: True; Statement 4: True",
+            "Statement 1: False; Statement 2: True; Statement 3: False; Statement 4: False",
+            "Statement 1: True; Statement 2: True; Statement 3: True; Statement 4: False"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Pemphigus vulgaris features autoantibodies against desmoglein 3 (and 1), producing suprabasal acantholysis with a 'fishnet' or 'honeycomb' intraepidermal intercellular pattern on direct immunofluorescence."
+          "explanation": "Statements 1, 2, and 4 are True. Statement 3 is False because dermatitis herpetiformis is characterized by granular (not linear) IgA deposits concentrated at the tips of dermal papillae. Linear IgA bullous dermatosis displays linear IgA, while pemphigus vulgaris shows intraepidermal acantholysis with intercellular fishnet IgG/C3, and bullous pemphigoid exhibits continuous linear BMZ staining."
         },
         {
           "id": "ini_q_15",
           "subject": [
-            "Orthopedics",
+            "Medicine",
             "Surgery"
           ],
           "system": [
-            "Musculoskeletal System"
+            "Gastrointestinal System"
           ],
-          "format": "Clinical Vignette",
+          "format": "Sequential Arrangement",
+          "style": "Clinical Vignette",
           "difficulty": "Medium",
-          "topic": "Knee Ligamentous Injuries & Sports Orthopedics",
-          "reference": "Campbell's Operative Orthopaedics, 14th ed., Vol. 3; Rockwood and Green's Fractures",
-          "text": "A 23-year-old athlete sustains a knee injury with an audible 'pop' during rapid deceleration and pivoting. Examination demonstrates an anterior drawer test with no firm endpoint and a positive Lachman test. Which autograft tendon is most frequently harvested for anatomic reconstruction of the anterior cruciate ligament (ACL)?",
+          "topic": "Acute Pancreatitis Prioritized Algorithm",
+          "reference": "American College of Gastroenterology (ACG) Acute Pancreatitis Guidelines; Bailey & Love's, 28th ed.",
+          "text": "A 52-year-old female presents with sudden-onset severe epigastric pain radiating to the mid-back and persistent vomiting. Serum amylase and lipase are elevated over four times the upper limit of normal. Arrange the prioritized clinical and imaging algorithm for suspected acute pancreatitis in chronological sequence:\n1. Transabdominal ultrasonography to evaluate gallbladder cholelithiasis and biliary ductal dilatation\n2. Immediate goal-directed crystalloid intravenous hydration with Ringer's Lactate and pain relief\n3. Contrast-enhanced computed tomography (CECT) of the abdomen after 72\u201396 hours if clinical non-improvement or suspected necrosis\n4. Urgent endoscopic retrograde cholangiopancreatography (ERCP) within 24 hours if concurrent acute cholangitis is diagnosed\nSelect the correct sequence:",
           "options": [
-            "Bone-patellar tendon-bone or Hamstrings (semitendinosus and gracilis)",
-            "Achilles tendon",
-            "Tibialis anterior tendon",
-            "Peroneus brevis tendon"
+            "2 \u2192 1 \u2192 4 \u2192 3",
+            "1 \u2192 2 \u2192 3 \u2192 4",
+            "3 \u2192 2 \u2192 1 \u2192 4",
+            "2 \u2192 3 \u2192 1 \u2192 4"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "The most widely utilized autografts for ACL reconstruction are the central third bone-patellar tendon-bone (BPTB) graft and the quadrupled hamstring tendon autograft (semitendinosus and gracilis)."
+          "explanation": "Management sequence: Immediate aggressive IV crystalloid resuscitation and analgesia (2) \u2192 Bedside transabdominal ultrasound to assess gallstones/etiology (1) \u2192 Urgent therapeutic ERCP within 24 hours only if concurrent acute ascending cholangitis is present (4) \u2192 Dynamic CECT abdomen delayed to 72-96 hours to delineate pancreatic parenchymal necrosis and peripancreatic fluid collections (3)."
         },
         {
           "id": "ini_q_16",
           "subject": [
-            "Community Medicine",
-            "Medicine"
+            "Community Medicine"
           ],
           "system": [
             "General"
           ],
-          "format": "One-Liner",
-          "difficulty": "Medium",
+          "format": "Single Best Answer",
+          "style": "One-Liner",
+          "difficulty": "Easy",
           "topic": "Epidemiological Study Designs & Measures of Association",
-          "reference": "Gordis Epidemiology, 6th ed., Ch. 10; Park's, 26th ed.",
-          "text": "In epidemiological case-control studies investigating a rare disease, what statistical parameter is calculated as the primary measure of association between exposure and outcome?",
+          "reference": "Gordis Epidemiology, 6th ed., Ch. 10; Park's Textbook of Preventive and Social Medicine, 26th ed.",
+          "text": "In a retrospective case-control epidemiological study evaluating the association between maternal smoking during pregnancy and congenital heart defects, what statistical measure represents the primary estimator of relative risk?",
           "options": [
             "Odds Ratio (OR)",
-            "Relative Risk (RR)",
-            "Attributable Risk Percentage",
-            "Incidence Rate Ratio"
+            "Attributable Risk (AR)",
+            "Incidence Density Ratio (IDR)",
+            "Population Attributable Risk Fraction"
           ],
           "correctAnswerIndex": 0,
-          "explanation": "Because incidence cannot be directly measured in retrospective case-control studies (unless total population at risk is known), the Odds Ratio (OR) is used as the primary estimate of relative risk (the rare disease assumption)."
+          "explanation": "In retrospective case-control studies, incidence cannot be calculated directly because the study population does not represent the entire population at risk. Therefore, the Odds Ratio (OR) is calculated as the primary surrogate measure of Relative Risk (under the rare disease assumption)."
         }
       ]
     }
