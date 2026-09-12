@@ -4096,20 +4096,16 @@ function renderActiveReviewCard(item) {
   }
 
   // Badges
-  if (isHidden) {
-    DOM.reviewQStatusBadge.classList.add('hidden');
+  DOM.reviewQStatusBadge.classList.remove('hidden');
+  if (isCorrect) {
+    DOM.reviewQStatusBadge.className = 'badge badge-correct';
+    DOM.reviewQStatusBadge.textContent = 'Correct';
+  } else if (isIncorrect) {
+    DOM.reviewQStatusBadge.className = 'badge badge-incorrect';
+    DOM.reviewQStatusBadge.textContent = 'Incorrect';
   } else {
-    DOM.reviewQStatusBadge.classList.remove('hidden');
-    if (isCorrect) {
-      DOM.reviewQStatusBadge.className = 'badge badge-correct';
-      DOM.reviewQStatusBadge.textContent = 'Correct';
-    } else if (isIncorrect) {
-      DOM.reviewQStatusBadge.className = 'badge badge-incorrect';
-      DOM.reviewQStatusBadge.textContent = 'Incorrect';
-    } else {
-      DOM.reviewQStatusBadge.className = 'badge badge-unattempted';
-      DOM.reviewQStatusBadge.textContent = 'Unattempted';
-    }
+    DOM.reviewQStatusBadge.className = 'badge badge-unattempted';
+    DOM.reviewQStatusBadge.textContent = 'Unattempted';
   }
 
   DOM.reviewBookmarkIndicator.classList.toggle('hidden', !resp.bookmarked);
@@ -4127,18 +4123,26 @@ function renderActiveReviewCard(item) {
     let rowClass = 'review-opt-row';
     let statusBadge = '';
 
-    if (!isHidden) {
-      if (isThisCorrect) {
+    if (isThisCorrect) {
+      if (!isHidden) {
         rowClass += ' correct-answer';
         if (isUserChosen) {
           statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key • Your Choice</span>`;
         } else {
           statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key</span>`;
         }
-      } else if (isUserChosen) {
-        rowClass += ' user-incorrect';
-        statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-red);">Your Choice</span>`;
+      } else {
+        // Answer hidden: suppress correct key label/highlighting from unchosen options;
+        // if user chose this option (and it is correct), preserve user response indicator
+        if (isUserChosen) {
+          rowClass += ' correct-answer';
+          statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Your Choice</span>`;
+        }
       }
+    } else if (isUserChosen) {
+      // User chose an incorrect option: always show user response
+      rowClass += ' user-incorrect';
+      statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-red);">Your Choice</span>`;
     }
 
     row.className = rowClass;
