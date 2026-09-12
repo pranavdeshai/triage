@@ -53,7 +53,7 @@
             <h1 class="landing-title">triage</h1>
             <p class="landing-tagline">Computer Based Test (CBT) platform for NEET-PG & INI-CET aspirants</p>
             <p class="landing-desc">
-              Distraction-free, timed examination simulation and curriculum-mapped practice with real-time confidence tracking and Triage Matrix analytics.
+              Distraction-free, timed examination simulation and curriculum-mapped practice with real-time confidence tracking and Triage Matrix analysis.
             </p>
           </div>
 
@@ -678,7 +678,7 @@
                 class="tab-btn"
                 data-master-tab="tab-analytics-master"
               >
-                Analytics
+                Analysis
               </button>
               <button
                 type="button"
@@ -966,7 +966,7 @@
                       <th>Test Title</th>
                       <th style="width: 95px;">Score</th>
                       <th style="width: 80px;">Accuracy</th>
-                      <th style="text-align: center; width: 140px;">Actions</th>
+                      <th style="text-align: center; width: 195px;">Actions</th>
                     </tr>
                   </thead>
                   <tbody></tbody>
@@ -978,7 +978,17 @@
           <!-- Col 3: Review Filter & Mini-Palette -->
           <aside class="analytics-filter-col">
             <div class="filter-panel-header">
-              <h3>Filter Questions</h3>
+              <button
+                type="button"
+                class="btn-filter-toggle"
+                id="btn-toggle-filters"
+                aria-expanded="false"
+                aria-controls="filter-controls-group"
+              >
+                <span class="filter-toggle-title">Filter Questions</span>
+                <span class="filter-toggle-chevron" id="filter-toggle-chevron">▶</span>
+                <span class="filter-active-count-badge hidden" id="filter-active-badge">0</span>
+              </button>
               <button
                 type="button"
                 class="btn btn-outline btn-sm"
@@ -989,7 +999,7 @@
               </button>
             </div>
 
-            <div class="filter-controls-group">
+            <div class="filter-controls-group collapsed" id="filter-controls-group">
               <div class="form-group">
                 <label for="filter-matrix">Triage Matrix</label>
                 <select id="filter-matrix" class="form-select">
@@ -1227,6 +1237,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Toast Notification Banner -->
     <div id="toast-notification" class="toast-notification hidden" role="status" aria-live="polite"></div>

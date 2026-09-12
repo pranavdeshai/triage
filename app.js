@@ -370,6 +370,7 @@ const AppState = {
     format: 'all',
     style: 'all'
   },
+  reviewFiltersCollapsed: true,
   reviewMasterTab: 'tab-question-review',
   analyticsSubtab: 'tab-triage-matrix',
   historyFilterExam: 'all',
@@ -614,6 +615,10 @@ const DOM = {
   analyticsTable: document.getElementById('analytics-table'),
 
   // Filters & Mini Palette
+  btnToggleFilters: document.getElementById('btn-toggle-filters'),
+  filterControlsGroup: document.getElementById('filter-controls-group'),
+  filterToggleChevron: document.getElementById('filter-toggle-chevron'),
+  filterActiveBadge: document.getElementById('filter-active-badge'),
   btnResetFilters: document.getElementById('btn-reset-filters'),
   filterMatrix: document.getElementById('filter-matrix'),
   filterResult: document.getElementById('filter-result'),
@@ -712,6 +717,7 @@ async function initApp() {
     applyTheme(AppState.theme);
     attachEventListeners();
     updateExamModeUI();
+    initFilterGroupCollapse();
     initAiGeneratorUI();
     renderHeaderNavActions();
     await loadHistoryFromDB();
@@ -1013,6 +1019,11 @@ function updateExamModeUI() {
     updateAiConfigSummary();
   }
 
+  if (DOM.btnSubmitSection) {
+    DOM.btnSubmitSection.textContent = isNeet ? 'Submit Section' : 'Submit Block';
+    DOM.btnSubmitSection.setAttribute('aria-label', isNeet ? 'Submit Section' : 'Submit Block');
+  }
+
   // Clear or revalidate input
   if (DOM.jsonTextInput.value.trim()) {
     validateJsonContent(DOM.jsonTextInput.value);
@@ -1020,6 +1031,11 @@ function updateExamModeUI() {
     DOM.startExamBtn.disabled = !AppState.examData;
   }
 }
+
+function getSubmitButtonLabel() {
+  return AppState.examMode === 'inicet' ? 'Submit Block' : 'Submit Section';
+}
+
 
 // ==========================================================================
 // 5. Event Listeners
@@ -1453,6 +1469,12 @@ function attachEventListeners() {
   DOM.btnCopyQuestion.addEventListener('click', copyActiveReviewQuestion);
   DOM.btnCopyAllFiltered.addEventListener('click', copyAllFilteredQuestions);
   DOM.btnResetFilters.addEventListener('click', resetReviewFilters);
+  if (DOM.btnToggleFilters) {
+    DOM.btnToggleFilters.addEventListener('click', () => {
+      const isCurrentlyCollapsed = DOM.filterControlsGroup ? DOM.filterControlsGroup.classList.contains('collapsed') : true;
+      toggleFilterGroup(!isCurrentlyCollapsed);
+    });
+  }
 
   // Filter Dropdowns
   DOM.filterMatrix.addEventListener('change', applyFiltersFromDropdowns);
@@ -3042,6 +3064,9 @@ function switchView(viewName) {
   if (DOM.viewReview) {
     DOM.viewReview.classList.toggle('active', viewName === 'review');
     DOM.viewReview.classList.toggle('hidden', viewName !== 'review');
+    if (viewName === 'review') {
+      initFilterGroupCollapse();
+    }
   }
 
   if (DOM.sampleTestBanner) {
@@ -3105,14 +3130,6 @@ function renderHeaderNavActions() {
     exitBtn.onclick = confirmExitTest;
     DOM.dynamicNavActions.appendChild(exitBtn);
   } else if (AppState.view === 'review') {
-    const retakeBtn = document.createElement('button');
-    retakeBtn.className = 'btn btn-outline';
-    retakeBtn.id = 'btn-header-retake';
-    retakeBtn.textContent = 'Retake Test';
-    retakeBtn.title = 'Retake this test with freshly randomized options';
-    retakeBtn.onclick = handleRetakeTest;
-    DOM.dynamicNavActions.appendChild(retakeBtn);
-
     const homeBtn = document.createElement('button');
     homeBtn.className = 'btn btn-primary';
     homeBtn.id = 'btn-header-home';
@@ -3175,6 +3192,10 @@ function handleNewTest() {
 }
 
 function handleRetakeTest() {
+  if (AppState.viewingAttemptId) {
+    retakeHistoryAttempt(AppState.viewingAttemptId);
+    return;
+  }
   if (!AppState.examData || !AppState.examData.sections || AppState.examData.sections.length === 0) {
     showToast("No test data available to retake.");
     return;
@@ -3184,6 +3205,7 @@ function handleRetakeTest() {
   const msg = `Are you sure you want to retake "${testTitle}"? A fresh test session will begin immediately with newly randomized options.`;
 
   showModal("Retake Test", msg, () => {
+    if (AppState.timerInterval) clearInterval(AppState.timerInterval);
     localStorage.removeItem('triage_exam_session');
     AppState.viewingAttemptId = null;
     if (DOM.pastAttemptBanner) {
@@ -3270,8 +3292,10 @@ function renderSectionTabs() {
     `;
 
     btn.onclick = () => {
+      const isIni = AppState.examMode === 'inicet';
+      const unitName = isIni ? 'Block' : 'Section';
       if (isSubmitted) {
-        showNoticeModal("Section Locked", "This section has been submitted and locked under CBT regulations.");
+        showNoticeModal(`${unitName} Locked`, `This ${unitName.toLowerCase()} has been submitted and locked under CBT regulations.`);
         return;
       }
       if (idx !== AppState.activeSectionIndex) {
@@ -3282,7 +3306,7 @@ function renderSectionTabs() {
           loadQuestion(AppState.activeSectionIndex, AppState.activeQuestionIndex);
           return;
         }
-        showNoticeModal("Section Lock Notice", "In accordance with CBT regulations, candidates cannot advance to subsequent sections without submitting the current section.");
+        showNoticeModal(`${unitName} Lock Notice`, `In accordance with CBT regulations, candidates cannot advance to subsequent ${unitName.toLowerCase()}s without submitting the current ${unitName.toLowerCase()}.`);
       }
     };
 
@@ -3341,13 +3365,14 @@ function loadQuestion(secIdx, qIdx) {
 
   // Render Options (85/15 dual-action rows)
   DOM.examOptionsList.innerHTML = '';
+
   question.options.forEach((optText, optIdx) => {
     const isSelected = resp.selectedOption === optIdx;
     const letter = String.fromCharCode(65 + optIdx);
     const confClass = isSelected ? (resp.confidence === 'not_sure' ? 'confidence-not-sure' : 'confidence-sure') : '';
 
     const row = document.createElement('div');
-    row.className = `option-row ${isSelected ? 'selected ' + confClass : ''}`;
+    row.className = `option-row ${isSelected ? 'selected ' + confClass : ''}`.trim();
     row.setAttribute('data-opt-index', optIdx);
 
     row.innerHTML = `
@@ -3390,8 +3415,9 @@ function loadQuestion(secIdx, qIdx) {
     DOM.examOptionsList.appendChild(row);
   });
 
-  const isLastSection = secIdx === AppState.examData.sections.length - 1;
-  DOM.btnSubmitSection.textContent = isLastSection ? 'Submit Test' : 'Submit Section';
+  const submitLabel = getSubmitButtonLabel();
+  DOM.btnSubmitSection.textContent = submitLabel;
+  DOM.btnSubmitSection.setAttribute('aria-label', submitLabel);
 
   if (DOM.timerSecLabel) {
     const isPractice = AppState.sessionMode === 'practice' || (currentSec && currentSec.id === 'sec_practice');
@@ -3406,6 +3432,7 @@ function loadQuestion(secIdx, qIdx) {
 
 function selectOption(qId, optIdx, confidence = 'sure') {
   const resp = AppState.responses[qId];
+
   if (resp.selectedOption !== null && resp.selectedOption !== optIdx) {
     resp.switchCount = (resp.switchCount || 0) + 1;
     resp.switchHistory.push({ from: resp.selectedOption, to: optIdx, timestamp: Date.now() });
@@ -3503,7 +3530,7 @@ function showKeyboardHelpModal() {
       <div class="kbd-row"><div class="kbd-keys"><kbd>Tab</kbd></div><span class="kbd-desc">Toggle Confidence (Answered questions only)</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>B</kbd></div><span class="kbd-desc">Toggle Bookmark</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>Enter</kbd></div><span class="kbd-desc">Save &amp; Next</span></div>
-      <div class="kbd-row"><div class="kbd-keys"><kbd>Shift</kbd> + <kbd>Enter</kbd></div><span class="kbd-desc">Submit Section / Test</span></div>
+      <div class="kbd-row"><div class="kbd-keys"><kbd>Shift</kbd> + <kbd>Enter</kbd></div><span class="kbd-desc">Submit ${AppState.examMode === 'inicet' ? 'Block' : 'Section'} / Test</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>P</kbd> / <kbd>&larr;</kbd></div><span class="kbd-desc">Previous Question</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></div><span class="kbd-desc">Clear Response</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>?</kbd></div><span class="kbd-desc">Toggle this Keyboard Help</span></div>
@@ -3830,16 +3857,19 @@ function confirmSubmitSection(isAuto) {
   const isLast = AppState.activeSectionIndex === AppState.examData.sections.length - 1;
   const curSec = AppState.examData.sections[AppState.activeSectionIndex];
   const stats = getSectionStats(curSec.id);
+  const isIni = AppState.examMode === 'inicet';
+  const unitName = isIni ? 'block' : 'section';
+  const unitNameCap = isIni ? 'Block' : 'Section';
 
   const title = isLast ? "Submit Complete Test?" : `Submit ${curSec.name}?`;
   const promptMsg = isLast
     ? "Are you sure you want to finish and submit the test? All responses will be locked for final evaluation."
-    : "Once submitted, this section cannot be reopened under CBT regulations. Do you wish to continue?";
+    : `Once submitted, this ${unitName} cannot be reopened under CBT regulations. Do you wish to continue?`;
 
   const summaryHtml = `
     <div class="modal-summary-grid">
       <div class="modal-summary-row">
-        <span class="modal-summary-label">Section</span>
+        <span class="modal-summary-label">${unitNameCap}</span>
         <span class="modal-summary-value">${curSec.name}</span>
       </div>
       <div class="modal-summary-row">
@@ -4149,9 +4179,48 @@ function updateFilterHighlights() {
 }
 
 function updateResetFilterState() {
-  const hasActive = Object.values(AppState.reviewFilters).some(v => v !== 'all');
-  DOM.btnResetFilters.disabled = !hasActive;
+  const activeCount = Object.values(AppState.reviewFilters).filter(v => v !== 'all').length;
+  if (DOM.btnResetFilters) {
+    DOM.btnResetFilters.disabled = activeCount === 0;
+  }
+  if (DOM.filterActiveBadge) {
+    DOM.filterActiveBadge.textContent = String(activeCount);
+    DOM.filterActiveBadge.classList.toggle('hidden', activeCount === 0);
+  }
 }
+
+function toggleFilterGroup(shouldCollapse) {
+  if (!DOM.filterControlsGroup) return;
+  const isCollapsed = shouldCollapse !== undefined
+    ? shouldCollapse
+    : !DOM.filterControlsGroup.classList.contains('collapsed');
+
+  DOM.filterControlsGroup.classList.toggle('collapsed', isCollapsed);
+  if (DOM.btnToggleFilters) {
+    DOM.btnToggleFilters.classList.toggle('expanded', !isCollapsed);
+    DOM.btnToggleFilters.setAttribute('aria-expanded', String(!isCollapsed));
+  }
+  if (DOM.filterToggleChevron) {
+    DOM.filterToggleChevron.textContent = isCollapsed ? '▶' : '▼';
+  }
+  AppState.reviewFiltersCollapsed = isCollapsed;
+  persistAppState();
+}
+
+function initFilterGroupCollapse() {
+  const isCollapsed = AppState.reviewFiltersCollapsed !== false;
+  if (DOM.filterControlsGroup) {
+    DOM.filterControlsGroup.classList.toggle('collapsed', isCollapsed);
+  }
+  if (DOM.btnToggleFilters) {
+    DOM.btnToggleFilters.classList.toggle('expanded', !isCollapsed);
+    DOM.btnToggleFilters.setAttribute('aria-expanded', String(!isCollapsed));
+  }
+  if (DOM.filterToggleChevron) {
+    DOM.filterToggleChevron.textContent = isCollapsed ? '▶' : '▼';
+  }
+}
+
 
 function resetReviewFilters() {
   DOM.filterMatrix.value = 'all';
@@ -5268,6 +5337,9 @@ function renderHistoryTab() {
           <button type="button" class="btn btn-outline btn-sm btn-view-attempt" data-attempt-id="${att.id}">
             ${isCurrentViewing ? 'Viewing' : 'View'}
           </button>
+          <button type="button" class="btn btn-outline btn-sm btn-table-retake" data-attempt-id="${att.id}" title="Retake this test with freshly randomized options">
+            Retake
+          </button>
           <button type="button" class="btn btn-outline btn-sm btn-table-delete" data-attempt-id="${att.id}" title="Delete Attempt">
             Delete
           </button>
@@ -5284,6 +5356,11 @@ function renderHistoryTab() {
       }
     }
 
+    const retakeBtn = tr.querySelector('.btn-table-retake');
+    if (retakeBtn) {
+      retakeBtn.onclick = () => retakeHistoryAttempt(att.id);
+    }
+
     const delBtn = tr.querySelector('.btn-table-delete');
     if (delBtn) {
       delBtn.onclick = () => deleteAttempt(att.id);
@@ -5291,6 +5368,41 @@ function renderHistoryTab() {
 
     tbody.appendChild(tr);
   });
+}
+
+function retakeHistoryAttempt(attemptId) {
+  const attempt = AppState.sessionHistory.find(a => a.id === attemptId);
+  if (!attempt || !attempt.examData || !attempt.examData.sections || attempt.examData.sections.length === 0) {
+    showToast("No test data available for this attempt to retake.");
+    return;
+  }
+
+  const testTitle = attempt.examTitle || attempt.examData.examTitle || (attempt.examMode === 'inicet' ? 'INI-CET CBT Mock Test' : 'NEET-PG CBT Mock Test');
+  const msg = `Are you sure you want to retake "${testTitle}"? A fresh test session will begin immediately with newly randomized options.`;
+
+  showModal("Retake Test", msg, () => {
+    if (AppState.timerInterval) clearInterval(AppState.timerInterval);
+    localStorage.removeItem('triage_exam_session');
+
+    AppState.viewingAttemptId = null;
+    AppState.examMode = attempt.examMode;
+    AppState.examData = JSON.parse(JSON.stringify(attempt.examData));
+    if (attempt.examTitle && AppState.examData) {
+      AppState.examData.examTitle = attempt.examTitle;
+    }
+    AppState.isSampleTest = !!attempt.isSampleTest;
+    AppState.responses = {};
+
+    if (DOM.pastAttemptBanner) {
+      DOM.pastAttemptBanner.classList.add('hidden');
+    }
+    if (DOM.sampleTestBanner) {
+      DOM.sampleTestBanner.classList.add('hidden');
+    }
+
+    updateExamModeUI();
+    startExamSession();
+  }, true);
 }
 
 function viewPastAttempt(attemptId) {
@@ -5327,7 +5439,7 @@ function viewPastAttempt(attemptId) {
     renderHistoryTab();
   }
 
-  showToast(`Loaded Attempt (${attempt.formattedDate}) into Review & Analytics.`, 2500);
+  showToast(`Loaded Attempt (${attempt.formattedDate}) into Review & Analysis.`, 2500);
   persistAppState();
 }
 
@@ -5761,6 +5873,10 @@ function checkPersistedState() {
       if (savedState.reviewActiveQuestionId) {
         AppState.reviewActiveQuestionId = savedState.reviewActiveQuestionId;
       }
+      if (savedState.reviewFiltersCollapsed !== undefined) {
+        AppState.reviewFiltersCollapsed = savedState.reviewFiltersCollapsed;
+      }
+      initFilterGroupCollapse();
       renderFilteredReviewQuestions();
       updateResetFilterState();
       return;
