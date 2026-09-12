@@ -59,7 +59,66 @@ const SUBJECT_ALIASES = {
   "radiotherapy": "Radiology",
   "anaesthesia": "Anesthesiology",
   "anaesthesiology": "Anesthesiology",
-  "anesthesia": "Anesthesiology"
+  "anesthesia": "Anesthesiology",
+  "cardiology": "Medicine",
+  "neurology": "Medicine",
+  "pulmonology": "Medicine",
+  "chest medicine": "Medicine",
+  "respiratory medicine": "Medicine",
+  "nephrology": "Medicine",
+  "gastroenterology": "Medicine",
+  "endocrinology": "Medicine",
+  "rheumatology": "Medicine",
+  "infectious diseases": "Medicine",
+  "infectious disease": "Medicine",
+  "hematology": "Pathology",
+  "haematology": "Pathology",
+  "urology": "Surgery",
+  "neurosurgery": "Surgery",
+  "plastic surgery": "Surgery",
+  "cardiothoracic surgery": "Surgery",
+  "pediatric surgery": "Surgery",
+  "surgical oncology": "Surgery",
+  "emergency medicine": "Medicine",
+  "critical care": "Medicine",
+  "intensive care": "Medicine",
+  "geriatrics": "Medicine",
+  "clinical pharmacology": "Pharmacology",
+  "histopathology": "Pathology",
+  "cytopathology": "Pathology",
+  "surgical pathology": "Pathology",
+  "medical microbiology": "Microbiology",
+  "bacteriology": "Microbiology",
+  "virology": "Microbiology",
+  "parasitology": "Microbiology",
+  "mycology": "Microbiology",
+  "genetics": "Biochemistry",
+  "medical biochemistry": "Biochemistry",
+  "neuroanatomy": "Anatomy",
+  "embryology": "Anatomy",
+  "histology": "Anatomy",
+  "gross anatomy": "Anatomy",
+  "clinical anatomy": "Anatomy",
+  "medical physiology": "Physiology",
+  "neurophysiology": "Physiology",
+  "clinical psychology": "Psychiatry",
+  "behavioral science": "Psychiatry",
+  "toxicology": "Forensic Medicine",
+  "epidemiology": "Community Medicine",
+  "public health": "Community Medicine",
+  "biostatistics": "Community Medicine",
+  "neonatology": "Pediatrics",
+  "pediatric medicine": "Pediatrics",
+  "gynecology": "Obstetrics & Gynecology",
+  "obstetrics": "Obstetrics & Gynecology",
+  "gynaecology": "Obstetrics & Gynecology",
+  "ophthalmic surgery": "Ophthalmology",
+  "ophthalmic medicine": "Ophthalmology",
+  "eye": "Ophthalmology",
+  "trauma surgery": "Surgery",
+  "orthopedic surgery": "Orthopedics",
+  "nuclear medicine": "Radiology",
+  "interventional radiology": "Radiology"
 };
 
 const STANDARD_SYSTEMS_LIST = [
@@ -110,7 +169,30 @@ function normalizeSubject(val) {
   const lower = raw.toLowerCase();
   if (SUBJECT_ALIASES[lower]) return SUBJECT_ALIASES[lower];
   const matched = MBBS_SUBJECTS_LIST.find(s => s.toLowerCase() === lower);
-  return matched || raw;
+  if (matched) return matched;
+
+  // Keyword heuristic fallback ensuring standard 19 MBBS subjects
+  if (lower.includes('surg')) return 'Surgery';
+  if (lower.includes('med')) return 'Medicine';
+  if (lower.includes('path')) return 'Pathology';
+  if (lower.includes('pharm')) return 'Pharmacology';
+  if (lower.includes('ped') || lower.includes('paed')) return 'Pediatrics';
+  if (lower.includes('gyn') || lower.includes('obs')) return 'Obstetrics & Gynecology';
+  if (lower.includes('radio')) return 'Radiology';
+  if (lower.includes('psych')) return 'Psychiatry';
+  if (lower.includes('derm') || lower.includes('skin')) return 'Dermatology';
+  if (lower.includes('micro')) return 'Microbiology';
+  if (lower.includes('biochem')) return 'Biochemistry';
+  if (lower.includes('anat')) return 'Anatomy';
+  if (lower.includes('physio')) return 'Physiology';
+  if (lower.includes('forensic') || lower.includes('tox')) return 'Forensic Medicine';
+  if (lower.includes('communit') || lower.includes('prevent') || lower.includes('social')) return 'Community Medicine';
+  if (lower.includes('ophth') || lower.includes('eye')) return 'Ophthalmology';
+  if (lower.includes('ent') || lower.includes('ear') || lower.includes('throat')) return 'ENT';
+  if (lower.includes('ortho') || lower.includes('bone')) return 'Orthopedics';
+  if (lower.includes('anest') || lower.includes('anaest')) return 'Anesthesiology';
+
+  return "Medicine";
 }
 
 function normalizeSystem(val) {
@@ -119,7 +201,37 @@ function normalizeSystem(val) {
   const lower = raw.toLowerCase();
   if (SYSTEM_ALIASES[lower]) return SYSTEM_ALIASES[lower];
   const matched = STANDARD_SYSTEMS_LIST.find(s => s.toLowerCase() === lower);
-  return matched || raw;
+  if (matched) return matched;
+
+  // Keyword heuristic fallback
+  if (lower.includes('cardio') || lower.includes('heart') || lower.includes('vascular')) return 'Cardiovascular System';
+  if (lower.includes('neuro') || lower.includes('brain') || lower.includes('cns')) return 'Central Nervous System';
+  if (lower.includes('respir') || lower.includes('lung') || lower.includes('pulmon')) return 'Respiratory System';
+  if (lower.includes('gastro') || lower.includes('git') || lower.includes('bowel') || lower.includes('digest')) return 'Gastrointestinal System';
+  if (lower.includes('hepato') || lower.includes('liver') || lower.includes('biliary')) return 'Hepatobiliary System';
+  if (lower.includes('renal') || lower.includes('kidney') || lower.includes('urin') || lower.includes('nephro')) return 'Renal & Urinary System';
+  if (lower.includes('musculo') || lower.includes('bone') || lower.includes('joint') || lower.includes('msk')) return 'Musculoskeletal System';
+  if (lower.includes('endocrin') || lower.includes('thyroid') || lower.includes('diabetes')) return 'Endocrine System';
+  if (lower.includes('hemat') || lower.includes('onco') || lower.includes('blood')) return 'Hematology & Oncology';
+  if (lower.includes('immun')) return 'Immune System';
+  if (lower.includes('integument') || lower.includes('derm') || lower.includes('skin')) return 'Integumentary System';
+  if (lower.includes('reproduct') || lower.includes('pelvi') || lower.includes('genital')) return 'Reproductive System';
+  if (lower.includes('head') || lower.includes('neck')) return 'Head & Neck';
+  if (lower.includes('upper limb') || lower.includes('arm')) return 'Upper Limb';
+  if (lower.includes('lower limb') || lower.includes('leg')) return 'Lower Limb';
+
+  return "General";
+}
+
+function cleanOptionPrefix(text) {
+  if (typeof text !== 'string') return String(text !== undefined && text !== null ? text : '');
+  return text
+    .trim()
+    .replace(/^[A-Da-d1-4][\.\:\)]\s*/, '')
+    .replace(/^\([A-Da-d1-4]\)\s*/, '')
+    .replace(/^\[[A-Da-d1-4]\]\s*/, '')
+    .replace(/^[A-Da-d1-4]\s+[-–—]\s+/, '')
+    .trim();
 }
 
 
@@ -541,6 +653,8 @@ const DOM = {
   // Past Attempt & History
   pastAttemptBanner: document.getElementById('past-attempt-banner'),
   pastAttemptLabel: document.getElementById('past-attempt-label'),
+  sampleTestBanner: document.getElementById('sample-test-banner'),
+  sampleTestBannerLabel: document.getElementById('sample-test-banner-label'),
   btnReturnLatest: document.getElementById('btn-return-latest'),
   historyComparisonTable: document.getElementById('history-comparison-table'),
   historyFileInput: document.getElementById('history-file-input'),
@@ -766,13 +880,9 @@ function setSessionMode(mode, autoAdvance = true) {
   }
   updateStepHeaderBadges();
   persistAppState();
-
-  if (autoAdvance) {
-    toggleSetupStep(2, true);
-  }
 }
 
-function setExamMode(mode, autoAdvance = true) {
+function setExamMode(mode) {
   AppState.examMode = mode;
   // If the active preset was the unit (36/50) or mock (180/200), update to match the new exam mode
   if (AppState.aiQuestionCount === 36 && mode === 'inicet') {
@@ -788,10 +898,6 @@ function setExamMode(mode, autoAdvance = true) {
   updateExamModeUI();
   updateStepHeaderBadges();
   persistAppState();
-
-  if (autoAdvance) {
-    toggleSetupStep(3, true);
-  }
 }
 
 function updateExamModeUI() {
@@ -1030,9 +1136,6 @@ function attachEventListeners() {
     DOM.selectAiScope.addEventListener('change', () => {
       setAiScope(DOM.selectAiScope.value);
       updateStepHeaderBadges();
-      if (DOM.selectAiScope.value === 'grand') {
-        toggleSetupStep(5, true);
-      }
     });
   }
   if (DOM.selectAiSubject) {
@@ -1120,7 +1223,6 @@ function attachEventListeners() {
       const count = parseInt(btn.dataset.count, 10);
       setAiQuestionCount(count);
       updateStepHeaderBadges();
-      toggleSetupStep(4, true);
     });
   }
 
@@ -1448,8 +1550,143 @@ function readFile(file) {
   reader.readAsText(file);
 }
 
+function parseJsonFlexible(rawText) {
+  if (!rawText || typeof rawText !== 'string') {
+    throw new Error("No JSON content provided.");
+  }
+  let str = rawText.trim();
+
+  // Normalize smart/curly quotes
+  str = str.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"').replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'");
+
+  // 1. Direct parse attempt
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    // Continue
+  }
+
+  // 2. Strip markdown code block fences (```json ... ``` or ``` ... ```)
+  let stripped = str.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  try {
+    return JSON.parse(stripped);
+  } catch (e) {
+    // Continue
+  }
+
+  // 3. Strip trailing commas before closing braces/brackets
+  let noTrailingCommas = stripped.replace(/,\s*([\]}])/g, '$1');
+  try {
+    return JSON.parse(noTrailingCommas);
+  } catch (e) {
+    // Continue
+  }
+
+  // 4. Extract outermost JSON object { ... } or array [ ... ]
+  const firstBrace = noTrailingCommas.indexOf('{');
+  const firstBracket = noTrailingCommas.indexOf('[');
+  let startIdx = -1;
+  let endIdx = -1;
+
+  if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+    startIdx = firstBrace;
+    endIdx = noTrailingCommas.lastIndexOf('}');
+  } else if (firstBracket !== -1) {
+    startIdx = firstBracket;
+    endIdx = noTrailingCommas.lastIndexOf(']');
+  }
+
+  if (startIdx !== -1 && endIdx > startIdx) {
+    const candidate = noTrailingCommas.substring(startIdx, endIdx + 1);
+    try {
+      return JSON.parse(candidate);
+    } catch (innerErr) {
+      const candNoCommas = candidate.replace(/,\s*([\]}])/g, '$1');
+      try {
+        return JSON.parse(candNoCommas);
+      } catch (innerErr2) {
+        throw new Error(`Invalid JSON: ${innerErr2.message}`);
+      }
+    }
+  }
+
+  throw new Error("Invalid JSON: Could not find a valid JSON object or array.");
+}
+
+function normalizeQuestionItem(q, qIdx) {
+  if (!q || typeof q !== 'object') {
+    throw new Error(`Question at index ${qIdx + 1} is not a valid object.`);
+  }
+
+  const id = (q.id && String(q.id).trim()) || `q${qIdx + 1}`;
+  const text = (q.text || q.question || q.stem || '').trim();
+  if (!text) {
+    throw new Error(`Question ${qIdx + 1} (${id}) is missing question text.`);
+  }
+
+  const rawOptions = q.options || q.choices || [];
+  if (!Array.isArray(rawOptions) || rawOptions.length !== 4) {
+    throw new Error(`Question ${qIdx + 1} (${id}) must contain exactly 4 options.`);
+  }
+
+  const cleanedOptions = rawOptions.map(opt => cleanOptionPrefix(String(opt !== undefined && opt !== null ? opt : '').trim()));
+
+  // Resolve correct answer index
+  let ansIdx = q.correctAnswerIndex;
+  if (ansIdx === undefined || ansIdx === null) {
+    ansIdx = q.correctAnswer !== undefined ? q.correctAnswer : (q.answer !== undefined ? q.answer : (q.correctOption !== undefined ? q.correctOption : q.answerIndex));
+  }
+
+  if (typeof ansIdx === 'string') {
+    const trimmed = ansIdx.trim().toUpperCase();
+    if (['A', 'B', 'C', 'D'].includes(trimmed)) {
+      ansIdx = trimmed.charCodeAt(0) - 65;
+    } else if (/^[0-3]$/.test(trimmed)) {
+      ansIdx = parseInt(trimmed, 10);
+    } else if (trimmed === '1' || trimmed === '2' || trimmed === '3' || trimmed === '4') {
+      ansIdx = parseInt(trimmed, 10) - 1;
+    } else {
+      const matchIdx = cleanedOptions.findIndex(o => o.toLowerCase() === ansIdx.trim().toLowerCase());
+      if (matchIdx !== -1) {
+        ansIdx = matchIdx;
+      } else {
+        const rawMatch = rawOptions.findIndex(o => String(o).trim().toLowerCase() === ansIdx.trim().toLowerCase());
+        if (rawMatch !== -1) ansIdx = rawMatch;
+      }
+    }
+  }
+
+  if (typeof ansIdx !== 'number' || isNaN(ansIdx) || ansIdx < 0 || ansIdx > 3) {
+    throw new Error(`Question ${qIdx + 1} (${id}) has invalid 'correctAnswerIndex' (must resolve to 0, 1, 2, or 3, or 'A'-'D').`);
+  }
+
+  // Canonical normalization of subject
+  const subjects = normalizeToArray(q.subject).map(s => normalizeSubject(s));
+  const validSubjects = subjects.filter(s => MBBS_SUBJECTS_LIST.includes(s));
+  const finalSubject = validSubjects.length > 0 ? validSubjects : ['Medicine'];
+
+  // Organ system
+  const systems = normalizeToArray(q.system).map(s => normalizeSystem(s));
+  const validSystems = systems.filter(s => STANDARD_SYSTEMS_LIST.includes(s));
+  const finalSystem = validSystems.length > 0 ? validSystems : ['General'];
+
+  return {
+    id,
+    text,
+    options: cleanedOptions,
+    correctAnswerIndex: ansIdx,
+    subject: finalSubject,
+    system: finalSystem,
+    format: canonicalizeFormat(q.format, text),
+    difficulty: canonicalizeDifficulty(q.difficulty),
+    explanation: typeof q.explanation === 'string' ? q.explanation.trim() : '',
+    reference: typeof q.reference === 'string' ? q.reference.trim() : '',
+    topic: typeof q.topic === 'string' ? q.topic.trim() : ''
+  };
+}
+
 function validateJsonContent(rawText) {
-  if (!rawText.trim()) {
+  if (!rawText || !rawText.trim()) {
     hideValidationAlert();
     DOM.startExamBtn.disabled = true;
     AppState.examData = null;
@@ -1457,14 +1694,24 @@ function validateJsonContent(rawText) {
   }
 
   try {
-    const parsed = JSON.parse(rawText);
+    let parsed = parseJsonFlexible(rawText);
 
-    if (!parsed.sections || !Array.isArray(parsed.sections) || parsed.sections.length === 0) {
-      throw new Error("Invalid JSON: Root must contain a non-empty 'sections' array.");
+    // If parsed is a single question object: { id: "q1", text: "...", options: [...] }
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && !parsed.questions && !parsed.sections && (parsed.text || parsed.question) && (parsed.options || parsed.choices)) {
+      parsed = { questions: [parsed] };
+    }
+
+    // If parsed is an array of questions: [ { ... }, { ... } ]
+    if (Array.isArray(parsed)) {
+      parsed = { questions: parsed };
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error("Invalid JSON: Root must be an object or array.");
     }
 
     // Determine / Verify examType
-    const declaredType = (parsed.examType || AppState.examMode).toLowerCase();
+    const declaredType = (parsed.examType || parsed.examMode || AppState.examMode || 'neetpg').toLowerCase();
     if (declaredType.includes('ini') || declaredType.includes('cbt_ini')) {
       AppState.examMode = 'inicet';
     } else if (declaredType.includes('neet') || declaredType.includes('pg')) {
@@ -1479,53 +1726,47 @@ function validateJsonContent(rawText) {
         : { correct: 4, incorrect: -1, unattempted: 0 };
     }
 
-    let totalQuestionCount = 0;
-    const invalidSubjects = new Set();
+    let allQuestions = [];
 
-    parsed.sections.forEach((sec, sIdx) => {
-      if (!sec.id || !sec.name || !Array.isArray(sec.questions)) {
-        throw new Error(`Section at index ${sIdx} is missing 'id', 'name', or 'questions' array.`);
-      }
-
-      sec.questions.forEach((q, qIdx) => {
-        totalQuestionCount++;
-        if (!q.id || !q.text || !Array.isArray(q.options) || q.options.length !== 4) {
-          throw new Error(`Question ${qIdx + 1} in '${sec.name}' must contain 'id', 'text', and exactly 4 'options'.`);
+    if (Array.isArray(parsed.sections) && parsed.sections.length > 0) {
+      // Pre-partitioned exam package format (e.g. neetpg.json, inicet.json, or saved test package)
+      let totalQ = 0;
+      parsed.sections.forEach((sec, sIdx) => {
+        if (!sec.id || !sec.name || !Array.isArray(sec.questions)) {
+          throw new Error(`Section at index ${sIdx} is missing 'id', 'name', or 'questions' array.`);
         }
-        if (typeof q.correctAnswerIndex !== 'number' || q.correctAnswerIndex < 0 || q.correctAnswerIndex > 3) {
-          throw new Error(`Question ${qIdx + 1} in '${sec.name}' has invalid 'correctAnswerIndex' (must be 0, 1, 2, or 3).`);
-        }
-
-        // Canonical normalization of subject, system, format, difficulty, reference, topic
-        const subjects = normalizeToArray(q.subject).map(s => normalizeSubject(s));
-        subjects.forEach(subj => {
-          if (!MBBS_SUBJECTS_LIST.includes(subj)) {
-            invalidSubjects.add(subj);
-          }
+        sec.questions = sec.questions.map((q) => {
+          totalQ++;
+          const normQ = normalizeQuestionItem(q, totalQ - 1);
+          allQuestions.push(normQ);
+          return normQ;
         });
-        const validSubjects = subjects.filter(s => MBBS_SUBJECTS_LIST.includes(s));
-        q.subject = validSubjects.length > 0 ? validSubjects : (subjects.length > 0 ? [subjects[0]] : ['Medicine']);
-
-        const systems = normalizeToArray(q.system).map(s => normalizeSystem(s));
-        q.system = systems.length > 0 ? systems : ['General'];
-
-        q.format = canonicalizeFormat(q.format, q.text);
-        q.difficulty = canonicalizeDifficulty(q.difficulty);
-        q.explanation = typeof q.explanation === 'string' ? q.explanation : '';
-        q.reference = typeof q.reference === 'string' ? q.reference.trim() : '';
-        q.topic = typeof q.topic === 'string' ? q.topic.trim() : '';
       });
-    });
+      parsed.questions = allQuestions;
+    } else if (Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+      // Question dataset format (from Copy AI Prompt or exported questions)
+      allQuestions = parsed.questions.map((q, qIdx) => normalizeQuestionItem(q, qIdx));
+      parsed.questions = allQuestions;
 
-    if (invalidSubjects.size > 0) {
-      const sampleInvalid = Array.from(invalidSubjects).slice(0, 3).join(', ');
-      throw new Error(`Strict taxonomy warning: Subject(s) [${sampleInvalid}] do not map to the standard MBBS subjects.`);
+      // Automatically partition into standard sections/blocks matching target examMode
+      const packaged = partitionQuestionsIntoSections(allQuestions, AppState.examMode);
+      parsed.sections = packaged.sections;
+      if (!parsed.examTitle) parsed.examTitle = packaged.examTitle;
+      if (!parsed.examType) parsed.examType = packaged.examType;
+    } else {
+      throw new Error("Invalid JSON: Root must contain a non-empty 'questions' or 'sections' array.");
+    }
+
+    if (allQuestions.length === 0) {
+      throw new Error("Invalid JSON: Exam must contain at least one question.");
     }
 
     hideValidationAlert();
     DOM.startExamBtn.disabled = false;
     AppState.examData = parsed;
-    showValidationNotice(`Valid ${AppState.examMode.toUpperCase()} configuration: ${parsed.sections.length} sections, ${totalQuestionCount} total questions validated.`, true);
+
+    const blockWord = AppState.examMode === 'inicet' ? 'blocks' : 'sections';
+    showValidationNotice(`Valid ${AppState.examMode.toUpperCase()} configuration: ${parsed.sections.length} ${blockWord}, ${allQuestions.length} total questions validated.`, true);
   } catch (err) {
     showValidationNotice(err.message, false);
     DOM.startExamBtn.disabled = true;
@@ -2793,6 +3034,11 @@ function switchView(viewName) {
     DOM.viewReview.classList.toggle('hidden', viewName !== 'review');
   }
 
+  if (DOM.sampleTestBanner) {
+    const isSampleReview = (viewName === 'review' && Boolean(AppState.isSampleTest) && !AppState.viewingAttemptId);
+    DOM.sampleTestBanner.classList.toggle('hidden', !isSampleReview);
+  }
+
   const targetHash = '#' + viewName;
   if (typeof window !== 'undefined' && window.location && window.location.hash !== targetHash && typeof history !== 'undefined' && history.replaceState) {
     history.replaceState(null, '', targetHash);
@@ -2806,13 +3052,8 @@ function renderHeaderNavActions() {
   DOM.dynamicNavActions.innerHTML = '';
 
   if (DOM.headerExamBadge) {
-    if (AppState.view === 'exam' && AppState.isSampleTest) {
-      DOM.headerExamBadge.textContent = 'SAMPLE';
-      DOM.headerExamBadge.className = 'brand-badge brand-badge-sample';
-    } else {
-      DOM.headerExamBadge.textContent = '';
-      DOM.headerExamBadge.className = 'brand-badge hidden';
-    }
+    DOM.headerExamBadge.textContent = '';
+    DOM.headerExamBadge.className = 'brand-badge hidden';
   }
 
   if (AppState.view === 'home') {
@@ -2891,6 +3132,9 @@ function handleNewTest() {
   if (DOM.pastAttemptBanner) {
     DOM.pastAttemptBanner.classList.add('hidden');
   }
+  if (DOM.sampleTestBanner) {
+    DOM.sampleTestBanner.classList.add('hidden');
+  }
 
   const stateRaw = localStorage.getItem('triage_app_state');
   if (stateRaw) {
@@ -2934,6 +3178,9 @@ function handleRetakeTest() {
     AppState.viewingAttemptId = null;
     if (DOM.pastAttemptBanner) {
       DOM.pastAttemptBanner.classList.add('hidden');
+    }
+    if (DOM.sampleTestBanner) {
+      DOM.sampleTestBanner.classList.add('hidden');
     }
     startExamSession();
   }, true);
@@ -3441,6 +3688,7 @@ function startActiveSectionTimer() {
     updateTimerDisplay(AppState.practiceElapsedTime, true);
 
     AppState.timerInterval = setInterval(() => {
+      if (!AppState.examData || !AppState.examData.sections) return;
       AppState.practiceElapsedTime++;
 
       const activeSection = AppState.examData.sections[AppState.activeSectionIndex];
@@ -3457,6 +3705,7 @@ function startActiveSectionTimer() {
     updateTimerDisplay(AppState.sectionTimesLeft[activeSecId], false);
 
     AppState.timerInterval = setInterval(() => {
+      if (!AppState.examData || !AppState.examData.sections) return;
       if (AppState.sectionTimesLeft[activeSecId] > 0) {
         AppState.sectionTimesLeft[activeSecId]--;
 
@@ -3639,6 +3888,9 @@ function confirmExitTest(onCancelCallback = null) {
       AppState.reviewActiveQuestionId = null;
       if (DOM.pastAttemptBanner) {
         DOM.pastAttemptBanner.classList.add('hidden');
+      }
+      if (DOM.sampleTestBanner) {
+        DOM.sampleTestBanner.classList.add('hidden');
       }
       switchView('home');
       DOM.startExamBtn.disabled = true;
@@ -4110,7 +4362,6 @@ function renderActiveReviewCard(item) {
     refDiv.style.borderTop = '1px dashed var(--border-color)';
     refDiv.style.fontSize = '0.8rem';
     refDiv.style.color = 'var(--text-muted)';
-    refDiv.style.fontFamily = 'var(--font-mono)';
     refDiv.innerHTML = '<strong>Reference:</strong> ';
     refDiv.appendChild(document.createTextNode(question.reference));
     DOM.reviewExplanationText.appendChild(refDiv);
@@ -4948,7 +5199,7 @@ function renderHistoryTab() {
   const allAttempts = AppState.sessionHistory || [];
   if (allAttempts.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem; font-family: var(--font-mono);">No test attempts recorded in history yet. Complete a mock test or import a history JSON.</td>`;
+    tr.innerHTML = `<td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem; font-family: var(--font-sans);">No test attempts recorded in history yet. Complete a mock test or import a history JSON.</td>`;
     tbody.appendChild(tr);
     return;
   }
@@ -4962,7 +5213,7 @@ function renderHistoryTab() {
 
   if (filteredAttempts.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem; font-family: var(--font-mono);">No test attempts match the selected test type filter.</td>`;
+    tr.innerHTML = `<td colspan="7" class="text-center text-muted" style="padding: 2.5rem 1rem; font-family: var(--font-sans);">No test attempts match the selected test type filter.</td>`;
     tbody.appendChild(tr);
     return;
   }
@@ -4984,11 +5235,11 @@ function renderHistoryTab() {
 
     tr.innerHTML = `
       <td><strong>#${idx + 1}</strong></td>
-      <td style="font-family: var(--font-mono); font-size: 0.82rem;">${att.formattedDate}</td>
+      <td style="font-family: var(--font-sans); font-size: 0.82rem;">${att.formattedDate}</td>
       <td><span class="brand-badge">${formattedExamType}</span></td>
       <td>${examTitle}</td>
-      <td style="font-family: var(--font-mono); font-weight: 700;">${m.totalScore} <span class="text-muted" style="font-size: 0.75rem;">/ ${m.maxScore}</span></td>
-      <td style="font-family: var(--font-mono); font-weight: 700;">${m.accuracy}%</td>
+      <td style="font-family: var(--font-sans); font-weight: 700;">${m.totalScore} <span class="text-muted" style="font-size: 0.75rem;">/ ${m.maxScore}</span></td>
+      <td style="font-family: var(--font-sans); font-weight: 700;">${m.accuracy}%</td>
       <td style="text-align: center;">
         <div class="history-actions-cell">
           <button type="button" class="btn btn-outline btn-sm btn-view-attempt" data-attempt-id="${att.id}">
@@ -5036,6 +5287,9 @@ function viewPastAttempt(attemptId) {
 
   DOM.pastAttemptLabel.textContent = `Viewing Archived Attempt: ${attempt.examTitle} (${attempt.formattedDate || 'Saved Test'})`;
   DOM.pastAttemptBanner.classList.remove('hidden');
+  if (DOM.sampleTestBanner) {
+    DOM.sampleTestBanner.classList.add('hidden');
+  }
   if (DOM.btnReturnLatest) {
     DOM.btnReturnLatest.classList.toggle('hidden', isLatest);
   }
@@ -5079,6 +5333,9 @@ function deleteAttempt(attemptId) {
           AppState.examData = null;
           AppState.responses = {};
           DOM.pastAttemptBanner.classList.add('hidden');
+          if (DOM.sampleTestBanner) {
+            DOM.sampleTestBanner.classList.add('hidden');
+          }
         }
       }
 
@@ -5105,6 +5362,9 @@ function confirmClearAllHistory() {
       AppState.examData = null;
       AppState.responses = {};
       DOM.pastAttemptBanner.classList.add('hidden');
+      if (DOM.sampleTestBanner) {
+        DOM.sampleTestBanner.classList.add('hidden');
+      }
 
       renderHistoryTab();
       showToast("All test history permanently cleared.", 2500);

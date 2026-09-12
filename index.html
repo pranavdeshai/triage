@@ -14,6 +14,10 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+    <!-- Typography: Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -78,7 +82,7 @@
             <!-- Setup Test Card -->
             <div class="landing-card landing-card-primary" id="card-landing-setup">
               <div class="landing-card-header">
-                <span class="landing-card-badge badge-primary">Custom Drill & Mock</span>
+                <span class="landing-card-badge">Custom Drill & Mock</span>
                 <h2 class="landing-card-title">Setup Test</h2>
               </div>
               <p class="landing-card-text">
@@ -140,9 +144,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">1</span>
                   <span class="setup-step-title">Test Mode</span>
-                  <span class="setup-step-badge" id="badge-step-mode">Practice Mode</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-mode">Practice Mode</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-mode">
                 <div class="session-mode-toggle-bar">
@@ -180,9 +186,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">2</span>
                   <span class="setup-step-title">Test Type</span>
-                  <span class="setup-step-badge" id="badge-step-type">NEET-PG (+4 / -1)</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-type">NEET-PG (+4 / -1)</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-type">
                 <div class="exam-toggle-bar">
@@ -215,9 +223,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">3</span>
                   <span class="setup-step-title">Test Length & Partitioning</span>
-                  <span class="setup-step-badge" id="badge-step-length">10 Qs (Practice Drill)</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-length">10 Qs (Practice Drill)</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-length">
                 <div class="ai-sizing-row" id="ai-sizing-row-practice">
@@ -257,9 +267,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">4</span>
                   <span class="setup-step-title">Syllabus</span>
-                  <span class="setup-step-badge" id="badge-step-syllabus">Full Syllabus</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-syllabus">Full Syllabus</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-syllabus">
                 <div class="scope-select-wrap">
@@ -318,9 +330,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">5</span>
                   <span class="setup-step-title">Difficulty & Format</span>
-                  <span class="setup-step-badge" id="badge-step-format">Balanced • Mixed</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-format">Balanced • Mixed</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-format">
                 <div class="ai-grid-2col">
@@ -352,9 +366,11 @@
                 <div class="setup-step-header-left">
                   <span class="setup-step-num">6</span>
                   <span class="setup-step-title">AI Settings</span>
-                  <span class="setup-step-badge" id="badge-step-ai">Key Required</span>
                 </div>
-                <span class="setup-step-chevron">▼</span>
+                <div class="setup-step-header-right">
+                  <span class="setup-step-badge" id="badge-step-ai">Key Required</span>
+                  <span class="setup-step-chevron">▼</span>
+                </div>
               </button>
               <div class="setup-step-body" id="step-body-ai">
                 <!-- Compact Key Strip -->
@@ -594,6 +610,14 @@
           <button type="button" class="btn btn-outline btn-sm" id="btn-return-latest">
             Return to Latest Test
           </button>
+        </div>
+
+        <!-- Sample Test Review Warning Banner -->
+        <div id="sample-test-banner" class="past-attempt-banner sample-test-banner hidden">
+          <div class="banner-left">
+            <span class="banner-indicator banner-indicator-sample">SAMPLE TEST</span>
+            <span id="sample-test-banner-label" class="banner-title">Viewing Sample Test Preview — This sample test is not saved to history and its analysis will not be preserved.</span>
+          </div>
         </div>
 
         <!-- Top KPI Dashboard -->
@@ -1076,7 +1100,7 @@
         </div>
         <div class="modal-body">
           <p>Start a verified NEET-PG sample mock test (10 clinical questions)?</p>
-          <div class="sample-dialog-notice" style="margin-top: 0.85rem; padding: 0.75rem 1rem; border-left: 3px solid var(--pastel-amber); background: rgba(245, 158, 11, 0.08); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+          <div class="sample-dialog-notice">
             <strong>Note:</strong> Sample tests are designed for quick preview and practice. Your answers and score will <strong>not</strong> be saved into your test history.
           </div>
         </div>

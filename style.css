@@ -3,8 +3,8 @@
    ========================================================================== */
 
 :root {
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  --font-sans: var(--font-mono);
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-sans);
   --transition-fast: 0.15s ease;
   font-size: 15px;
 }
@@ -139,7 +139,7 @@ html {
 }
 
 body {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   background-color: var(--bg-app);
   color: var(--text-primary);
   min-height: 100vh;
@@ -172,7 +172,7 @@ button, input, select, textarea, a, .option-row {
 }
 
 button, input, select, textarea {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: inherit;
   color: inherit;
   background: transparent;
@@ -191,6 +191,7 @@ button {
 }
 
 .btn {
+  font-family: var(--font-sans);
   padding: 0.55rem 1rem;
   font-size: 0.88rem;
   font-weight: 600;
@@ -336,7 +337,7 @@ button {
 }
 
 .brand-title {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -346,7 +347,7 @@ button {
 /* Level 3: Pure Descriptive Elements — Test Type Badge */
 .brand-badge {
   font-size: 0.72rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -552,7 +553,7 @@ button {
 
 .home-header-text .exam-format-details {
   font-size: 0.8rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   color: var(--text-secondary);
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
@@ -579,7 +580,7 @@ button {
 .test-name-label {
   font-size: 0.75rem;
   font-weight: 700;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -838,7 +839,7 @@ button {
 }
 
 .sec-tooltip .tooltip-title {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -874,7 +875,7 @@ button {
 .sec-tooltip .tooltip-row .legend-text {
   flex: 1;
   text-align: left;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
 }
 
 .sec-tab-btn:hover .sec-tooltip,
@@ -960,6 +961,7 @@ button {
 }
 
 .question-counter {
+  font-family: var(--font-mono);
   font-size: 1.15rem;
   font-weight: 700;
 }
@@ -1004,6 +1006,7 @@ button {
 }
 
 .question-text {
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   line-height: 1.6;
   white-space: pre-line;
@@ -1098,10 +1101,15 @@ button {
 }
 
 .option-label {
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   flex: 1;
   word-break: break-word;
   color: var(--text-primary);
+}
+
+.option-label strong {
+  font-family: var(--font-mono);
 }
 
 /* Right 15% Doubt Zone (No partition separator line) */
@@ -1499,10 +1507,20 @@ button {
   border-radius: 0px !important;
   color: var(--text-primary);
   opacity: 1;
+  margin-bottom: 1rem;
 }
 
 .past-attempt-banner.hidden {
-  display: none;
+  display: none !important;
+}
+
+.sample-test-banner {
+  border-color: var(--border-focus);
+}
+
+.sample-test-banner .banner-indicator-sample {
+  background-color: var(--text-primary);
+  color: var(--bg-app);
 }
 
 .past-attempt-banner .banner-left {
@@ -1512,7 +1530,7 @@ button {
 }
 
 .past-attempt-banner .banner-indicator {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1522,7 +1540,7 @@ button {
 }
 
 .past-attempt-banner .banner-title {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -2130,6 +2148,7 @@ button {
 }
 
 .review-q-text {
+  font-family: var(--font-sans);
   font-size: 1.05rem;
   line-height: 1.65;
   white-space: pre-line;
@@ -2142,6 +2161,7 @@ button {
 }
 
 .review-opt-row {
+  font-family: var(--font-sans);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2149,6 +2169,10 @@ button {
   background: var(--bg-app);
   border: 1px solid var(--border-color);
   font-size: 0.92rem;
+}
+
+.review-opt-row strong {
+  font-family: var(--font-mono);
 }
 
 .review-opt-row.correct-answer {
@@ -2175,9 +2199,11 @@ button {
   background: var(--bg-app);
   border: 1px solid var(--border-color);
   padding: 1rem;
+  font-family: var(--font-sans);
 }
 
 .explanation-title {
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -2187,6 +2213,7 @@ button {
 }
 
 .explanation-content {
+  font-family: var(--font-sans);
   font-size: 0.92rem;
   line-height: 1.6;
   color: var(--text-secondary);
@@ -3547,7 +3574,7 @@ kbd {
 
 .ai-sizing-breakdown {
   margin-top: 0.65rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.82rem;
   padding: 0.6rem 0.85rem;
   border-radius: 4px;
@@ -3928,6 +3955,7 @@ kbd {
 }
 
 .landing-title {
+  font-family: var(--font-sans);
   font-size: 2.75rem;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -3936,6 +3964,7 @@ kbd {
 }
 
 .landing-tagline {
+  font-family: var(--font-sans);
   font-size: 1.15rem;
   font-weight: 500;
   color: var(--text-primary);
@@ -3943,6 +3972,7 @@ kbd {
 }
 
 .landing-desc {
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: var(--text-secondary);
   line-height: 1.6;
@@ -3981,6 +4011,7 @@ kbd {
 }
 
 .landing-card-badge {
+  font-family: var(--font-sans);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.2rem 0.6rem;
@@ -3991,12 +4022,8 @@ kbd {
   letter-spacing: 0.05em;
 }
 
-.landing-card-badge.badge-primary {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--accent-blue);
-}
-
 .landing-card-title {
+  font-family: var(--font-sans);
   font-size: 1.4rem;
   font-weight: 700;
   margin: 0;
@@ -4004,6 +4031,7 @@ kbd {
 }
 
 .landing-card-text {
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.6;
@@ -4025,6 +4053,7 @@ kbd {
 }
 
 .landing-card-btn {
+  font-family: var(--font-sans);
   width: 100%;
   padding: 0.75rem 1rem;
   font-weight: 600;
@@ -4041,6 +4070,7 @@ kbd {
 }
 
 .btn-setup-back {
+  font-family: var(--font-sans);
   padding: 0.35rem 0.75rem;
   font-size: 0.82rem;
 }
@@ -4065,6 +4095,7 @@ kbd {
 }
 
 .setup-step-header {
+  font-family: var(--font-sans);
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -4077,6 +4108,7 @@ kbd {
   color: var(--text-primary);
   user-select: none;
   transition: background-color 0.12s ease;
+  gap: 0.75rem;
 }
 
 .setup-step-header:hover {
@@ -4087,10 +4119,19 @@ kbd {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.setup-step-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .setup-step-title {
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -4099,6 +4140,7 @@ kbd {
 .setup-step-badge {
   display: inline-flex;
   align-items: center;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.18rem 0.55rem;
@@ -4106,12 +4148,13 @@ kbd {
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .setup-step-card.active .setup-step-badge {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: var(--accent-blue);
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .setup-step-chevron {
@@ -4119,7 +4162,7 @@ kbd {
   color: var(--text-muted);
   transition: transform 0.2s ease;
   display: inline-block;
-  margin-left: 0.5rem;
+  flex-shrink: 0;
 }
 
 .setup-step-card.active .setup-step-chevron {
@@ -4144,6 +4187,7 @@ kbd {
   border-radius: 50%;
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -4156,7 +4200,7 @@ kbd {
   border-radius: 4px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 0.82rem;
   color: var(--text-secondary);
   line-height: 1.45;
@@ -4175,6 +4219,7 @@ kbd {
 
 .explanation-pill {
   display: inline-block;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.15rem 0.45rem;
@@ -4191,6 +4236,7 @@ kbd {
 
 .scope-summary-pill {
   display: inline-block;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   font-weight: 500;
   padding: 0.35rem 0.75rem;
@@ -4234,6 +4280,7 @@ kbd {
 }
 
 .start-summary-lbl {
+  font-family: var(--font-sans);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -4242,11 +4289,20 @@ kbd {
 }
 
 .start-summary-val {
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .sample-dialog-notice {
-  border-radius: 6px;
+  margin-top: 0.85rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--border-focus);
+  background: var(--bg-hover);
+  border-radius: 0px !important;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
