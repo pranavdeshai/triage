@@ -371,6 +371,7 @@ const AppState = {
     style: 'all'
   },
   reviewFiltersCollapsed: true,
+  reviewHideAnswer: false,
   reviewMasterTab: 'tab-question-review',
   analyticsSubtab: 'tab-triage-matrix',
   historyFilterExam: 'all',
@@ -419,10 +420,9 @@ const DOM = {
   btnLandingSetup: document.getElementById('btn-landing-setup'),
   btnSetupBackHome: document.getElementById('btn-setup-back-home'),
 
-  // Mode explanation & scope pill
+  // Mode explanation
   modeExplanationPractice: document.getElementById('mode-explanation-practice'),
   modeExplanationExam: document.getElementById('mode-explanation-exam'),
-  aiScopeSummaryPill: document.getElementById('ai-scope-summary-pill'),
 
   // Setup Step Badges (Collapsible Accordion)
   badgeStepMode: document.getElementById('badge-step-mode'),
@@ -461,24 +461,12 @@ const DOM = {
   inputTestName: document.getElementById('input-dialog-test-name') || document.getElementById('input-test-name'),
   btnResetTestName: document.getElementById('btn-dialog-reset-name') || document.getElementById('btn-reset-test-name'),
   tabSetupAi: document.getElementById('tab-setup-ai'),
-  tabSetupSample: document.getElementById('tab-setup-sample'),
   tabSetupManual: document.getElementById('tab-setup-manual'),
   setupAiPanel: document.getElementById('setup-ai-panel'),
-  setupSamplePanel: document.getElementById('setup-sample-panel'),
   setupManualPanel: document.getElementById('setup-manual-panel'),
-
-  // AI Live Summary Bar
-  aiConfigSummaryBar: document.getElementById('ai-config-summary-bar'),
-  summaryTagMode: document.getElementById('summary-tag-mode'),
-  summaryTagScope: document.getElementById('summary-tag-scope'),
-  summaryTagCount: document.getElementById('summary-tag-count'),
-  summaryTagDiff: document.getElementById('summary-tag-diff'),
-  summaryTagModel: document.getElementById('summary-tag-model'),
 
   // AI Generator Elements
   selectAiScope: document.getElementById('select-ai-scope'),
-  selectAiSubject: document.getElementById('select-ai-subject'),
-  selectAiSystem: document.getElementById('select-ai-system'),
   selectAiDifficulty: document.getElementById('select-ai-difficulty'),
   selectAiStyle: document.getElementById('select-ai-style'),
   selectAiFormat: document.getElementById('select-ai-format'),
@@ -508,19 +496,8 @@ const DOM = {
   btnCountMock: document.getElementById('btn-count-mock'),
   aiCustomSizingElement: document.getElementById('ai-custom-sizing-element'),
   inputAiCustomCount: document.getElementById('input-ai-custom-count'),
-  simulationSizingNotice: document.getElementById('simulation-sizing-notice'),
-  simulationLockBadge: document.getElementById('simulation-lock-badge'),
   aiSizingRowPractice: document.getElementById('ai-sizing-row-practice'),
   aiSizingBreakdown: document.getElementById('ai-sizing-breakdown'),
-  aiDifficultyGroup: document.getElementById('ai-difficulty-group'),
-  aiStyleGroup: document.getElementById('ai-style-group'),
-  btnToggleAiAdvanced: document.getElementById('btn-toggle-ai-advanced'),
-  aiAdvancedIndicator: document.getElementById('ai-advanced-indicator'),
-  aiAdvancedDrawer: document.getElementById('ai-advanced-drawer'),
-  selectAiModel: document.getElementById('select-ai-model'),
-  inputAiCustomModel: document.getElementById('input-ai-custom-model'),
-  inputAiTemp: document.getElementById('input-ai-temp'),
-  valAiTemp: document.getElementById('val-ai-temp'),
   aiGenerationProgress: document.getElementById('ai-generation-progress'),
   aiProgressStatus: document.getElementById('ai-progress-status'),
   aiProgressPercentage: document.getElementById('ai-progress-percentage'),
@@ -538,7 +515,6 @@ const DOM = {
   jsonTextInput: document.getElementById('json-text-input'),
   validationAlert: document.getElementById('validation-alert'),
   validationMsg: document.getElementById('validation-msg'),
-  loadSampleBtn: document.getElementById('load-sample-btn'),
   startExamBtn: document.getElementById('start-exam-btn'),
 
   // Exam Workspace Controls
@@ -601,11 +577,13 @@ const DOM = {
   reviewQNum: document.getElementById('review-q-num'),
   reviewQStatusBadge: document.getElementById('review-q-status-badge'),
   reviewBookmarkIndicator: document.getElementById('review-bookmark-indicator'),
+  btnToggleReviewAnswer: document.getElementById('btn-toggle-review-answer'),
   btnReviewPrevQ: document.getElementById('btn-review-prev-q'),
   btnReviewNextQ: document.getElementById('btn-review-next-q'),
   btnCopyQuestion: document.getElementById('btn-copy-question'),
   reviewQText: document.getElementById('review-q-text'),
   reviewOptionsList: document.getElementById('review-options-list'),
+  reviewExplanationBox: document.getElementById('review-explanation-box'),
   reviewExplanationText: document.getElementById('review-explanation-text'),
   reviewTagPills: document.getElementById('review-tag-pills'),
 
@@ -640,18 +618,6 @@ const DOM = {
   modalBody: document.getElementById('modal-body'),
   modalBtnCancel: document.getElementById('modal-btn-cancel'),
   modalBtnConfirm: document.getElementById('modal-btn-confirm'),
-
-  // Test Ready Modal
-  modalTestReady: document.getElementById('modal-test-ready'),
-  testReadyTitle: document.getElementById('test-ready-title'),
-  readyStatQuestions: document.getElementById('ready-stat-questions'),
-  readyStatSections: document.getElementById('ready-stat-sections'),
-  readyStatDuration: document.getElementById('ready-stat-duration'),
-  readyStatScheme: document.getElementById('ready-stat-scheme'),
-  testReadySubjects: document.getElementById('test-ready-subjects'),
-  btnTestReadyInspect: document.getElementById('btn-test-ready-inspect'),
-  btnTestReadyDownload: document.getElementById('btn-test-ready-download'),
-  btnTestReadyStart: document.getElementById('btn-test-ready-start'),
 
   // Copy AI Prompt Modal
   modalCopyPrompt: document.getElementById('modal-copy-prompt'),
@@ -881,9 +847,6 @@ function setSessionMode(mode, autoAdvance = true) {
   if (DOM.modeExplanationExam) {
     DOM.modeExplanationExam.classList.toggle('hidden', !isSim);
   }
-  if (DOM.simulationSizingNotice) {
-    DOM.simulationSizingNotice.classList.toggle('hidden', !isSim);
-  }
   if (DOM.aiSizingRowPractice) {
     DOM.aiSizingRowPractice.classList.remove('hidden');
   }
@@ -900,9 +863,6 @@ function setSessionMode(mode, autoAdvance = true) {
   updateExamModeUI();
   if (typeof updateAiSizingBreakdown === 'function') {
     updateAiSizingBreakdown();
-  }
-  if (typeof updateAiConfigSummary === 'function') {
-    updateAiConfigSummary();
   }
   updateStepHeaderBadges();
   persistAppState();
@@ -930,9 +890,6 @@ function updateExamModeUI() {
   const isNeet = AppState.examMode === 'neetpg';
   DOM.modeBtnNeet.classList.toggle('active', isNeet);
   DOM.modeBtnIni.classList.toggle('active', !isNeet);
-  if (DOM.loadSampleBtn) {
-    DOM.loadSampleBtn.textContent = isNeet ? 'Load NEET-PG Sample' : 'Load INI-CET Sample';
-  }
 
   if (DOM.inputTestName) {
     const defaultPlaceholder = isNeet ? 'NEET-PG Mock Test' : 'INI-CET Mock Test';
@@ -950,11 +907,6 @@ function updateExamModeUI() {
   if (DOM.btnCountMock) {
     DOM.btnCountMock.dataset.count = isNeet ? '180' : '200';
     DOM.btnCountMock.textContent = isNeet ? '180 Qs (Full Test)' : '200 Qs (Full Test)';
-  }
-  if (DOM.simulationLockBadge) {
-    DOM.simulationLockBadge.textContent = isNeet
-      ? 'Official NEET-PG Format: 5 Sections × 36 Qs (42 min / section • +4 / -1)'
-      : 'Official INI-CET Format: 4 Blocks × 50 Qs (45 min / block • +1 / -0.333)';
   }
 
   // Deduplicated Exam Format Details: shows marking scheme and pacing without repeating mode description
@@ -1014,9 +966,6 @@ function updateExamModeUI() {
 
   if (typeof updateAiSizingBreakdown === 'function') {
     updateAiSizingBreakdown();
-  }
-  if (typeof updateAiConfigSummary === 'function') {
-    updateAiConfigSummary();
   }
 
   if (DOM.btnSubmitSection) {
@@ -1083,9 +1032,6 @@ function attachEventListeners() {
     DOM.jsonTextInput.addEventListener('input', () => validateJsonContent(DOM.jsonTextInput.value));
   }
 
-  if (DOM.loadSampleBtn) {
-    DOM.loadSampleBtn.addEventListener('click', loadDefaultSample);
-  }
   if (DOM.startExamBtn) {
     DOM.startExamBtn.addEventListener('click', () => {
       if (AppState.examData) {
@@ -1183,9 +1129,6 @@ function attachEventListeners() {
   if (DOM.tabSetupAi) {
     DOM.tabSetupAi.addEventListener('click', () => switchSetupMode('ai'));
   }
-  if (DOM.tabSetupSample) {
-    DOM.tabSetupSample.addEventListener('click', () => switchSetupMode('sample'));
-  }
   if (DOM.tabSetupManual) {
     DOM.tabSetupManual.addEventListener('click', () => switchSetupMode('manual'));
   }
@@ -1216,16 +1159,6 @@ function attachEventListeners() {
     DOM.selectAiScope.addEventListener('change', () => {
       setAiScope(DOM.selectAiScope.value);
       updateStepHeaderBadges();
-    });
-  }
-  if (DOM.selectAiSubject) {
-    DOM.selectAiSubject.addEventListener('change', () => {
-      updateAiConfigSummary();
-    });
-  }
-  if (DOM.selectAiSystem) {
-    DOM.selectAiSystem.addEventListener('change', () => {
-      updateAiConfigSummary();
     });
   }
   if (DOM.btnSelectAllSubjects) {
@@ -1294,7 +1227,6 @@ function attachEventListeners() {
   if (DOM.selectAiDifficulty) {
     DOM.selectAiDifficulty.addEventListener('change', () => {
       AppState.aiDifficulty = DOM.selectAiDifficulty.value;
-      updateAiConfigSummary();
       updateStepHeaderBadges();
     });
   }
@@ -1326,64 +1258,11 @@ function attachEventListeners() {
       }
     });
   });
-  if (DOM.aiDifficultyGroup) {
-    DOM.aiDifficultyGroup.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn-segmented');
-      if (!btn) return;
-      setAiDifficulty(btn.dataset.value);
-    });
-  }
-  if (DOM.aiStyleGroup) {
-    DOM.aiStyleGroup.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn-segmented');
-      if (!btn) return;
-      setAiStyle(btn.dataset.value);
-    });
-  }
 
-  // AI Generator - Advanced Settings Drawer
-  if (DOM.btnToggleAiAdvanced) {
-    DOM.btnToggleAiAdvanced.addEventListener('click', toggleAiAdvancedDrawer);
-  }
-  if (DOM.selectAiModel) {
-    DOM.selectAiModel.addEventListener('change', () => {
-      const isCustom = DOM.selectAiModel.value === 'custom';
-      if (DOM.inputAiCustomModel) {
-        DOM.inputAiCustomModel.classList.toggle('hidden', !isCustom);
-        const hint = document.getElementById('ai-custom-model-hint');
-        if (hint) hint.style.display = isCustom ? 'block' : 'none';
-        if (isCustom) {
-          DOM.inputAiCustomModel.focus();
-          AppState.aiModel = DOM.inputAiCustomModel.value.trim() || 'gemini-3.5-flash';
-        } else {
-          AppState.aiModel = DOM.selectAiModel.value;
-        }
-      } else {
-        AppState.aiModel = DOM.selectAiModel.value;
-      }
-      localStorage.setItem('triage_ai_model', AppState.aiModel);
-      updateAiConfigSummary();
-    });
-  }
-  if (DOM.inputAiCustomModel) {
-    DOM.inputAiCustomModel.addEventListener('input', () => {
-      const customVal = DOM.inputAiCustomModel.value.trim();
-      AppState.aiModel = customVal || 'gemini-3.5-flash';
-      localStorage.setItem('triage_ai_model', AppState.aiModel);
-      updateAiConfigSummary();
-    });
-  }
   if (DOM.inputAiCustomTopic) {
     DOM.inputAiCustomTopic.addEventListener('input', () => {
-      updateAiConfigSummary();
+      updateStepHeaderBadges();
       persistAppState();
-    });
-  }
-  if (DOM.inputAiTemp) {
-    DOM.inputAiTemp.addEventListener('input', () => {
-      DOM.valAiTemp.textContent = DOM.inputAiTemp.value;
-      AppState.aiTemperature = parseFloat(DOM.inputAiTemp.value);
-      localStorage.setItem('triage_ai_temp', DOM.inputAiTemp.value);
     });
   }
 
@@ -1404,29 +1283,6 @@ function attachEventListeners() {
   }
   if (DOM.btnCopyPromptAction) {
     DOM.btnCopyPromptAction.addEventListener('click', copyPromptToClipboard);
-  }
-
-  // Test Ready Modal
-  if (DOM.btnTestReadyStart) {
-    DOM.btnTestReadyStart.addEventListener('click', () => {
-      closeStartTestDialog();
-      if (AppState.examData) {
-        startExamSession();
-      }
-    });
-  }
-  if (DOM.btnTestReadyDownload) {
-    DOM.btnTestReadyDownload.addEventListener('click', downloadGeneratedTestJson);
-  }
-  if (DOM.btnTestReadyInspect) {
-    DOM.btnTestReadyInspect.addEventListener('click', () => {
-      closeStartTestDialog();
-      switchSetupMode('manual');
-      if (AppState.examData) {
-        DOM.jsonTextInput.value = JSON.stringify(AppState.examData, null, 2);
-        validateJsonContent(DOM.jsonTextInput.value);
-      }
-    });
   }
 
   // CBT Exam Actions
@@ -1466,6 +1322,9 @@ function attachEventListeners() {
   }
   DOM.btnReviewPrevQ.addEventListener('click', handleReviewPrevQuestion);
   DOM.btnReviewNextQ.addEventListener('click', handleReviewNextQuestion);
+  if (DOM.btnToggleReviewAnswer) {
+    DOM.btnToggleReviewAnswer.addEventListener('click', toggleReviewAnswer);
+  }
   DOM.btnCopyQuestion.addEventListener('click', copyActiveReviewQuestion);
   DOM.btnCopyAllFiltered.addEventListener('click', copyAllFilteredQuestions);
   DOM.btnResetFilters.addEventListener('click', resetReviewFilters);
@@ -1878,7 +1737,6 @@ function initAiGeneratorUI() {
   renderSystemChips();
   updateScopeBadges();
   updateAiSizingBreakdown();
-  updateAiConfigSummary();
 }
 
 function renderApiKeyStatus() {
@@ -1910,89 +1768,15 @@ function renderApiKeyStatus() {
   updateStepHeaderBadges();
 }
 
-function updateAiConfigSummary() {
-  if (!DOM.aiConfigSummaryBar) return;
-
-  // 1. Target Exam
-  if (DOM.summaryTagMode) {
-    DOM.summaryTagMode.textContent = AppState.examMode === 'inicet' ? 'INI-CET' : 'NEET-PG';
-  }
-
-  // 2. Syllabus Scope
-  if (DOM.summaryTagScope) {
-    if (AppState.aiScope === 'grand') {
-      DOM.summaryTagScope.textContent = 'Grand Test (19 Subjects)';
-    } else if (AppState.aiScope === 'subject') {
-      const subj = DOM.selectAiSubject ? DOM.selectAiSubject.value : 'Medicine';
-      DOM.summaryTagScope.textContent = `Subject: ${subj}`;
-    } else if (AppState.aiScope === 'system') {
-      const sys = DOM.selectAiSystem ? DOM.selectAiSystem.value : 'Cardiovascular System';
-      DOM.summaryTagScope.textContent = `System: ${sys}`;
-    } else if (AppState.aiScope === 'topic') {
-      const customTopic = DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : '';
-      DOM.summaryTagScope.textContent = customTopic ? `Topic: "${customTopic.slice(0, 18)}..."` : 'Custom Topic';
-    } else {
-      const subjCount = AppState.aiSelectedSubjects ? AppState.aiSelectedSubjects.length : 0;
-      const sysCount = AppState.aiSelectedSystems ? AppState.aiSelectedSystems.length : 0;
-      const customTopic = DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : '';
-
-      if (customTopic) {
-        DOM.summaryTagScope.textContent = `Custom: "${customTopic.slice(0, 20)}${customTopic.length > 20 ? '...' : ''}"`;
-      } else if (subjCount > 0 && sysCount > 0) {
-        DOM.summaryTagScope.textContent = `${subjCount} Subj, ${sysCount} Sys`;
-      } else if (subjCount > 0) {
-        DOM.summaryTagScope.textContent = `${subjCount} Subjects`;
-      } else if (sysCount > 0) {
-        DOM.summaryTagScope.textContent = `${sysCount} Systems`;
-      } else {
-        DOM.summaryTagScope.textContent = 'Custom Scope';
-      }
-    }
-  }
-
-  // 3. Question Count
-  if (DOM.summaryTagCount) {
-    const count = parseInt(AppState.aiQuestionCount, 10) || 10;
-    DOM.summaryTagCount.textContent = `${count} Qs`;
-  }
-
-  // 4. Difficulty
-  if (DOM.summaryTagDiff) {
-    const diffMap = {
-      'balanced': 'Balanced',
-      'easy': 'Easy',
-      'medium': 'Medium',
-      'hard': 'Hard'
-    };
-    DOM.summaryTagDiff.textContent = diffMap[AppState.aiDifficulty] || 'Balanced';
-  }
-
-  // 5. Model
-  if (DOM.summaryTagModel) {
-    const model = AppState.aiModel || 'gemini-3.5-flash';
-    if (model === 'gemini-3.5-flash') {
-      DOM.summaryTagModel.textContent = 'Gemini 3.5 Flash';
-    } else if (model === 'gemini-2.5-flash') {
-      DOM.summaryTagModel.textContent = 'Gemini 2.5 Flash';
-    } else if (model === 'gemini-2.5-pro') {
-      DOM.summaryTagModel.textContent = 'Gemini 2.5 Pro';
-    } else {
-      DOM.summaryTagModel.textContent = model.length > 18 ? model.slice(0, 16) + '...' : model;
-    }
-  }
-}
-
 function switchSetupMode(mode) {
-  const validModes = ['ai', 'sample', 'manual'];
+  const validModes = ['ai', 'manual'];
   if (!validModes.includes(mode)) mode = 'ai';
   AppState.setupMode = mode;
 
   if (DOM.tabSetupAi) DOM.tabSetupAi.classList.toggle('active', mode === 'ai');
-  if (DOM.tabSetupSample) DOM.tabSetupSample.classList.toggle('active', mode === 'sample');
   if (DOM.tabSetupManual) DOM.tabSetupManual.classList.toggle('active', mode === 'manual');
 
   if (DOM.setupAiPanel) DOM.setupAiPanel.classList.toggle('hidden', mode !== 'ai');
-  if (DOM.setupSamplePanel) DOM.setupSamplePanel.classList.toggle('hidden', mode !== 'sample');
   if (DOM.setupManualPanel) DOM.setupManualPanel.classList.toggle('hidden', mode !== 'manual');
   persistAppState();
 }
@@ -2037,7 +1821,6 @@ function setAiScope(scope) {
   if (DOM.btnScopeCustom) DOM.btnScopeCustom.classList.toggle('active', scope === 'custom');
   if (DOM.aiCustomScopeDrawer) DOM.aiCustomScopeDrawer.classList.toggle('hidden', scope !== 'custom');
   updateScopeBadges();
-  updateAiConfigSummary();
   persistAppState();
 }
 
@@ -2050,16 +1833,6 @@ function updateScopeBadges() {
   }
   if (DOM.countSelectedSystems) {
     DOM.countSelectedSystems.textContent = sysCount;
-  }
-  if (DOM.aiScopeSummaryPill) {
-    if (AppState.aiScope === 'grand') {
-      DOM.aiScopeSummaryPill.textContent = 'Full Syllabus (All 19 Subjects & 16 Systems)';
-    } else {
-      const topic = (DOM.inputAiCustomTopic && DOM.inputAiCustomTopic.value.trim()) || '';
-      let text = `Custom Syllabus: ${sCount}/19 Subjects, ${sysCount}/16 Systems`;
-      if (topic) text += ` • "${topic}"`;
-      DOM.aiScopeSummaryPill.textContent = text;
-    }
   }
 }
 
@@ -2093,21 +1866,18 @@ function toggleSubjectSelection(subj, chipEl) {
     chipEl.classList.remove('active');
   }
   updateScopeBadges();
-  updateAiConfigSummary();
   persistAppState();
 }
 
 function selectAllSubjects() {
   AppState.aiSelectedSubjects = [...MBBS_SUBJECTS_LIST];
   renderSubjectChips();
-  updateAiConfigSummary();
   persistAppState();
 }
 
 function clearAllSubjects() {
   AppState.aiSelectedSubjects = [];
   renderSubjectChips();
-  updateAiConfigSummary();
   persistAppState();
 }
 
@@ -2141,21 +1911,18 @@ function toggleSystemSelection(sys, chipEl) {
     chipEl.classList.remove('active');
   }
   updateScopeBadges();
-  updateAiConfigSummary();
   persistAppState();
 }
 
 function selectAllSystems() {
   AppState.aiSelectedSystems = [...STANDARD_SYSTEMS_LIST];
   renderSystemChips();
-  updateAiConfigSummary();
   persistAppState();
 }
 
 function clearAllSystems() {
   AppState.aiSelectedSystems = [];
   renderSystemChips();
-  updateAiConfigSummary();
   persistAppState();
 }
 
@@ -2178,7 +1945,6 @@ function setAiQuestionCount(count, updateInput = true) {
     DOM.inputAiCustomCount.value = count;
   }
   updateAiSizingBreakdown();
-  updateAiConfigSummary();
   persistAppState();
 }
 
@@ -2246,12 +2012,6 @@ function calculateSectionPartition(totalQ, examMode) {
   };
 }
 
-function formatTimeBudget(totalSeconds) {
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  return `${mins} min${secs > 0 ? ` ${String(secs).padStart(2, '0')}s` : ' 00s'}`;
-}
-
 function updateAiSizingBreakdown() {
   if (!DOM.aiSizingBreakdown) return;
   const examLabel = AppState.examMode === 'inicet' ? 'INI-CET' : 'NEET-PG';
@@ -2279,35 +2039,6 @@ function updateAiSizingBreakdown() {
   const totalMinutes = secDurationMinutes * numSections;
   const secName = isNeet ? 'Section' : 'Block';
   DOM.aiSizingBreakdown.innerHTML = `<strong>Exam Mode:</strong> ${count} Qs in ${numSections} ${secName}${numSections > 1 ? 's' : ''} (~${avgSecCount} Qs/sec) • ${secDurationMinutes} min/${secName.toLowerCase()} (${totalMinutes} min total • ${paceSeconds}s/Q budget) • Section locks on submit`;
-}
-
-function setAiDifficulty(diff) {
-  AppState.aiDifficulty = diff;
-  if (DOM.aiDifficultyGroup) {
-    DOM.aiDifficultyGroup.querySelectorAll('.btn-segmented').forEach(b => {
-      b.classList.toggle('active', b.dataset.value === diff);
-    });
-  }
-  updateAiConfigSummary();
-  persistAppState();
-}
-
-function setAiStyle(style) {
-  AppState.aiStyle = style;
-  if (DOM.aiStyleGroup) {
-    DOM.aiStyleGroup.querySelectorAll('.btn-segmented').forEach(b => {
-      b.classList.toggle('active', b.dataset.value === style);
-    });
-  }
-  persistAppState();
-}
-
-function toggleAiAdvancedDrawer() {
-  if (!DOM.aiAdvancedDrawer) return;
-  const isHidden = DOM.aiAdvancedDrawer.classList.toggle('hidden');
-  if (DOM.aiAdvancedIndicator) {
-    DOM.aiAdvancedIndicator.textContent = isHidden ? 'EXPAND [+]' : 'COLLAPSE [−]';
-  }
 }
 
 function cancelAiGeneration() {
@@ -2646,15 +2377,6 @@ async function generateTestWithGemini() {
     } else {
       console.error(err);
       showToast(`Error: ${err.message}`, 6000);
-      if (model !== 'gemini-3.5-flash' && (/switch to "Gemini 3.5 Flash"/i.test(err.message) || /high demand|demand|overloaded|capacity/i.test(err.message))) {
-        if (DOM.selectAiModel) {
-          DOM.selectAiModel.value = 'gemini-3.5-flash';
-          AppState.aiModel = 'gemini-3.5-flash';
-          localStorage.setItem('triage_ai_model', 'gemini-3.5-flash');
-          if (DOM.inputAiCustomModel) DOM.inputAiCustomModel.classList.add('hidden');
-          updateAiConfigSummary();
-        }
-      }
     }
   } finally {
     DOM.btnAiGenerate.disabled = false;
@@ -2709,22 +2431,6 @@ function copyPromptToClipboard() {
   } else {
     showToast("Clipboard not supported in this browser.");
   }
-}
-
-function downloadGeneratedTestJson() {
-  if (!AppState.examData) return;
-  const jsonStr = JSON.stringify(AppState.examData, null, 2);
-  const blob = new Blob([jsonStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  const cleanMode = AppState.examMode || 'test';
-  a.download = `triage_${cleanMode}_mock_test_${Date.now()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast("Test JSON downloaded.");
 }
 
 function openStartTestDialog(testData) {
@@ -3118,7 +2824,7 @@ function renderHeaderNavActions() {
   } else if (AppState.view === 'exam') {
     const helpBtn = document.createElement('button');
     helpBtn.className = 'btn btn-outline';
-    helpBtn.id = 'btn-keyboard-help';
+    helpBtn.id = 'btn-header-kbd-help';
     helpBtn.textContent = '?';
     helpBtn.title = 'Keyboard Shortcuts (?)';
     helpBtn.onclick = showKeyboardHelpModal;
@@ -3179,7 +2885,6 @@ function handleNewTest() {
   switchView('home');
 
   updateExamModeUI();
-  updateAiConfigSummary();
   updateScopeBadges();
   updateAiSizingBreakdown();
   if (AppState.setupMode === 'manual') {
@@ -3189,33 +2894,6 @@ function handleNewTest() {
       DOM.startExamBtn.disabled = true;
     }
   }
-}
-
-function handleRetakeTest() {
-  if (AppState.viewingAttemptId) {
-    retakeHistoryAttempt(AppState.viewingAttemptId);
-    return;
-  }
-  if (!AppState.examData || !AppState.examData.sections || AppState.examData.sections.length === 0) {
-    showToast("No test data available to retake.");
-    return;
-  }
-
-  const testTitle = AppState.examData.examTitle || (AppState.examMode === 'inicet' ? 'INI-CET CBT Mock Test' : 'NEET-PG CBT Mock Test');
-  const msg = `Are you sure you want to retake "${testTitle}"? A fresh test session will begin immediately with newly randomized options.`;
-
-  showModal("Retake Test", msg, () => {
-    if (AppState.timerInterval) clearInterval(AppState.timerInterval);
-    localStorage.removeItem('triage_exam_session');
-    AppState.viewingAttemptId = null;
-    if (DOM.pastAttemptBanner) {
-      DOM.pastAttemptBanner.classList.add('hidden');
-    }
-    if (DOM.sampleTestBanner) {
-      DOM.sampleTestBanner.classList.add('hidden');
-    }
-    startExamSession();
-  }, true);
 }
 
 async function openHistoryView() {
@@ -3533,6 +3211,7 @@ function showKeyboardHelpModal() {
       <div class="kbd-row"><div class="kbd-keys"><kbd>Shift</kbd> + <kbd>Enter</kbd></div><span class="kbd-desc">Submit ${AppState.examMode === 'inicet' ? 'Block' : 'Section'} / Test</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>P</kbd> / <kbd>&larr;</kbd></div><span class="kbd-desc">Previous Question</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></div><span class="kbd-desc">Clear Response</span></div>
+      <div class="kbd-row"><div class="kbd-keys"><kbd>A</kbd></div><span class="kbd-desc">Hide / Show Answer &amp; Explanation (Review Mode)</span></div>
       <div class="kbd-row"><div class="kbd-keys"><kbd>?</kbd></div><span class="kbd-desc">Toggle this Keyboard Help</span></div>
     </div>
   `;
@@ -3570,6 +3249,9 @@ function handleGlobalKeyDown(e) {
       } else if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'j') {
         e.preventDefault();
         handleReviewNextQuestion();
+      } else if (e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        toggleReviewAnswer();
       }
     }
     return;
@@ -4379,8 +4061,21 @@ function handleReviewNextQuestion() {
   persistAppState();
 }
 
+function toggleReviewAnswer() {
+  AppState.reviewHideAnswer = !AppState.reviewHideAnswer;
+  const list = getFilteredQuestionsList();
+  if (list && list.length > 0) {
+    const activeItem = list.find(f => f.question.id === AppState.reviewActiveQuestionId) || list[0];
+    if (activeItem) {
+      renderActiveReviewCard(activeItem);
+    }
+  }
+  persistAppState();
+}
+
 function renderActiveReviewCard(item) {
   const { question, section, indexInSection, isCorrect, isIncorrect, quadrant, resp } = item;
+  const isHidden = !!AppState.reviewHideAnswer;
 
   const isPracticeSection = (section && section.id === 'sec_practice') || 
                             (section && section.name && /practice/i.test(section.name)) ||
@@ -4390,16 +4085,31 @@ function renderActiveReviewCard(item) {
     ? `Question ${indexInSection}`
     : `${section.name} — Question ${indexInSection}`;
 
+  // Hide/Show Answer button state
+  if (DOM.btnToggleReviewAnswer) {
+    DOM.btnToggleReviewAnswer.textContent = isHidden ? 'Show Answer' : 'Hide Answer';
+    DOM.btnToggleReviewAnswer.title = isHidden 
+      ? 'Show Answer & Explanation (Shortcut: A)' 
+      : 'Hide Answer & Explanation (Shortcut: A)';
+    DOM.btnToggleReviewAnswer.setAttribute('aria-pressed', String(isHidden));
+    DOM.btnToggleReviewAnswer.classList.toggle('active', isHidden);
+  }
+
   // Badges
-  if (isCorrect) {
-    DOM.reviewQStatusBadge.className = 'badge badge-correct';
-    DOM.reviewQStatusBadge.textContent = 'Correct';
-  } else if (isIncorrect) {
-    DOM.reviewQStatusBadge.className = 'badge badge-incorrect';
-    DOM.reviewQStatusBadge.textContent = 'Incorrect';
+  if (isHidden) {
+    DOM.reviewQStatusBadge.classList.add('hidden');
   } else {
-    DOM.reviewQStatusBadge.className = 'badge badge-unattempted';
-    DOM.reviewQStatusBadge.textContent = 'Unattempted';
+    DOM.reviewQStatusBadge.classList.remove('hidden');
+    if (isCorrect) {
+      DOM.reviewQStatusBadge.className = 'badge badge-correct';
+      DOM.reviewQStatusBadge.textContent = 'Correct';
+    } else if (isIncorrect) {
+      DOM.reviewQStatusBadge.className = 'badge badge-incorrect';
+      DOM.reviewQStatusBadge.textContent = 'Incorrect';
+    } else {
+      DOM.reviewQStatusBadge.className = 'badge badge-unattempted';
+      DOM.reviewQStatusBadge.textContent = 'Unattempted';
+    }
   }
 
   DOM.reviewBookmarkIndicator.classList.toggle('hidden', !resp.bookmarked);
@@ -4417,16 +4127,18 @@ function renderActiveReviewCard(item) {
     let rowClass = 'review-opt-row';
     let statusBadge = '';
 
-    if (isThisCorrect) {
-      rowClass += ' correct-answer';
-      if (isUserChosen) {
-        statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key • Your Choice</span>`;
-      } else {
-        statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key</span>`;
+    if (!isHidden) {
+      if (isThisCorrect) {
+        rowClass += ' correct-answer';
+        if (isUserChosen) {
+          statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key • Your Choice</span>`;
+        } else {
+          statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-green);">Correct Key</span>`;
+        }
+      } else if (isUserChosen) {
+        rowClass += ' user-incorrect';
+        statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-red);">Your Choice</span>`;
       }
-    } else if (isUserChosen) {
-      rowClass += ' user-incorrect';
-      statusBadge = `<span class="opt-status-tag" style="color: var(--pastel-red);">Your Choice</span>`;
     }
 
     row.className = rowClass;
@@ -4436,6 +4148,11 @@ function renderActiveReviewCard(item) {
     `;
     DOM.reviewOptionsList.appendChild(row);
   });
+
+  // Explanation Box visibility
+  if (DOM.reviewExplanationBox) {
+    DOM.reviewExplanationBox.classList.toggle('hidden', isHidden);
+  }
 
   DOM.reviewExplanationText.textContent = question.explanation || "No extended clinical commentary available.";
   if (question.reference) {
@@ -4838,87 +4555,6 @@ function formatQuestionPlaintext(q, resp) {
   const refText = q.reference ? `\nReference: ${q.reference}` : '';
   const metaText = `\nStyle: ${q.style || 'N/A'} | Format: ${q.format || 'N/A'} | Difficulty: ${q.difficulty || 'Medium'} | Topic: ${q.topic || 'N/A'}`;
   return `Question: ${q.text}\n\nA. ${q.options[0]}\nB. ${q.options[1]}\nC. ${q.options[2]}\nD. ${q.options[3]}\n\nCandidate Choice: ${chosen} (Confidence: ${conf}, Bookmarked: ${bookmarked})\nCorrect Key: ${correct}${metaText}\n\nExplanation:\n${q.explanation || 'N/A'}${refText}`;
-}
-
-function downloadTestResults() {
-  const scheme = AppState.examData.markingScheme || { correct: 4, incorrect: -1, unattempted: 0 };
-  const payload = {
-    branding: "triage",
-    examType: AppState.examMode,
-    examTitle: AppState.examData.examTitle || 'CBT Mock Simulation',
-    exportedAt: new Date().toISOString(),
-    markingScheme: scheme,
-    summary: {
-      totalQuestions: 0,
-      correct: 0,
-      incorrect: 0,
-      unattempted: 0,
-      totalScore: 0,
-      triageMatrix: {
-        mastered: 0,
-        sillyMistakes: 0,
-        luckyGuesses: 0,
-        knowledgeGaps: 0
-      }
-    },
-    sections: []
-  };
-
-  AppState.examData.sections.forEach(sec => {
-    const secData = {
-      id: sec.id,
-      name: sec.name,
-      questions: []
-    };
-
-    sec.questions.forEach(q => {
-      payload.summary.totalQuestions++;
-      const resp = AppState.responses[q.id] || {};
-      const isAttempted = resp.selectedOption !== null && resp.selectedOption !== undefined;
-      const isCorrect = isAttempted && resp.selectedOption === q.correctAnswerIndex;
-      const quad = getQuestionQuadrant(q, resp);
-
-      if (!isAttempted) payload.summary.unattempted++;
-      else if (isCorrect) payload.summary.correct++;
-      else payload.summary.incorrect++;
-
-      if (quad === 'mastered') payload.summary.triageMatrix.mastered++;
-      else if (quad === 'silly_mistake') payload.summary.triageMatrix.sillyMistakes++;
-      else if (quad === 'lucky_guesses') payload.summary.triageMatrix.luckyGuesses++;
-      else payload.summary.triageMatrix.knowledgeGaps++;
-
-      secData.questions.push({
-        id: q.id,
-        text: q.text,
-        subject: normalizeToArray(q.subject).map(s => normalizeSubject(s)),
-        system: normalizeToArray(q.system).map(s => normalizeSystem(s)),
-        format: canonicalizeFormat(q.format, q.text),
-        difficulty: canonicalizeDifficulty(q.difficulty),
-        topic: q.topic || '',
-        reference: q.reference || '',
-        candidateAnswerIndex: resp.selectedOption,
-        correctAnswerIndex: q.correctAnswerIndex,
-        confidence: resp.confidence,
-        triageQuadrant: quad,
-        timeSpentSeconds: resp.timeSpent || 0,
-        switches: resp.switchCount || 0
-      });
-    });
-
-    payload.sections.push(secData);
-  });
-
-  payload.summary.totalScore = (payload.summary.correct * scheme.correct) +
-    (payload.summary.incorrect * scheme.incorrect) +
-    (payload.summary.unattempted * scheme.unattempted);
-
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `triage_${AppState.examMode}_${Date.now()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 // ==========================================================================
@@ -5738,6 +5374,7 @@ function persistAppState() {
       analyticsSubtab: AppState.analyticsSubtab || 'tab-triage-matrix',
       reviewActiveQuestionId: AppState.reviewActiveQuestionId || null,
       reviewFilters: AppState.reviewFilters || {},
+      reviewHideAnswer: !!AppState.reviewHideAnswer,
       viewingAttemptId: AppState.viewingAttemptId || null,
       historyFilterExam: AppState.historyFilterExam || 'all',
       historySortOrder: AppState.historySortOrder || 'latest'
@@ -5754,10 +5391,6 @@ function persistAppState() {
   }
 }
 
-function checkPersistedSession() {
-  checkPersistedState();
-}
-
 function checkPersistedState() {
   const rawState = localStorage.getItem('triage_app_state');
   const rawExam = localStorage.getItem('triage_exam_session');
@@ -5766,6 +5399,10 @@ function checkPersistedState() {
     try {
       savedState = JSON.parse(rawState);
     } catch (e) {}
+  }
+
+  if (savedState && savedState.reviewHideAnswer !== undefined) {
+    AppState.reviewHideAnswer = Boolean(savedState.reviewHideAnswer);
   }
 
   const hash = (typeof window !== 'undefined' && window.location) ? window.location.hash : '';
@@ -5954,7 +5591,6 @@ function restoreHomeState(savedState) {
     renderSystemChips();
     updateScopeBadges();
     updateAiSizingBreakdown();
-    updateAiConfigSummary();
   }
 
   updateStepHeaderBadges();
