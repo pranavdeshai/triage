@@ -716,8 +716,8 @@
                     </button>
                   </div>
                   <div class="review-status-indicators">
-                    <span id="review-q-status-badge" class="badge">Unattempted</span>
-                    <span id="review-bookmark-indicator" class="badge badge-marked hidden">Bookmarked</span>
+                    <span id="review-q-status-badge" class="badge">UNATTEMPTED</span>
+                    <span id="review-bookmark-indicator" class="badge badge-marked hidden">BOOKMARKED</span>
                     <button
                       type="button"
                       class="btn btn-outline btn-sm"
@@ -874,13 +874,28 @@
 
               <!-- TAB: GENERIC ANALYTICS BREAKDOWN -->
               <div id="tab-analytics-generic" class="analytics-subtab hidden">
-                <div class="tab-header-banner">
-                  <h2 id="generic-tab-title">Category Breakdown</h2>
-                  <p id="generic-tab-desc" class="text-muted">
-                    Click any row to filter questions.
-                  </p>
+                <div class="tab-header-banner generic-analytics-banner">
+                  <div class="generic-banner-text">
+                    <h2 id="generic-tab-title">Category Breakdown</h2>
+                    <p id="generic-tab-desc" class="text-muted">
+                      Click any category to filter review questions.
+                    </p>
+                  </div>
+                  <div class="generic-banner-controls">
+                    <span id="analytics-category-count" class="analytics-count-pill">0 Categories</span>
+                    <div class="analytics-sort-wrapper">
+                      <label for="analytics-sort-select" class="analytics-sort-label">Sort:</label>
+                      <select id="analytics-sort-select" class="select-input select-input-sm">
+                        <option value="default">Default</option>
+                        <option value="lowest_accuracy">Lowest Accuracy</option>
+                        <option value="highest_accuracy">Highest Accuracy</option>
+                        <option value="most_questions">Most Questions</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div class="table-responsive">
+                <div id="analytics-bars-list" class="analytics-bars-list"></div>
+                <div class="table-responsive hidden" id="analytics-table-container">
                   <table class="analytics-data-table" id="analytics-table">
                     <thead></thead>
                     <tbody></tbody>

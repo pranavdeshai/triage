@@ -374,6 +374,7 @@ const AppState = {
   reviewHideAnswer: false,
   reviewMasterTab: 'tab-question-review',
   analyticsSubtab: 'tab-triage-matrix',
+  analyticsSortOrder: 'default', // 'default' | 'lowest_accuracy' | 'highest_accuracy' | 'most_questions'
   historyFilterExam: 'all',
   historySortOrder: 'latest', // 'latest' | 'oldest'
   reviewActiveTab: 'tab-question-review',
@@ -590,6 +591,10 @@ const DOM = {
   // Generic Analytics
   genericTabTitle: document.getElementById('generic-tab-title'),
   genericTabDesc: document.getElementById('generic-tab-desc'),
+  analyticsCategoryCount: document.getElementById('analytics-category-count'),
+  analyticsSortSelect: document.getElementById('analytics-sort-select'),
+  analyticsBarsList: document.getElementById('analytics-bars-list'),
+  analyticsTableContainer: document.getElementById('analytics-table-container'),
   analyticsTable: document.getElementById('analytics-table'),
 
   // Filters & Mini Palette
@@ -1320,6 +1325,14 @@ function attachEventListeners() {
   if (DOM.analyticsSubnavBar) {
     DOM.analyticsSubnavBar.addEventListener('click', handleAnalyticsSubnavClick);
   }
+  if (DOM.analyticsSortSelect) {
+    DOM.analyticsSortSelect.addEventListener('change', (e) => {
+      AppState.analyticsSortOrder = e.target.value;
+      if (AppState.analyticsSubtab && AppState.analyticsSubtab !== 'tab-triage-matrix') {
+        renderGenericAnalyticsTab(AppState.analyticsSubtab);
+      }
+    });
+  }
   DOM.btnReviewPrevQ.addEventListener('click', handleReviewPrevQuestion);
   DOM.btnReviewNextQ.addEventListener('click', handleReviewNextQuestion);
   if (DOM.btnToggleReviewAnswer) {
@@ -2047,6 +2060,131 @@ function cancelAiGeneration() {
   }
 }
 
+// ==========================================================================
+// Medical Concept Similarity & Deduplication Engine
+// ==========================================================================
+
+const MEDICAL_STOP_WORDS = new Set([
+  'a', 'about', 'above', 'after', 'again', 'against', 'all', 'also', 'am', 'an', 'and', 'any', 'are', 'aren',
+  'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'can',
+  'could', 'did', 'do', 'does', 'doing', 'down', 'during', 'each', 'few', 'for', 'from', 'further', 'had',
+  'has', 'have', 'having', 'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i', 'if',
+  'in', 'into', 'is', 'it', 'its', 'itself', 'just', 'me', 'more', 'most', 'my', 'myself', 'no', 'nor', 'not',
+  'now', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'our', 'ours', 'ourselves', 'out', 'over', 'own',
+  'same', 'should', 'so', 'some', 'such', 'than', 'that', 'the', 'their', 'theirs', 'them', 'themselves',
+  'then', 'there', 'these', 'they', 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very',
+  'was', 'wasn', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'with', 'would',
+  'you', 'your', 'yours', 'yourself', 'yourselves',
+  // Common medical MCQ phrasing stop-words
+  'patient', 'presents', 'presented', 'presentation', 'presenting', 'history', 'examination', 'shows', 'shown',
+  'reveals', 'revealed', 'found', 'initial', 'step', 'management', 'treatment', 'investigation', 'diagnosis',
+  'likely', 'associated', 'regarding', 'true', 'false', 'statement', 'statements', 'correct', 'incorrect',
+  'following', 'best', 'next', 'year', 'years', 'old', 'male', 'female', 'complaining', 'complaints', 'known',
+  'case', 'admitted', 'hospital', 'clinic', 'tested', 'test', 'choice', 'appropriate'
+]);
+
+function normalizeMedicalTokens(str) {
+  if (typeof str !== 'string') return new Set();
+  const words = str
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !MEDICAL_STOP_WORDS.has(w));
+  return new Set(words);
+}
+
+function computeTokenJaccard(setA, setB) {
+  if (!setA || !setB || setA.size === 0 || setB.size === 0) return 0;
+  let intersectionCount = 0;
+  for (const item of setA) {
+    if (setB.has(item)) intersectionCount++;
+  }
+  const unionCount = setA.size + setB.size - intersectionCount;
+  return unionCount > 0 ? intersectionCount / unionCount : 0;
+}
+
+function normalizeConceptTopic(topicStr) {
+  if (typeof topicStr !== 'string') return '';
+  return topicStr
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function areQuestionsConceptuallyDuplicate(q1, q2) {
+  if (!q1 || !q2) return false;
+
+  // 1. Topic Collision Check
+  const t1 = normalizeConceptTopic(q1.topic);
+  const t2 = normalizeConceptTopic(q2.topic);
+  if (t1 && t2) {
+    if (t1 === t2) return true;
+    // Substring topic match if meaningful length (e.g. "myocardial infarction" vs "acute myocardial infarction")
+    if ((t1.length >= 5 && t2.includes(t1)) || (t2.length >= 5 && t1.includes(t2))) {
+      return true;
+    }
+    // Token overlap between topics
+    const tTokens1 = normalizeMedicalTokens(t1);
+    const tTokens2 = normalizeMedicalTokens(t2);
+    if (tTokens1.size > 0 && tTokens2.size > 0) {
+      const topicJaccard = computeTokenJaccard(tTokens1, tTokens2);
+      if (topicJaccard >= 0.60) return true;
+    }
+  }
+
+  // 2. Substantive Question Stem Word Overlap
+  const stemTokens1 = normalizeMedicalTokens(q1.text);
+  const stemTokens2 = normalizeMedicalTokens(q2.text);
+  const stemJaccard = computeTokenJaccard(stemTokens1, stemTokens2);
+  if (stemJaccard >= 0.45) return true;
+
+  // 3. Exact 6+ Word Consecutive Phrase Match in Stem
+  if (typeof q1.text === 'string' && typeof q2.text === 'string') {
+    const clean1 = q1.text.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim().split(' ');
+    const clean2 = q2.text.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (clean1.length >= 6) {
+      for (let i = 0; i <= clean1.length - 6; i++) {
+        const subphrase = clean1.slice(i, i + 6).join(' ');
+        // Ignore generic stop-word sequences
+        const substantive = subphrase.split(' ').filter(w => !MEDICAL_STOP_WORDS.has(w));
+        if (substantive.length >= 3 && clean2.includes(subphrase)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  // 4. Identical Correct Option with Shared Subject/System and Moderate Stem Overlap
+  if (Array.isArray(q1.options) && Array.isArray(q2.options)) {
+    const optIdx1 = Number.isInteger(q1.correctAnswerIndex) ? q1.correctAnswerIndex : 0;
+    const optIdx2 = Number.isInteger(q2.correctAnswerIndex) ? q2.correctAnswerIndex : 0;
+    const ans1 = (q1.options[optIdx1] || '').toLowerCase().replace(/[^\w\s]/g, ' ').trim();
+    const ans2 = (q2.options[optIdx2] || '').toLowerCase().replace(/[^\w\s]/g, ' ').trim();
+
+    if (ans1 && ans2 && ans1 === ans2 && ans1.length >= 4) {
+      const subs1 = normalizeToArray(q1.subject).map(s => String(s).toLowerCase());
+      const subs2 = normalizeToArray(q2.subject).map(s => String(s).toLowerCase());
+      const sharedSub = subs1.some(s => subs2.includes(s));
+      if (sharedSub && stemJaccard >= 0.20) return true;
+    }
+  }
+
+  return false;
+}
+
+function isDuplicateQuestion(candidateQ, existingQuestionsList) {
+  if (!candidateQ || !Array.isArray(existingQuestionsList) || existingQuestionsList.length === 0) {
+    return false;
+  }
+  for (const existing of existingQuestionsList) {
+    if (areQuestionsConceptuallyDuplicate(candidateQ, existing)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function buildAiTestPrompt(options = {}) {
   const count = options.count || AppState.aiQuestionCount || 10;
   const examMode = options.examMode || AppState.examMode || 'neetpg';
@@ -2058,6 +2196,9 @@ function buildAiTestPrompt(options = {}) {
   const customTopic = options.customTopic !== undefined ? options.customTopic : (DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : '');
   const selectedSubjects = options.selectedSubjects || AppState.aiSelectedSubjects || [];
   const selectedSystems = options.selectedSystems || AppState.aiSelectedSystems || [];
+  const coveredTopics = Array.isArray(options.coveredTopics)
+    ? options.coveredTopics.filter(t => typeof t === 'string' && t.trim().length > 0)
+    : [];
 
   let scopeInstruction = "";
   if (scope === 'grand') {
@@ -2129,6 +2270,18 @@ function buildAiTestPrompt(options = {}) {
 
   const batchStart = options.batchStartIndex || 1;
 
+  let deduplicationInstruction = `STRICT CONCEPT UNIQUENESS & DEDUPLICATION MANDATE:
+- Every single question MUST test a completely unique clinical disease, pathological mechanism, diagnostic criteria, anatomical structure, or pharmacological agent.
+- ZERO DUPLICATE QUESTIONS OR CONCEPTS: Do NOT generate multiple questions testing the same disease entity, topic, or clinical scenario under different wording, presentation styles, or formats.
+- Ensure broad, balanced coverage across diverse subtopics without repeating any single core concept or condition.`;
+
+  if (coveredTopics.length > 0) {
+    deduplicationInstruction += `\n- PREVIOUSLY COVERED TOPICS & CONCEPTS IN THIS EXAM (STRICTLY FORBIDDEN TO REPEAT):
+The following ${coveredTopics.length} clinical topics/concepts have ALREADY been tested in prior batches of this exam. You MUST NOT generate questions on any of these topics, conditions, or closely related concepts:
+${coveredTopics.slice(-50).map(t => `  * ${t}`).join('\n')}
+Generate ${count} completely FRESH, UNTESTED medical topics distinct from the above list.`;
+  }
+
   const prompt = `You are an expert medical educator and test item writer for Indian medical postgraduate entrance examinations (NEET-PG / INI-CET).
 
 Generate exactly ${count} high-quality, authentic multiple-choice questions matching these specifications:
@@ -2153,6 +2306,7 @@ MANDATORY TAXONOMY & FORMAT REQUIREMENTS:
 9. 'correctAnswerIndex' must be 0, 1, 2, or 3 (0-indexed).
 10. All options in all formats MUST be invariant under random option shuffling. NEVER use positional distractor references like 'All of the above', 'None of the above', or 'Both A and B'.
 11. Provide a thorough, educational 'explanation' detailing why the correct option is right and why the other three distractors are incorrect, plus key high-yield takeaways.
+12. ${deduplicationInstruction}
 
 OUTPUT FORMAT:
 Return a strictly valid JSON object with a single "questions" array containing the ${count} question objects.
@@ -2235,18 +2389,9 @@ async function generateTestWithGemini() {
   const totalQ = parseInt(AppState.aiQuestionCount, 10) || 10;
   const model = 'gemini-3.5-flash';
   AppState.aiModel = model;
-  AppState.aiTemperature = 0.15;
+  AppState.aiTemperature = 0.40;
 
-  // Divide into batches of at most 25 questions
-  const batches = [];
-  let remaining = totalQ;
-  let currentStart = 1;
-  while (remaining > 0) {
-    const bCount = Math.min(remaining, 25);
-    batches.push({ count: bCount, startIndex: currentStart });
-    currentStart += bCount;
-    remaining -= bCount;
-  }
+  const estimatedBatches = Math.max(1, Math.ceil(totalQ / 25));
 
   // Setup UI for generation
   DOM.btnAiGenerate.disabled = true;
@@ -2255,69 +2400,94 @@ async function generateTestWithGemini() {
   DOM.aiProgressFill.style.width = '0%';
   DOM.aiProgressPercentage.textContent = '0%';
   DOM.aiProgressStatus.textContent = `Starting generation of ${totalQ} questions...`;
-  DOM.aiProgressBatch.textContent = `Batch 1 of ${batches.length}`;
+  DOM.aiProgressBatch.textContent = `Batch 1 of ${estimatedBatches}`;
 
   AppState.aiAbortController = new AbortController();
   const allQuestions = [];
+  const acceptedTopics = new Set();
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  let batchNum = 0;
+  let consecutiveErrors = 0;
+  const maxAttempts = Math.max(estimatedBatches * 3, 10);
 
   try {
-    for (let bIdx = 0; bIdx < batches.length; bIdx++) {
+    while (allQuestions.length < totalQ && batchNum < maxAttempts) {
       if (AppState.aiAbortController.signal.aborted) {
         throw new Error("Generation cancelled by user.");
       }
 
-      const batch = batches[bIdx];
-      const batchNum = bIdx + 1;
-      const pct = Math.round((bIdx / batches.length) * 100);
+      batchNum++;
+      const needed = totalQ - allQuestions.length;
+      // Request up to 25. When nearing the target (needed < 25), add a buffer (+2) so that
+      // even if the model produces off-by-one or a duplicate is filtered, the exact count is met!
+      const requestCount = needed >= 25 ? 25 : Math.min(needed + 2, 25);
+
+      const displayBatchNum = Math.min(batchNum, estimatedBatches);
+      const pct = Math.min(Math.round((allQuestions.length / totalQ) * 100), 99);
 
       DOM.aiProgressFill.style.width = `${pct}%`;
       DOM.aiProgressPercentage.textContent = `${pct}%`;
-      DOM.aiProgressStatus.textContent = `Generating questions ${batch.startIndex}–${batch.startIndex + batch.count - 1} of ${totalQ}...`;
-      DOM.aiProgressBatch.textContent = `Batch ${batchNum} of ${batches.length}`;
+      DOM.aiProgressStatus.textContent = `Generating questions (${allQuestions.length}/${totalQ} collected, requesting ${requestCount})...`;
+      DOM.aiProgressBatch.textContent = `Batch ${displayBatchNum} of ${estimatedBatches}`;
 
       const prompt = buildAiTestPrompt({
-        count: batch.count,
-        batchStartIndex: batch.startIndex,
+        count: requestCount,
+        batchStartIndex: allQuestions.length + 1,
         examMode: AppState.examMode,
         scope: AppState.aiScope,
         difficulty: AppState.aiDifficulty,
         style: AppState.aiStyle,
         selectedSubjects: AppState.aiSelectedSubjects,
         selectedSystems: AppState.aiSelectedSystems,
-        customTopic: DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : ''
+        customTopic: DOM.inputAiCustomTopic ? DOM.inputAiCustomTopic.value.trim() : '',
+        coveredTopics: Array.from(acceptedTopics)
       });
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      let resData = null;
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AppState.aiAbortController.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.40
+            }
+          })
+        });
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: AppState.aiAbortController.signal,
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.15
-          }
-        })
-      });
+        if (!res.ok) {
+          let errDetail = `API error ${res.status}`;
+          try {
+            const errJson = await res.json();
+            if (errJson && errJson.error && errJson.error.message) {
+              errDetail = errJson.error.message;
+            }
+          } catch (_) {}
+          throw new Error(errDetail);
+        }
 
-      if (!res.ok) {
-        let errDetail = `API error ${res.status}`;
-        try {
-          const errJson = await res.json();
-          if (errJson && errJson.error && errJson.error.message) {
-            errDetail = errJson.error.message;
-          }
-        } catch (_) {}
-
-        throw new Error(`Gemini API Error: ${errDetail}`);
+        resData = await res.json();
+        consecutiveErrors = 0;
+      } catch (fetchErr) {
+        if (AppState.aiAbortController.signal.aborted) {
+          throw new Error("Generation cancelled by user.");
+        }
+        consecutiveErrors++;
+        console.warn(`[Triage Generation] Batch ${batchNum} fetch error:`, fetchErr.message);
+        if (consecutiveErrors >= 3) {
+          throw new Error(`Gemini API Error: ${fetchErr.message}`);
+        }
+        await new Promise(r => setTimeout(r, 1000));
+        continue;
       }
 
-      const resData = await res.json();
       const rawText = resData?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!rawText) {
-        throw new Error(`No content received from Gemini for batch ${batchNum}.`);
+        continue;
       }
 
       let parsedBatch = null;
@@ -2328,20 +2498,47 @@ async function generateTestWithGemini() {
         }
         parsedBatch = JSON.parse(cleanText);
       } catch (e) {
-        throw new Error(`Failed to parse batch ${batchNum} JSON: ${e.message}`);
+        console.warn(`[Triage Generation] Failed to parse batch ${batchNum} JSON:`, e.message);
+        continue;
       }
 
-      const qList = Array.isArray(parsedBatch) ? parsedBatch : (parsedBatch.questions || []);
-      if (!Array.isArray(qList) || qList.length === 0) {
-        throw new Error(`Batch ${batchNum} did not return any questions.`);
+      // Handle top-level array, { questions: [...] }, or single question object
+      let qList = [];
+      if (Array.isArray(parsedBatch)) {
+        qList = parsedBatch;
+      } else if (Array.isArray(parsedBatch.questions)) {
+        qList = parsedBatch.questions;
+      } else if (parsedBatch && parsedBatch.text && Array.isArray(parsedBatch.options)) {
+        qList = [parsedBatch];
       }
 
-      allQuestions.push(...qList);
+      DOM.aiProgressStatus.textContent = `Validating concept uniqueness for batch ${batchNum}...`;
+      for (const q of qList) {
+        if (allQuestions.length >= totalQ) break;
+        if (!q || !q.text || !Array.isArray(q.options)) continue;
+        if (isDuplicateQuestion(q, allQuestions)) {
+          console.warn(`[Triage Deduplication] Skipped duplicate/repeated concept in batch ${batchNum}: "${q.topic || q.text.slice(0, 50)}"`);
+          continue;
+        }
+        allQuestions.push(q);
+        if (q.topic && typeof q.topic === 'string' && q.topic.trim().length > 0) {
+          acceptedTopics.add(q.topic.trim());
+        }
+      }
+    }
+
+    if (allQuestions.length < totalQ) {
+      throw new Error(`Could only generate ${allQuestions.length} of ${totalQ} requested questions. Please check your API quota or topic constraints and try again.`);
+    }
+
+    // Exact count guarantee: clamp to exact totalQ
+    if (allQuestions.length > totalQ) {
+      allQuestions.splice(totalQ);
     }
 
     DOM.aiProgressFill.style.width = '100%';
     DOM.aiProgressPercentage.textContent = '100%';
-    DOM.aiProgressStatus.textContent = `All ${allQuestions.length} questions received. Assembling test sections...`;
+    DOM.aiProgressStatus.textContent = `All ${allQuestions.length} unique questions verified. Assembling test sections...`;
 
     allQuestions.forEach((q, idx) => {
       q.id = `q${idx + 1}`;
@@ -4098,14 +4295,16 @@ function renderActiveReviewCard(item) {
   // Badges
   DOM.reviewQStatusBadge.classList.remove('hidden');
   if (isCorrect) {
+    const conf = resp && resp.confidence === 'not_sure' ? 'NOT SURE' : 'SURE';
     DOM.reviewQStatusBadge.className = 'badge badge-correct';
-    DOM.reviewQStatusBadge.textContent = 'Correct';
+    DOM.reviewQStatusBadge.textContent = `CORRECT • ${conf}`;
   } else if (isIncorrect) {
+    const conf = resp && resp.confidence === 'not_sure' ? 'NOT SURE' : 'SURE';
     DOM.reviewQStatusBadge.className = 'badge badge-incorrect';
-    DOM.reviewQStatusBadge.textContent = 'Incorrect';
+    DOM.reviewQStatusBadge.textContent = `INCORRECT • ${conf}`;
   } else {
     DOM.reviewQStatusBadge.className = 'badge badge-unattempted';
-    DOM.reviewQStatusBadge.textContent = 'Unattempted';
+    DOM.reviewQStatusBadge.textContent = 'UNATTEMPTED';
   }
 
   DOM.reviewBookmarkIndicator.classList.toggle('hidden', !resp.bookmarked);
@@ -4367,6 +4566,9 @@ function renderGenericAnalyticsTab(tabId) {
   DOM.genericTabTitle.textContent = title;
   DOM.genericTabDesc.textContent = desc;
 
+  if (DOM.analyticsBarsList) DOM.analyticsBarsList.classList.remove('hidden');
+  if (DOM.analyticsTableContainer) DOM.analyticsTableContainer.classList.add('hidden');
+
   const groups = {};
   AppState.examData.sections.forEach(sec => {
     sec.questions.forEach(q => {
@@ -4399,52 +4601,133 @@ function renderGenericAnalyticsTab(tabId) {
     });
   });
 
-  const tableHead = DOM.analyticsTable.querySelector('thead');
-  const tableBody = DOM.analyticsTable.querySelector('tbody');
-  tableHead.innerHTML = `
-    <tr>
-      <th>Category</th>
-      <th>Total</th>
-      <th>Correct</th>
-      <th>Incorrect</th>
-      <th>Unattempted</th>
-      <th>Accuracy</th>
-      <th style="text-align: center; width: 60px;">Ratio</th>
-    </tr>
-  `;
-  tableBody.innerHTML = '';
+  const unitMap = {
+    section: 'Sections',
+    subject: 'Subjects',
+    system: 'Systems',
+    difficulty: 'Levels',
+    format: 'Formats',
+    style: 'Styles'
+  };
+  const unit = unitMap[groupKey] || 'Categories';
+  const totalCategories = Object.keys(groups).length;
+  if (DOM.analyticsCategoryCount) {
+    DOM.analyticsCategoryCount.textContent = `${totalCategories} ${unit}`;
+  }
+
+  const sortOrder = AppState.analyticsSortOrder || 'default';
+  if (DOM.analyticsSortSelect) {
+    DOM.analyticsSortSelect.value = sortOrder;
+  }
+
+  if (!DOM.analyticsBarsList) return;
+  DOM.analyticsBarsList.innerHTML = '';
 
   Object.entries(groups)
     .sort((a, b) => {
-      if (groupKey === 'subject' || groupKey === 'system') {
-        return a[0].localeCompare(b[0]);
+      const [nameA, dataA] = a;
+      const [nameB, dataB] = b;
+      const attA = dataA.correct + dataA.incorrect;
+      const accA = attA > 0 ? (dataA.correct / attA) * 100 : 0;
+      const attB = dataB.correct + dataB.incorrect;
+      const accB = attB > 0 ? (dataB.correct / attB) * 100 : 0;
+
+      if (sortOrder === 'lowest_accuracy') {
+        if (accA !== accB) return accA - accB;
+        return dataB.total - dataA.total;
       }
-      return b[1].total - a[1].total;
+      if (sortOrder === 'highest_accuracy') {
+        if (accA !== accB) return accB - accA;
+        return dataB.total - dataA.total;
+      }
+      if (sortOrder === 'most_questions') {
+        if (dataB.total !== dataA.total) return dataB.total - dataA.total;
+        return accA - accB;
+      }
+      // 'default'
+      if (groupKey === 'subject' || groupKey === 'system') {
+        return nameA.localeCompare(nameB);
+      }
+      return dataB.total - dataA.total;
     })
     .forEach(([name, data]) => {
-      const accuracy = (data.correct + data.incorrect) > 0
-        ? ((data.correct / (data.correct + data.incorrect)) * 100).toFixed(1) + '%'
-        : '0.0%';
+      const attempted = data.correct + data.incorrect;
+      const accNum = attempted > 0 ? (data.correct / attempted) * 100 : 0;
+      const accuracy = attempted > 0 ? accNum.toFixed(1) + '%' : '0.0%';
 
-      const row = document.createElement('tr');
-      row.className = 'clickable-row';
-      row.innerHTML = `
-        <td class="bold-text">${name}</td>
-        <td>${data.total}</td>
-        <td style="color: var(--pastel-green); font-weight: 700;">${data.correct}</td>
-        <td style="color: var(--pastel-red); font-weight: 700;">${data.incorrect}</td>
-        <td style="color: var(--text-muted);">${data.unattempted}</td>
-        <td><strong>${accuracy}</strong></td>
-        <td class="donut-cell">${createMiniDonutSvg(data.correct, data.incorrect, data.unattempted, data.total)}</td>
+      let accClass = '';
+      if (attempted > 0) {
+        if (accNum >= 70) accClass = 'high-accuracy';
+        else if (accNum < 50) accClass = 'low-accuracy';
+        else accClass = 'mid-accuracy';
+      }
+
+      const total = data.total || 1;
+      const cPct = (data.correct / total) * 100;
+      const iPct = (data.incorrect / total) * 100;
+      const uPct = (data.unattempted / total) * 100;
+
+      const item = document.createElement('div');
+      item.className = 'analytics-bar-item';
+      item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
+      item.title = `Click to filter review questions for ${name}`;
+
+      item.innerHTML = `
+        <div class="analytics-bar-header">
+          <span class="analytics-bar-title" title="${name}">${name}</span>
+          <span class="analytics-bar-accuracy-pill ${accClass}">${accuracy} • ${data.total} Qs</span>
+        </div>
+        <div class="analytics-bar-track" title="Total: ${data.total} | Correct: ${data.correct} | Incorrect: ${data.incorrect} | Unattempted: ${data.unattempted}">
+          ${cPct > 0 ? `<div class="analytics-bar-seg seg-correct" style="width: ${cPct.toFixed(2)}%" title="Correct: ${data.correct} (${cPct.toFixed(1)}%)"></div>` : ''}
+          ${iPct > 0 ? `<div class="analytics-bar-seg seg-incorrect" style="width: ${iPct.toFixed(2)}%" title="Incorrect: ${data.incorrect} (${iPct.toFixed(1)}%)"></div>` : ''}
+          ${uPct > 0 ? `<div class="analytics-bar-seg seg-unattempted" style="width: ${uPct.toFixed(2)}%" title="Unattempted: ${data.unattempted} (${uPct.toFixed(1)}%)"></div>` : ''}
+        </div>
+        <div class="analytics-bar-stats">
+          <span class="bar-stat-item stat-total">
+            <span class="stat-label">Total:</span>
+            <span class="stat-val">${data.total}</span>
+          </span>
+          <span class="bar-stat-item stat-correct">
+            <span class="stat-dot">●</span>
+            <span class="stat-label">Correct:</span>
+            <span class="stat-val">${data.correct}</span>
+          </span>
+          <span class="bar-stat-item stat-incorrect">
+            <span class="stat-dot">●</span>
+            <span class="stat-label">Incorrect:</span>
+            <span class="stat-val">${data.incorrect}</span>
+          </span>
+          <span class="bar-stat-item stat-unattempted">
+            <span class="stat-dot">●</span>
+            <span class="stat-label">Unattempted:</span>
+            <span class="stat-val">${data.unattempted}</span>
+          </span>
+          <span class="bar-stat-item stat-accuracy">
+            <span class="stat-label">Accuracy:</span>
+            <span class="stat-val">${accuracy}</span>
+          </span>
+        </div>
       `;
-      row.onclick = () => filterReviewByTag(data.key, name);
-      tableBody.appendChild(row);
+
+      item.onclick = () => filterReviewByTag(data.key, name);
+      item.onkeydown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          filterReviewByTag(data.key, name);
+        }
+      };
+
+      DOM.analyticsBarsList.appendChild(item);
     });
 }
 
 function renderTimeAnalysisTab() {
   DOM.genericTabTitle.textContent = "Time & Pacing Analysis";
   DOM.genericTabDesc.textContent = "Section pacing and question resolution velocity.";
+
+  if (DOM.analyticsBarsList) DOM.analyticsBarsList.classList.add('hidden');
+  if (DOM.analyticsTableContainer) DOM.analyticsTableContainer.classList.remove('hidden');
 
   const tableHead = DOM.analyticsTable.querySelector('thead');
   const tableBody = DOM.analyticsTable.querySelector('tbody');
@@ -4480,6 +4763,9 @@ function renderTimeAnalysisTab() {
 function renderBehaviorAnalysisTab() {
   DOM.genericTabTitle.textContent = "Behavioral & Option Switch Analysis";
   DOM.genericTabDesc.textContent = "Tracking answer alterations and clinical second-guessing.";
+
+  if (DOM.analyticsBarsList) DOM.analyticsBarsList.classList.add('hidden');
+  if (DOM.analyticsTableContainer) DOM.analyticsTableContainer.classList.remove('hidden');
 
   let totalSwitches = 0, switchCorrect = 0, switchIncorrect = 0;
 
